@@ -2,7 +2,7 @@
 /**
  * Plugin Name: wecom – מאגר ידע פנימי
  * Description: פלטפורמת הידע לנציגי שירות ותמיכה של wecom. מוסיף תבנית עמוד "wecom – מאגר ידע" ושומר את הספרייה, סל המיחזור והיסטוריית הגרסאות במסד הנתונים של WordPress.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Text Domain: wecom-kb
@@ -10,7 +10,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WECOM_KB_VERSION', '1.0.0' );
+define( 'WECOM_KB_VERSION', '1.1.0' );
 define( 'WECOM_KB_FILE', __FILE__ );
 define( 'WECOM_KB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WECOM_KB_URL', plugin_dir_url( __FILE__ ) );

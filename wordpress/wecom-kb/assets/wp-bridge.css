@@ -46,7 +46,7 @@
 .wkb-readonly #snav-history,
 .wkb-readonly #mob-new,
 .wkb-readonly .tc-del,
-.wkb-readonly #article-content button,
+.wkb-readonly .nb-edit-only,
 .wkb-readonly [onclick^="nbEditDoc"],
 .wkb-readonly [onclick^="nbConfirmDeleteDoc"],
 .wkb-readonly [data-action="new"] {

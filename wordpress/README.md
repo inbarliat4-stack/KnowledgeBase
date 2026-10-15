@@ -31,17 +31,17 @@ wordpress/
 
 - **The front-end is the prototype, unchanged.** `build.cjs` copies the CSS, JS and HTML out of `index.html`. `wp-bridge.js` loads right after `app.js` and replaces only the persistence functions (`nbLoadLibrary`, `nbSaveLibrary`, `nbGetHistory`, `nbRestoreHistorySnapshot`). Everything else runs as in the prototype.
 - **Design changes stay in `index.html`.** Edit and preview it as before, then run `node wordpress/build.cjs` and deploy the plugin. Never edit the generated files by hand.
-- **Data model.** The app works with one JSON document, `{topics, docs, trash, seedVersion}`. Each save inserts a row in `wp_wecom_kb_versions`. The newest row is the live library, and older rows are the version history (the newest 200 are kept; change this with the `wecom_kb_history_max` filter). History rows now record who made each change.
+- **Data model.** The app works with one JSON document, `{topics, docs, worlds, trash, seedVersion}`. It follows the spec's hierarchy: content world → topic → knowledge items. Each item (`docs[id]`) has a type `kind` (M/R/O/E/S/T/I), `worlds`, `topicIds`, `tags`, `desc` and `owner`. R/S items keep their content in `stages`; the other types use a type-specific `body`, described at the top of the "TYPE-SPECIFIC CONTENT" section in `index.html`. Each save inserts a row in `wp_wecom_kb_versions`. The newest row is the live library, and older rows are the version history (the newest 200 are kept; change this with the `wecom_kb_history_max` filter). History rows now record who made each change.
 - **Initial page load** inlines the library into the page (`window.WECOM_KB`), so the app's synchronous start-up code didn't need to change.
 - **Concurrent edits.** Every save sends the version it was based on. If someone else saved in between, the server returns `409`, and the editor chooses between keeping their version (the other one stays in history) and reloading the latest.
-- **Images.** The prototype embeds pasted images as base64. The server moves them into the Media Library (deduplicated by hash) and stores URLs instead.
+- **Images.** The prototype embeds pasted images as base64. The server moves them into the Media Library (deduplicated by hash) and stores URLs instead. This includes images inside the rich text of information (I) items.
 - **Drafts.** The in-progress "פריט ידע חדש" draft stays in `localStorage`, because it is personal to each editor's browser.
 
 ## Permissions
 
 | Who | Capability (filter) | Gets |
 |---|---|---|
-| Agents | `read` (`wecom_kb_view_cap`) | read-only app: no create, edit, delete, trash or history |
+| Agents | `read` (`wecom_kb_view_cap`) | read-only app: no create, edit, delete, trash, history or world management. Search, guided diagnosis and copy buttons work. Elements with class `nb-edit-only` are hidden. |
 | Content editors | `edit_posts` (`wecom_kb_edit_cap`) | full app |
 | Admins | `manage_options` | plus Tools → import/export |
 

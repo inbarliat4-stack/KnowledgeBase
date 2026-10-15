@@ -1256,7 +1256,7 @@ function nbRenderLibFilters(){
     +[{id:'all',name:'הכל'}].concat(WORLDS).map(function(w){
       return '<button class="filter-btn world-btn'+(nbCurrentWorld===w.id?' active':'')+'" onclick="filterWorld(\''+nbEsc(w.id)+'\')">'+nbEsc(w.name)+'</button>';
     }).join('')
-    +'<button class="filter-btn world-btn ghost" onclick="nbManageWorlds()" title="ניהול עולמות תוכן">⚙ ניהול</button>';
+    +'<button class="filter-btn world-btn ghost nb-edit-only" onclick="nbManageWorlds()" title="ניהול עולמות תוכן">⚙ ניהול</button>';
   var kel=document.getElementById('lib-kinds');
   if(kel) kel.innerHTML='<span class="filter-label">סוג פריט</span>'
     +'<button class="filter-btn world-btn'+(nbCurrentKind==='all'?' active':'')+'" onclick="filterKind(\'all\')">הכל</button>'
@@ -1547,7 +1547,7 @@ function nbOpenTopic(id){
     +(items.length
       ?'<div class="item-grid">'+items.map(nbItemCardHTML).join('')+'</div>'
       :'<div class="empty-state">📝 עדיין אין פריטי ידע בנושא זה.</div>')
-    +'<button class="nb-add-item" onclick="nbNewItemForTopic('+t.id+')">+ הוסף פריט ידע לנושא זה</button>';
+    +'<button class="nb-add-item nb-edit-only" onclick="nbNewItemForTopic('+t.id+')">+ הוסף פריט ידע לנושא זה</button>';
   showView('topic');
 }
 
@@ -1747,6 +1747,7 @@ function showDynamicDoc(docId){
 
   // Add "עדכן מסמך" button
   var btnRow=document.createElement('div');
+  btnRow.className='nb-edit-only'; // hidden for read-only users in the WordPress version
   btnRow.style.cssText='display:flex;gap:10px;margin:16px 0 0;max-width:680px';
 
   var updateBtn=document.createElement('button');

@@ -20,7 +20,7 @@ class Wecom_KB_Sanitizer {
 	const MAX_DEPTH = 32;
 
 	/** Keys whose values are identifiers, never displayed text. */
-	const ID_KEYS = array( 'id', 'dynId', 'docId', 'trashId', 'cat', 'pri', '_isViewDoc' );
+	const ID_KEYS = array( 'id', 'dynId', 'docId', 'trashId', 'cat', 'pri', '_isViewDoc', 'kind', 'worlds' );
 
 	/** Keys whose values are image URLs. */
 	const IMAGE_KEYS = array( 'img', 'images' );
@@ -49,6 +49,25 @@ class Wecom_KB_Sanitizer {
 			'trash'       => isset( $state->trash ) && is_array( $state->trash ) ? $this->walk( $state->trash, 'trash', 0 ) : array(),
 			'seedVersion' => isset( $state->seedVersion ) ? (int) $state->seedVersion : 0,
 		);
+		// Content worlds (departments): [{id, name}].
+		if ( isset( $state->worlds ) && is_array( $state->worlds ) ) {
+			$clean->worlds = array_values(
+				array_filter(
+					array_map(
+						function ( $w ) {
+							if ( ! is_object( $w ) || ! isset( $w->id, $w->name ) ) {
+								return null;
+							}
+							return (object) array(
+								'id'   => preg_replace( '/[^A-Za-z0-9_\-]/', '', (string) $w->id ),
+								'name' => sanitize_text_field( (string) $w->name ),
+							);
+						},
+						$state->worlds
+					)
+				)
+			);
+		}
 
 		return $clean;
 	}
@@ -99,6 +118,20 @@ class Wecom_KB_Sanitizer {
 
 		if ( in_array( $key, self::IMAGE_KEYS, true ) ) {
 			return esc_url_raw( $value );
+		}
+
+		// Rich text of information documents: move pasted/inserted images to
+		// the Media Library first, because wp_kses_post drops data: URLs.
+		if ( 'html' === $key ) {
+			$value = preg_replace_callback(
+				'#(<img\b[^>]*\bsrc\s*=\s*["\'])(data:image/[^"\']+)(["\'])#i',
+				function ( $m ) {
+					$url = $this->data_image( $m[2] );
+					return $url && 0 !== strpos( $url, 'data:' ) ? $m[1] . esc_url( $url ) . $m[3] : $m[1] . $m[3];
+				},
+				$value
+			);
+			return wp_kses_post( $value );
 		}
 
 		// Plain text is left byte-for-byte (the editor matches step texts

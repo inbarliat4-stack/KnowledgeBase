@@ -98,9 +98,12 @@
   var initialSaveLabel = null;
 
   // Mirrors the original nbLoadLibrary, but reads the server copy instead of
-  // localStorage. Same seed-version rules: when the built-in content in
-  // index.html has been updated (NB_SEED_VERSION bumped), the new built-in
-  // documents win and topics people created themselves are kept.
+  // localStorage. Same rules: the saved library is the source of truth (so
+  // deleted built-in documents stay deleted); when the built-in content in
+  // index.html has been updated (NB_SEED_VERSION bumped), built-in documents
+  // that still exist get the new content, new built-in documents are added,
+  // and topics people created themselves are kept. The app converts older
+  // data to the worlds → topics → items model right after loading.
   window.nbLoadLibrary = function () {
     var saved = CFG.library;
     if (!saved) {
@@ -112,12 +115,25 @@
 
     var seedMatches = saved.seedVersion === NB_SEED_VERSION;
 
-    var savedDocs = saved.docs || {};
-    window.dynamicDocs = window.dynamicDocs || {};
-    Object.keys(savedDocs).forEach(function (k) {
-      var isSeedDoc = k.indexOf('pdf_') === 0 || k === 'view-churn-doc';
-      if (seedMatches || !isSeedDoc) window.dynamicDocs[k] = savedDocs[k];
-    });
+    if (saved.docs) {
+      var savedDocs = saved.docs;
+      var seedDocs = window.dynamicDocs || {};
+      if (!seedMatches) {
+        var trashed = {};
+        (saved.trash || []).forEach(function (e) { if (e.docId) trashed[e.docId] = true; });
+        Object.keys(seedDocs).forEach(function (k) {
+          if (savedDocs[k]) {
+            savedDocs[k].stages = seedDocs[k].stages;
+            savedDocs[k].topic = seedDocs[k].topic;
+          } else if (!trashed[k]) {
+            savedDocs[k] = seedDocs[k];
+          }
+        });
+      }
+      window.dynamicDocs = savedDocs;
+    }
+
+    if (Array.isArray(saved.worlds) && saved.worlds.length) WORLDS = saved.worlds;
 
     if (Array.isArray(saved.topics) && saved.topics.length) {
       if (seedMatches) {
@@ -136,8 +152,10 @@
 
   // Registered after app.js's own DOMContentLoaded handler, so this runs
   // once the built-in documents have been linked to their topics.
+  // Skipped when the app already saved at start-up (it does so after
+  // converting older data), so first visits don't create two versions.
   document.addEventListener('DOMContentLoaded', function () {
-    if (initialSaveLabel && CFG.canEdit) window.nbSaveLibrary(initialSaveLabel);
+    if (initialSaveLabel && CFG.canEdit && !pending) window.nbSaveLibrary(initialSaveLabel);
   });
 
   // ── Save ────────────────────────────────────────────────────────────────
@@ -149,6 +167,7 @@
     return JSON.parse(JSON.stringify({
       topics: TOPICS || [],
       docs: window.dynamicDocs || {},
+      worlds: WORLDS || [],
       trash: nbTrash || [],
       seedVersion: NB_SEED_VERSION
     }));
@@ -157,12 +176,18 @@
   // The server moves base64 images into the Media Library; swap them for
   // their URLs in memory too, so they aren't re-uploaded on every save.
   function replaceImages(map) {
-    if (!map || !Object.keys(map).length) return;
+    var keys = map ? Object.keys(map) : [];
+    if (!keys.length) return;
     (function walk(o) {
       if (!o || typeof o !== 'object') return;
       Object.keys(o).forEach(function (k) {
         var v = o[k];
         if (typeof v === 'string' && map[v]) o[k] = map[v];
+        // Images embedded inside rich text (information documents).
+        else if (typeof v === 'string' && v.indexOf('data:image') !== -1) {
+          keys.forEach(function (d) { if (v.indexOf(d) !== -1) v = v.split(d).join(map[d]); });
+          o[k] = v;
+        }
         else if (v && typeof v === 'object') walk(v);
       });
     })({ a: TOPICS, b: window.dynamicDocs, c: nbTrash });
@@ -264,8 +289,11 @@
           var lib = res.library || {};
           TOPICS = lib.topics || [];
           window.dynamicDocs = lib.docs || {};
+          if (Array.isArray(lib.worlds) && lib.worlds.length) WORLDS = lib.worlds;
+          nbNormalizeModel(); // versions saved before the restructure use the old format
+          nbRenderSidebar();
+          nbRenderLibFilters();
           renderLibrary('all');
-          renderHomeWaves();
           showView('library');
           nbSaveLibrary('שוחזר לגרסה מתאריך ' + dateStr);
           nbUpdateTrashBadge();
@@ -282,7 +310,8 @@
   if (!CFG.canEdit) {
     var noop = function () {};
     ['nbEditDoc', 'nbConfirmDeleteDoc', 'nbConfirmDeleteTopic', 'nbOpenTrash', 'nbOpenHistory',
-      'nbGoNew', 'nbCreateDoc', 'nbRestoreFromTrash', 'nbPermanentlyDeleteFromTrash'].forEach(function (fn) {
+      'nbGoNew', 'nbCreateDoc', 'nbRestoreFromTrash', 'nbPermanentlyDeleteFromTrash',
+      'nbNewItemForTopic', 'nbManageWorlds', 'nbAddWorld', 'nbRenameWorld'].forEach(function (fn) {
       window[fn] = noop;
     });
 
