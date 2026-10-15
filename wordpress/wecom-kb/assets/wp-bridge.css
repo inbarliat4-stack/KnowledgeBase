@@ -1,0 +1,54 @@
+/* WordPress-only additions on top of app.css (which is generated from index.html). */
+
+/* ── Save status toast ─────────────────────────────────────────────────── */
+.wkb-status {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: #fff;
+  font: 500 13px/1.45 Rubik, sans-serif;
+  direction: rtl;
+  box-shadow: 0 6px 24px rgba(31, 46, 59, .25);
+}
+.wkb-status[hidden] { display: none; }
+.wkb-status.wkb-saved { background: var(--ok); }
+.wkb-status.wkb-error { background: #fff; color: var(--navy); border: 2px solid var(--red); }
+.wkb-status .wkb-msg { flex: 1 1 200px; }
+.wkb-status button {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--navy);
+  font: 600 12.5px Rubik, sans-serif;
+  cursor: pointer;
+}
+.wkb-status button.wkb-primary { background: var(--red); border-color: var(--red); color: #fff; }
+
+@media (max-width: 768px) {
+  /* Sit above the mobile bottom nav. */
+  .wkb-status { left: 16px; right: 16px; bottom: 76px; max-width: none; }
+}
+
+/* ── Read-only mode (users without edit rights) ────────────────────────── */
+.wkb-readonly #snav-new,
+.wkb-readonly #snav-trash,
+.wkb-readonly #snav-history,
+.wkb-readonly #mob-new,
+.wkb-readonly .tc-del,
+.wkb-readonly #article-content button,
+.wkb-readonly [onclick^="nbEditDoc"],
+.wkb-readonly [onclick^="nbConfirmDeleteDoc"],
+.wkb-readonly [data-action="new"] {
+  display: none !important;
+}

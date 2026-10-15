@@ -1,0 +1,67 @@
+# wecom knowledge base: WordPress plugin
+
+This folder turns the GitHub Pages prototype (`../index.html`) into a WordPress plugin. The data that each browser used to keep in `localStorage` (library, trash, version history) moves into the WordPress database, so everyone shares one library.
+
+```
+wordpress/
+├── build.cjs                 ← regenerates the front-end assets from ../index.html
+└── wecom-kb/                 ← the plugin (zip this folder to install)
+    ├── wecom-kb.php          ← bootstrap, page template, access control
+    ├── includes/
+    │   ├── class-store.php      ← DB table wp_wecom_kb_versions (live library + history)
+    │   ├── class-sanitizer.php  ← server-side cleaning + base64 image → Media Library
+    │   ├── class-rest.php       ← REST API
+    │   └── class-admin.php      ← Tools → "wecom מאגר ידע" (status, export, import)
+    ├── templates/
+    │   ├── app.php           ← full-screen page template
+    │   └── app-body.html     ← GENERATED: <body> of index.html
+    └── assets/
+        ├── app.css / app.js  ← GENERATED: <style> / <script> of index.html
+        └── wp-bridge.js/.css ← hand-written WordPress layer (persistence, read-only mode)
+```
+
+## Install
+
+1. Zip the `wecom-kb` folder and upload it in **Plugins → Add New → Upload**, or copy it to `wp-content/plugins/`.
+2. Activate it. Activation creates the DB table and a page at **/kb/** that uses the template *"wecom – מאגר ידע (מסך מלא)"*. Any other page can use that template too. The page has no public content: the template sends logged-out visitors to the login screen, and the page is left out of the sitemap.
+3. Open the page while logged in as an editor. On first load, the built-in content from `index.html` is saved as version #1.
+4. To move content people created on the GitHub Pages version, go to **Tools → wecom מאגר ידע → ייבוא**. The page has a console one-liner that exports a browser's `localStorage` to a JSON file. Do this from the browser where the content was created, because that data never left that browser.
+
+## How it works
+
+- **The front-end is the prototype, unchanged.** `build.cjs` copies the CSS, JS and HTML out of `index.html`. `wp-bridge.js` loads right after `app.js` and replaces only the persistence functions (`nbLoadLibrary`, `nbSaveLibrary`, `nbGetHistory`, `nbRestoreHistorySnapshot`). Everything else runs as in the prototype.
+- **Design changes stay in `index.html`.** Edit and preview it as before, then run `node wordpress/build.cjs` and deploy the plugin. Never edit the generated files by hand.
+- **Data model.** The app works with one JSON document, `{topics, docs, trash, seedVersion}`. Each save inserts a row in `wp_wecom_kb_versions`. The newest row is the live library, and older rows are the version history (the newest 200 are kept; change this with the `wecom_kb_history_max` filter). History rows now record who made each change.
+- **Initial page load** inlines the library into the page (`window.WECOM_KB`), so the app's synchronous start-up code didn't need to change.
+- **Concurrent edits.** Every save sends the version it was based on. If someone else saved in between, the server returns `409`, and the editor chooses between keeping their version (the other one stays in history) and reloading the latest.
+- **Images.** The prototype embeds pasted images as base64. The server moves them into the Media Library (deduplicated by hash) and stores URLs instead.
+- **Drafts.** The in-progress "פריט ידע חדש" draft stays in `localStorage`, because it is personal to each editor's browser.
+
+## Permissions
+
+| Who | Capability (filter) | Gets |
+|---|---|---|
+| Agents | `read` (`wecom_kb_view_cap`) | read-only app: no create, edit, delete, trash or history |
+| Content editors | `edit_posts` (`wecom_kb_edit_cap`) | full app |
+| Admins | `manage_options` | plus Tools → import/export |
+
+Logged-out visitors are redirected to the login page. Read-only is enforced on the server (REST permission checks); hiding the buttons is only cosmetic.
+
+## REST API (`/wp-json/wecom-kb/v1/`)
+
+| Method | Route | Capability | |
+|---|---|---|---|
+| GET | `library` | view | `{version, library, history}` |
+| POST | `library` | edit | body `{state, label, base_version, force}` → `{version, history_item, images}`; `409` on conflict |
+| GET | `history` | view | `[{id, ts, label, author}]` |
+| GET | `history/{id}` | edit | `{id, library}` |
+
+## Security notes
+
+The prototype renders titles and step texts with `innerHTML`. That was harmless when each person only saw their own browser's data. Now one editor's input runs in everyone else's browser, including admins'. The sanitizer therefore limits ID fields to `[A-Za-z0-9_-]` and runs any text containing markup through `wp_kses_post`. Still, only give `wecom_kb_edit_cap` to trusted staff. A longer-term fix is to move the app's rendering from string concatenation to `textContent`.
+
+## Things to know
+
+- The template deliberately skips `wp_head()`/`wp_footer()`, so theme CSS doesn't clash with the app's design. As a result, plugins that inject scripts through those hooks (for example analytics) won't run on this page. Add them to `templates/app.php` if needed.
+- Large pasted images make a large save request. If saves fail with images, raise `post_max_size` / `upload_max_filesize` in PHP. Per-image limit: `wecom_kb_max_image_bytes` (8 MB).
+- When the built-in seed content in `index.html` changes, bump `NB_SEED_VERSION` as before. On the next editor visit, the new built-in docs replace the stored ones, and topics created by users are kept. This is the same rule the prototype used.
