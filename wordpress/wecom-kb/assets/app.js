@@ -765,6 +765,19 @@ function nbRenderTracking(){
           +'<td class="tt-gap">'+nbEsc(r.t.gap||'')+'</td><td>'+nbEsc(r.d.owner||'')+'</td>'
           +'<td class="tt-muted">'+nbFmtDate(r.d.updatedAt)+'</td></tr>';
       }).join('')+'</tbody></table></div>'
+      // Phones: the same rows as cards, every field on its own line.
+      +'<div class="track-cards">'+rows.map(function(r){
+        var prioCls=r.t.priority==='גבוהה'?'h':r.t.priority==='בינונית'?'m':'l';
+        return '<div class="track-card" onclick="showDynamicDoc(\''+nbEsc(r.d.id)+'\')">'
+          +'<div class="tc2-top">'+nbKindBadge(r.d.kind,true)+(r.code?'<span class="tt-code">'+nbEsc(r.code)+'</span>':'')
+          +'<span class="tc2-title">'+nbEsc(r.title)+'</span></div>'
+          +'<div class="tc2-badges">'+nbStatusBadge(r.d,true)
+          +(r.t.state?'<span class="tc2-chip">'+nbEsc(r.t.state)+'</span>':'')
+          +(r.t.priority?'<span class="prio prio-'+prioCls+'">עדיפות '+nbEsc(r.t.priority)+'</span>':'')+'</div>'
+          +(r.t.gap?'<div class="tc2-gap"><span>פער / פעולה נדרשת</span>'+nbEsc(r.t.gap)+'</div>':'')
+          +'<div class="tc2-meta">'+[r.topics.length?'נושא: '+nbEsc(r.topics.join(', ')):'',r.d.owner?'אחראי: '+nbEsc(r.d.owner):'',r.d.updatedAt?'עודכן: '+nbFmtDate(r.d.updatedAt):''].filter(Boolean).join(' · ')+'</div>'
+          +'</div>';
+      }).join('')+'</div>'
       :'<div class="empty-state">אין פריטים בסינון הזה</div>');
 }
 // Download the tracking table as a CSV that Excel opens (UTF-8 with BOM, Hebrew safe).

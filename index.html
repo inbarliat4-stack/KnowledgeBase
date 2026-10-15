@@ -1046,7 +1046,21 @@ select.s1-input{height:40px;cursor:pointer}
 .tt-gap{color:var(--warn);min-width:220px;line-height:1.5}
 .prio{font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;white-space:nowrap}
 .prio-h{background:#FDECEA;color:#B42318}.prio-m{background:#FEF3E2;color:#B45309}.prio-l{background:#F1F3F6;color:#475569}
-@media(max-width:640px){.tp-grid{grid-template-columns:1fr 1fr}.s1-row{grid-template-columns:1fr}}
+.track-cards{display:none}
+.track-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-sm);cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.track-card:active{background:var(--bg)}
+.tc2-top{display:flex;align-items:flex-start;gap:8px}
+.tc2-top .kind-badge{margin-top:2px;flex-shrink:0}
+.tc2-top .tt-code{flex-shrink:0;font-size:14px;line-height:1.5}
+.tc2-title{font-size:15px;font-weight:700;color:var(--navy);line-height:1.45;min-width:0;word-break:break-word}
+.tc2-badges{display:flex;gap:6px;flex-wrap:wrap}
+.tc2-chip{font-size:11px;font-weight:600;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 9px}
+.tc2-gap{font-size:13px;line-height:1.55;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-b);border-radius:8px;padding:7px 10px;word-break:break-word}
+.tc2-gap span{display:block;font-size:11px;font-weight:700;margin-bottom:2px}
+.tc2-meta{font-size:12px;color:var(--muted);line-height:1.5;word-break:break-word}
+@media(max-width:640px){.tp-grid{grid-template-columns:1fr 1fr}.s1-row{grid-template-columns:1fr}
+  .track-table-wrap{display:none}
+  .track-cards{display:flex;flex-direction:column;gap:10px}}
 
 /* ── Links between items, and gaps still to be filled ── */
 .kb-link{color:#1D45B4;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
@@ -1856,6 +1870,19 @@ function nbRenderTracking(){
           +'<td class="tt-gap">'+nbEsc(r.t.gap||'')+'</td><td>'+nbEsc(r.d.owner||'')+'</td>'
           +'<td class="tt-muted">'+nbFmtDate(r.d.updatedAt)+'</td></tr>';
       }).join('')+'</tbody></table></div>'
+      // Phones: the same rows as cards, every field on its own line.
+      +'<div class="track-cards">'+rows.map(function(r){
+        var prioCls=r.t.priority==='גבוהה'?'h':r.t.priority==='בינונית'?'m':'l';
+        return '<div class="track-card" onclick="showDynamicDoc(\''+nbEsc(r.d.id)+'\')">'
+          +'<div class="tc2-top">'+nbKindBadge(r.d.kind,true)+(r.code?'<span class="tt-code">'+nbEsc(r.code)+'</span>':'')
+          +'<span class="tc2-title">'+nbEsc(r.title)+'</span></div>'
+          +'<div class="tc2-badges">'+nbStatusBadge(r.d,true)
+          +(r.t.state?'<span class="tc2-chip">'+nbEsc(r.t.state)+'</span>':'')
+          +(r.t.priority?'<span class="prio prio-'+prioCls+'">עדיפות '+nbEsc(r.t.priority)+'</span>':'')+'</div>'
+          +(r.t.gap?'<div class="tc2-gap"><span>פער / פעולה נדרשת</span>'+nbEsc(r.t.gap)+'</div>':'')
+          +'<div class="tc2-meta">'+[r.topics.length?'נושא: '+nbEsc(r.topics.join(', ')):'',r.d.owner?'אחראי: '+nbEsc(r.d.owner):'',r.d.updatedAt?'עודכן: '+nbFmtDate(r.d.updatedAt):''].filter(Boolean).join(' · ')+'</div>'
+          +'</div>';
+      }).join('')+'</div>'
       :'<div class="empty-state">אין פריטים בסינון הזה</div>');
 }
 // Download the tracking table as a CSV that Excel opens (UTF-8 with BOM, Hebrew safe).
