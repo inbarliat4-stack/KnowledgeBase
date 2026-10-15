@@ -895,6 +895,101 @@ select.s1-input{height:40px;cursor:pointer}
 .nb-row-meta{font-size:11.5px;color:var(--muted);white-space:nowrap}
 .nb-btn{height:36px;padding:0 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--rs);font-family:Rubik,sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 @media(max-width:640px){.topic-head{padding:16px}.topic-title{font-size:19px}.item-grid{grid-template-columns:1fr}}
+
+/* ── TYPE-SPECIFIC CONTENT: agent views ── */
+.kv-img{display:block;max-width:100%;max-height:260px;width:auto;margin-top:8px;border-radius:8px;border:1px solid var(--border);cursor:zoom-in}
+/* O – numbered procedure */
+.o-group{margin-bottom:18px}
+.o-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.o-steps{list-style:none;counter-reset:ostep;display:flex;flex-direction:column;gap:6px}
+.o-steps>li{counter-increment:ostep;position:relative;padding:10px 46px 10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.6}
+.o-steps>li::before{content:counter(ostep);position:absolute;right:12px;top:9px;width:24px;height:24px;border-radius:50%;background:#2E5CE0;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+/* I – rich text */
+.kv-rich{font-size:14.5px;line-height:1.75;color:var(--text)}
+.kv-rich h2{font-size:19px;font-weight:800;color:var(--navy);margin:18px 0 8px}
+.kv-rich h3{font-size:16px;font-weight:700;color:var(--navy);margin:16px 0 6px}
+.kv-rich h4{font-size:14.5px;font-weight:700;color:var(--navy-m);margin:12px 0 4px}
+.kv-rich>*:first-child{margin-top:0}
+.kv-rich p{margin:0 0 10px}
+.kv-rich ul,.kv-rich ol{margin:0 0 12px;padding-right:22px}
+.kv-rich li{margin-bottom:4px}
+.kv-rich a{color:#1D45B4;text-decoration:underline}
+.kv-rich blockquote{border-right:3px solid var(--border-strong);padding-right:12px;color:var(--text-2);margin:0 0 12px}
+.kv-rich table{border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:13.5px;display:block;overflow-x:auto}
+.kv-rich th,.kv-rich td{border:1px solid var(--border-strong);padding:7px 10px;text-align:right;vertical-align:top;min-width:80px}
+.kv-rich th{background:var(--navy-l);font-weight:700;color:var(--navy)}
+.kv-rich img{max-width:100%;height:auto;border-radius:8px;margin:6px 0}
+/* T – call scripts */
+.t-block{margin-bottom:18px}
+.t-sit{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.t-line{display:flex;align-items:flex-start;gap:10px;background:#F4FBF7;border:1px solid #CDEBDA;border-right:4px solid #0E7A4F;border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.t-line.anchor{background:#0E7A4F;border-color:#0E7A4F}
+.t-line.anchor .t-text{color:#fff;font-weight:600}
+.t-text{flex:1;font-size:14px;line-height:1.65;color:var(--text)}
+.t-copy{flex-shrink:0;font-family:Rubik,sans-serif;font-size:11.5px;font-weight:600;color:#0E7A4F;background:#fff;border:1px solid #CDEBDA;border-radius:6px;padding:3px 9px;cursor:pointer}
+/* E – escalation */
+.kv-e{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.e-sec{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.e-sec ul{padding-right:18px;font-size:13.5px;line-height:1.65}
+.e-sec li{margin-bottom:4px}
+.e-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.e-icon{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#fff;background:#B45309;flex-shrink:0}
+.e-to{border-color:#F3C78B;background:#FEF7EC}
+.e-extra{grid-column:1/-1}
+.e-missing{font-size:13px;color:var(--warn);background:var(--warn-bg);border:1px dashed var(--warn-b);border-radius:8px;padding:8px 10px}
+@media(max-width:640px){.kv-e{grid-template-columns:1fr}}
+/* M – guided diagnosis */
+.m-intro{background:#F1ECFC;border:1px solid #DCCFF7;border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.65;color:#3B2475;margin-bottom:16px;display:flex;flex-direction:column;gap:4px}
+.m-trail{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.m-trail-item{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:right;font-family:Rubik,sans-serif;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--text-2)}
+.m-trail-item:hover{border-color:#6D3FD1}
+.m-trail-q{font-size:12.5px;min-width:0}
+.m-trail-a{font-size:12.5px;font-weight:700;color:#6D3FD1;background:#F1ECFC;border-radius:20px;padding:2px 10px;white-space:nowrap}
+.m-note{background:var(--warn-bg);border:1px solid var(--warn-b);border-right:4px solid var(--warn);border-radius:10px;padding:10px 14px;font-size:13.5px;line-height:1.6;color:var(--text);margin-bottom:12px}
+.m-q{background:var(--white);border:1.5px solid #6D3FD1;border-radius:14px;padding:18px;box-shadow:var(--shadow-md)}
+.m-q-num{font-size:11.5px;font-weight:700;color:#6D3FD1;letter-spacing:.3px;margin-bottom:4px}
+.m-q-text{font-size:17px;font-weight:700;color:var(--navy);line-height:1.4}
+.m-q-hint{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+.m-answers{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.m-answer{font-family:Rubik,sans-serif;font-size:14px;font-weight:600;color:#6D3FD1;background:#F1ECFC;border:1.5px solid #DCCFF7;border-radius:10px;padding:10px 18px;cursor:pointer;transition:all var(--t)}
+.m-answer:hover{background:#6D3FD1;border-color:#6D3FD1;color:#fff}
+.m-result{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:16px}
+.m-result-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.m-go{display:flex;align-items:center;gap:10px;width:100%;text-align:right;font-family:Rubik,sans-serif;font-size:15px;font-weight:700;color:var(--navy);background:var(--bg);border:1.5px solid var(--border-strong);border-radius:10px;padding:12px 14px;cursor:pointer}
+.m-go:hover{border-color:var(--navy)}
+.m-go-arrow{margin-right:auto;font-size:18px;color:var(--red)}
+.m-restart{margin-top:12px;font-family:Rubik,sans-serif;font-size:12.5px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline}
+.m-outro{margin-top:18px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+.m-outro-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.m-outro ul{padding-right:18px;font-size:13.5px;line-height:1.65}
+
+/* ── TYPE-SPECIFIC CONTENT: editors ── */
+.kind-editor{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:4px;box-shadow:var(--shadow-sm)}
+.ke-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.ke-title{font-size:15px;font-weight:700;color:var(--navy)}
+.ke-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ke-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.ke-row{display:flex;gap:8px;align-items:flex-start}
+.ke-row>.s1-input{flex:1;min-width:0}
+.ke-ta{resize:vertical;min-height:38px;line-height:1.55}
+.ke-del{flex-shrink:0;width:30px;height:36px;border:1px solid var(--border);border-radius:var(--rs);background:var(--white);color:var(--muted);cursor:pointer;font-size:12px}
+.ke-del:hover{color:var(--red);border-color:var(--red-m)}
+.ke-add{align-self:flex-start;font-family:Rubik,sans-serif;font-size:12.5px;font-weight:600;color:var(--navy);background:var(--white);border:1.5px dashed var(--border-strong);border-radius:var(--rs);padding:6px 14px;cursor:pointer;margin-bottom:10px}
+.ke-add:hover{border-color:var(--navy)}
+.ke-card .ke-add{margin-bottom:0}
+.ke-steps{padding-right:20px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.ke-thumb{max-height:70px;border-radius:6px;margin-top:4px}
+.ke-q{border-color:#DCCFF7}
+.ke-qnum{flex-shrink:0;font-size:12px;font-weight:700;color:#6D3FD1;background:#F1ECFC;border-radius:20px;padding:8px 10px;white-space:nowrap}
+.ke-answers{display:flex;flex-direction:column;gap:8px;padding-right:12px;border-right:2px solid #DCCFF7}
+.ke-answer{display:flex;flex-direction:column;gap:6px}
+.ke-go{max-width:46%;height:36px;font-size:12.5px}
+.rich-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px;background:var(--bg);border:1.5px solid var(--border);border-bottom:none;border-radius:var(--rs) var(--rs) 0 0}
+.rich-toolbar button{font-family:Rubik,sans-serif;font-size:12.5px;color:var(--text-2);background:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer}
+.rich-toolbar button:hover{border-color:var(--navy);color:var(--navy)}
+.rich-edit{min-height:220px;border:1.5px solid var(--border);border-radius:0 0 var(--rs) var(--rs);padding:12px 14px;background:var(--white);outline:none}
+.rich-edit:focus{border-color:var(--navy-m)}
+@media(max-width:640px){.ke-row{flex-wrap:wrap}.ke-go{max-width:none;width:100%}}
 </style>
 <script>
 var TOPICS=[
@@ -1249,7 +1344,7 @@ function nbItemCardHTML(d){
 }
 
 function nbNewItemForTopic(topicId){
-  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};});
+  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};}); nbState._bodies={};
   nbCustomStages=[];
   nbStageOrder=[];
   window.nbEditingDocId=null;
@@ -1415,6 +1510,7 @@ function showDynamicDoc(docId){
       +'<div style="padding-right:52px;margin-bottom:16px">'+items+stageImgHtml+'</div>';
   }).join('');
 
+  var kindHtml=nbKindBodyHTML(doc);
   var html=nbSiblingStripHTML(doc)
     +'<div class="article-box">'
     +'<div class="article-head">'
@@ -1424,10 +1520,11 @@ function showDynamicDoc(docId){
     +nbItemFieldsHTML(doc)
     +'</div>'
     +'<div class="article-body">'
-    +(doc.stages.length?stagesHtml:'<div class="info-box">לא נבחרו שלבים לפריט הידע זה.</div>')
+    +(kindHtml!=null?kindHtml:(doc.stages.length?stagesHtml:'<div class="info-box">לא נבחרו שלבים לפריט הידע זה.</div>'))
     +'</div></div>';
 
   document.getElementById('article-content').innerHTML=html;
+  if(doc.kind==='M'&&kindHtml!=null) nbMStart();
 
   // Add "עדכן מסמך" button
   var btnRow=document.createElement('div');
@@ -1827,13 +1924,16 @@ function nbEditDocImpl(docId){
   if(!doc) return;
 
   // Reset form state
-  NB_STAGES.forEach(function(s){ nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}}; });
+  NB_STAGES.forEach(function(s){ nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}}; }); nbState._bodies={};
   nbCustomStages=[];
   nbStageOrder=['s1'];
 
   // Restore s1 data
   nbState['s1'].s1data={topic:doc.topic,desc:doc.desc||'',kind:doc.kind,worlds:(doc.worlds||[]).slice(),
     tags:(doc.tags||[]).join(', '),owner:doc.owner||'',topicId:doc.topicIds&&doc.topicIds.length?String(doc.topicIds[0]):'',cat:doc.cat};
+  // Typed items: load their content (or a conversion of their old steps) into the editor.
+  nbState._bodies={};
+  if(!nbIsStageKind(doc.kind)) nbState._bodies[doc.kind]=nbBodyForEditor(doc);
   nbState['s1'].applied=true;
 
   // Restore stage selections (rebuilding any custom, user-created stages
@@ -1908,7 +2008,7 @@ function nbExport(){
 }
 
 function nbInit(){
-  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};});
+  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};}); nbState._bodies={};
   nbCustomStages=[];
   nbStageOrder=[];
   nbRender();
@@ -2157,7 +2257,7 @@ function nbRenderAddStageForm(){
 }
 
 var nbState={};
-NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};});
+NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};}); nbState._bodies={};
 
 function nbRender(){
   var el=document.getElementById('nb-stages');
@@ -2165,6 +2265,14 @@ function nbRender(){
   var order=nbGetStageOrder();
   var allStages=nbGetAllStages();
   var orderedStages=order.map(function(id){return allStages.filter(function(s){return s.id===id;})[0];}).filter(Boolean);
+  // R and S use the step builder; every other type gets its own editor.
+  if(!nbIsStageKind(nbCurKind())){
+    var s1def=allStages.filter(function(s){return s.id==='s1';})[0];
+    el.innerHTML=nbRenderStage(s1def)+'<div id="nb-kind-editor" class="kind-editor">'+nbKindEditorHTML(nbCurKind())+'</div>';
+    nbUpdateSummary();
+    nbSaveDraft();
+    return;
+  }
   el.innerHTML=orderedStages.map(nbRenderStage).join('')+nbRenderAddStageForm();
   // Update summary
   nbUpdateSummary();
@@ -2338,6 +2446,8 @@ function nbSelR(el){
   var inp=el.querySelector('input[type=radio]');
   if(inp) inp.checked=true;
   nbSaveDraft();
+  // Changing the type swaps the content editor below.
+  if(field==='kind') nbRender();
 }
 
 function nbPickOpt(sid,idx){
@@ -2448,6 +2558,8 @@ function nbUpdateSummary(){
   var allStages=nbGetAllStages();
   var order=nbGetStageOrder();
   var orderedStages=order.map(function(id){return allStages.filter(function(s){return s.id===id;})[0];}).filter(Boolean);
+  var sk=nbCurKind(), typed=!nbIsStageKind(sk);
+  if(typed) orderedStages=orderedStages.filter(function(s){return s.id==='s1';});
   var html=orderedStages.filter(function(s){
     var st=nbState[s.id];
     return st.applied || (s.id==='s1'&&st.s1data&&st.s1data.topic) || (st.picked&&st.picked.length>0) || (st.custom&&st.custom.length>0);
@@ -2476,6 +2588,7 @@ function nbUpdateSummary(){
         return '<div style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;margin-bottom:5px">'          +'<div style="display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--text)">'          +'<span style="color:var(--red);flex-shrink:0;font-size:10px;margin-top:3px">›</span>'          +'<span>'+txt+'</span></div>'          +(img?'<img src="'+img+'" onclick="event.stopPropagation();nbOpenLightbox(this.src)" style="max-height:160px;width:auto;max-width:100%;border-radius:6px;border:1px solid var(--border);margin-top:6px;display:block;cursor:zoom-in">':'')          +'</div>';
       }).join('')      +'</div>';
   }).join('');
+  if(typed&&html) html+=nbBodySummaryHTML(sk);
   var sc=document.getElementById('nb-sum-content');
   if(sc) sc.innerHTML=html;
   if(box) box.style.display=html?'':'none';
@@ -2488,6 +2601,23 @@ function nbCreateDoc(){
     console.error('nbCreateDoc failed:', e);
     alert('אירעה שגיאה בשמירה: '+e.message+'\n\nהשינויים לא נשמרו. נסה שוב, ואם זה חוזר — רענן את הדף (ייתכן שנטענת גרסה ישנה מהמטמון של הדפדפן).');
   }
+}
+
+// Puts the typed editor's content on the item (O/I/T/E/M), or keeps the
+// steps (R/S). Returns false when a typed item has no content yet.
+function nbApplyBodyToDoc(doc,stages){
+  var k=doc.kind;
+  if(nbIsStageKind(k)){ doc.stages=stages; delete doc.body; return true; }
+  var b=nbCleanBody(k,nbBody(k));
+  if(!nbBodyHasContent(k,b)){
+    alert('יש להזין תוכן ל'+NB_KINDS[k].full+' לפני השמירה.');
+    var ed=document.getElementById('nb-kind-editor');
+    if(ed) ed.scrollIntoView({behavior:'smooth'});
+    return false;
+  }
+  doc.body=b;
+  doc.stages=[];
+  return true;
 }
 
 function nbCreateDocImpl(){
@@ -2522,8 +2652,12 @@ function nbCreateDocImpl(){
       if(items.length) stages.push({num:nbContentNum(sid),id:def.id,title:def.title,items:items,images:stageImgs2});
     });
     var edited=window.dynamicDocs[docId];
+    // Check the content before changing anything, so a refused save leaves the item intact.
+    var probe={kind:NB_KINDS[s1.kind]?s1.kind:'R'};
+    if(!nbApplyBodyToDoc(probe,stages)){ window.nbEditingDocId=docId; return; }
     nbApplyS1Fields(edited,s1);
-    edited.stages=stages;
+    edited.stages=probe.stages;
+    if(probe.body) edited.body=probe.body; else delete edited.body;
     // The form edits the item's main topic; links to other topics are kept.
     var mainTopic=nbResolveTopic(s1);
     if(mainTopic!=null){
@@ -2536,7 +2670,7 @@ function nbCreateDocImpl(){
     nbSaveLibrary('עודכן: '+topic);
     showDynamicDoc(docId);
     nbShowSuccessModal(topic+' — עודכן!');
-    NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};});
+    NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};}); nbState._bodies={};
     nbCustomStages=[];
     nbStageOrder=[];
     nbRender();
@@ -2583,6 +2717,7 @@ function nbCreateDocImpl(){
   window.dynamicDocs=window.dynamicDocs||{};
   var newDoc={id:docId,cat:cat,docType:docType,stages:stages,createdAt:Date.now()};
   nbApplyS1Fields(newDoc,s1);
+  if(!nbApplyBodyToDoc(newDoc,stages)) return;
   window.dynamicDocs[docId]=newDoc;
   window.nbLinkToTopicId=null;
   var topicId=nbResolveTopic(s1);
@@ -2591,7 +2726,7 @@ function nbCreateDocImpl(){
   showDynamicDoc(docId);
   nbShowSuccessModal(topic);
 
-  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};});
+  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};}); nbState._bodies={};
   nbCustomStages=[];
   nbStageOrder=[];
   nbRender();
@@ -2602,7 +2737,7 @@ function nbCreateDocImpl(){
 
 // Initialize nbState immediately
 var nbState={};
-NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};});
+NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}};}); nbState._bodies={};
 
 
 // ── PDF KNOWLEDGE ITEMS ─────────────────────────────────────────────────
@@ -2663,6 +2798,476 @@ window.dynamicDocs['pdf_019'] = {"id": "pdf_019", "topic": "תפעול STK וש�
 window.dynamicDocs['pdf_020'] = {"id": "pdf_020", "topic": "בחירת רשת ידנית בחו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מטרת המסמך ולפני שמתחילים", "items": [{"text": "לחבר את המכשיר ידנית לרשת סלולרית זמינה כאשר הוא אינו מתביית אוטומטית, או כאשר נדרש לעבור לרשת מארחת אחרת", "img": null}, {"text": "ודא: שירותי נדידה פעילים בקו, נדידת נתונים פעילה במכשיר, המכשיר באזור עם קליטה, וקיימת רשימת מפעילים מאושרים למדינה", "img": null}]}, {"num": "2", "title": "אייפון וסמסונג", "items": [{"text": "אייפון: הגדרות ← סלולרי ← בחירת רשת ← כבה \"אוטומטי\" ← המתן לרשימת רשתות ← בחר מפעיל מרשימת המפעילים המאושרים בחו\"ל", "img": null}, {"text": "סמסונג: הגדרות ← חיבורים ← רשתות תקשורת סלולרית ← מפעילי רשת ← כבה \"בחר באופן אוטומטי\" ← בחר מפעיל מהרשימה המאושרת", "img": null}, {"text": "בשני המקרים: לאחר רישום תקין החזר את בחירת הרשת למצב אוטומטי ובדוק את השירות; אם הרישום נכשל — נסה מפעיל מאושר נוסף", "img": null}]}, {"num": "3", "title": "שיאומי / וואווי / וואן פלוס / גוגל פיקסל / אופו / רילמי", "items": [{"text": "הנתיב עשוי להשתנות בין דגמים — חפש בהגדרות \"רשת סלולרית\", \"מפעיל\" או \"בחירת רשת\"", "img": null}, {"text": "בטל בחירת רשת אוטומטית, המתן להופעת הרשתות הזמינות, ובחר מפעיל מהרשימה המאושרת", "img": null}, {"text": "לאחר רישום תקין החזר את הבחירה למצב אוטומטי", "img": null}]}, {"num": "4", "title": "אם אף מפעיל אינו מאפשר רישום", "items": [{"text": "ודא שנוסו כל המפעילים המאושרים במדינה", "img": null}, {"text": "בצע מצב טיסה והחזרה למצב רגיל; אם עדיין אין רישום — בצע כיבוי והדלקה ונסה שוב בחירת רשת ידנית", "img": null}, {"text": "אם המכשיר עדיין אינו מצליח להירשם — חזור למסלול R-01 (אין קליטה או רישום לרשת בחו\"ל)", "img": null}]}, {"num": "5", "title": "הלקוח נמצא בארצות הברית", "items": [{"text": "אין לבחור מפעיל באופן אקראי — עבור למסמך \"תאימות מכשירים ורשתות בארצות הברית\" ובדוק התאמה בין דגם המכשיר, דור הרשת הנתמך והמפעיל המארח", "img": null}]}, {"num": "6", "title": "סיום הטיפול וחשוב לנציג", "items": [{"text": "המכשיר התחבר והשירות עובד → הטיפול הסתיים", "img": null}, {"text": "המכשיר התחבר אך השירות עדיין לא עובד → חזור למסלול שממנו הופנית (גלישה / שיחות / הודעות)", "img": null}, {"text": "המכשיר אינו מצליח להירשם לאף רשת → חזור למסלול R-01 והמשך לפי שלבי ההסלמה", "img": null}, {"text": "לאחר שהרישום הושלם בהצלחה יש להחזיר את המכשיר לבחירת רשת אוטומטית, אלא אם קיימת הנחיה מקצועית אחרת במסלול הספציפי", "img": null}]}]};
 
 window.dynamicDocs['pdf_021'] = {"id": "pdf_021", "topic": "העברה למומחה בתקלת חו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מתי מעבירים למומחה", "items": [{"text": "העבר למומחה רק לאחר שבוצעו כל הבדיקות הרלוונטיות למסלול התקלה והשירות עדיין אינו עובד", "img": null}, {"text": "אין להעביר למומחה לפני השלמת שלבי האבחון והתפעול הרלוונטיים — העברה למומחה אינה שלב אבחון", "img": null}]}, {"num": "2", "title": "לפני ההעברה ודא", "items": [{"text": "שירותי הנדידה פעילים במערכת", "img": null}, {"text": "החבילה מתאימה למדינה ובתוקף (אם נדרשת חבילה לשירות)", "img": null}, {"text": "המכשיר רשום לרשת זרה", "img": null}, {"text": "בוצעו בדיקות המכשיר הרלוונטיות ובחירת רשת ידנית אם המסלול דרש זאת", "img": null}, {"text": "בוצע רענון מכשיר לאחר שינוי במערכת, ואם נדרש — ריענון SIM במערכת באמצעות הכפתור החדש בלבד", "img": null}]}, {"num": "3", "title": "מה מתעדים לפני ההעברה", "items": [{"text": "המדינה שבה נמצא הלקוח, וסוג התקלה", "img": null}, {"text": "האם המכשיר רשום לרשת, ושם הרשת שאליה הוא מחובר", "img": null}, {"text": "דגם המכשיר, הבדיקות שכבר בוצעו ופעולות שבוצעו במערכת", "img": null}, {"text": "רשתות שנוסו ידנית ותוצאת כל פעולה", "img": null}, {"text": "המטרה: שהמומחה לא יחזור עם הלקוח על כל התהליך מההתחלה", "img": null}]}, {"num": "4", "title": "מקרים שמחייבים המשך טיפול מקצועי", "items": [{"text": "אין רישום לרשת — הלקוח אינו מצליח להירשם לאף רשת מאושרת לאחר השלמת מסלול R-01", "img": null}, {"text": "אין גלישה — המכשיר רשום לרשת וכל שלבי R-02 בוצעו, אך עדיין אין גלישה", "img": null}, {"text": "תקלה בשיחות — בוצעו הבדיקות במסלול R-04 והשיחות עדיין אינן פועלות", "img": null}, {"text": "תקלה בהודעות — בוצעו הבדיקות במסלול R-05 וההודעות עדיין אינן נשלחות/מתקבלות", "img": null}]}, {"num": "5", "title": "⚠ מה קורה לאחר ההעברה — חסר מידע להשלמה", "items": [{"text": "לאיזה תור / גורם מועברת הפנייה", "img": null}, {"text": "אילו שדות חובה יש למלא", "img": null}, {"text": "זמן הטיפול הצפוי", "img": null}, {"text": "מי אחראי לחזור ללקוח", "img": null}]}, {"num": "6", "title": "כלל מנחה לנציג", "items": [{"text": "העברה למומחה אינה שלב אבחון — לפני ההעברה ודא שהמסלול הרלוונטי הושלם ושכל המידע שכבר נאסף מתועד", "img": null}]}]};
+
+// ── TYPE-SPECIFIC CONTENT (spec §3–5, §8) ───────────────────────────────
+// R and S items keep the step builder (doc.stages). The other types store
+// their own content shape in doc.body:
+//   O  {groups:[{title, steps:[{text,img}]}]}            numbered procedure, optional groups (e.g. per device)
+//   I  {html}                                            rich text: headings, lists, tables, links, images
+//   T  {scripts:[{situation, lines:[text]}]}             situation → suggested wording
+//   E  {when:[], to:[], conditions:[], document:[], extra:[{title, lines:[]}]}
+//   M  {intro:[], questions:[{q, hint, answers:[{text, note, go}]}], outro:[]}
+//      go = 'q:<index>' (next question) | 'item:<id>' (open a knowledge item) | '' (end)
+// Items written before these editors existed (and the built-in documents)
+// have only stages; they are converted on display, and saved in the new
+// shape the next time an editor saves them.
+
+function nbIsStageKind(k){ return k==='R'||k==='S'||!NB_KINDS[k]; }
+function nbLines(s){ return String(s||'').split('\n').map(function(x){return x.trim();}).filter(Boolean); }
+function nbPlain(s){ return String(s==null?'':s).replace(/<[^>]*>/g,''); }
+
+// The diagnosis for the built-in "אבחון מרכזי לתקלות ושירות בחו"ל", written
+// from its text as clickable questions; R-01…R-05 link to their items.
+var NB_SEED_BODIES={
+  pdf_011:{
+    intro:['לזהות במהירות מה התקלה של הלקוח ולהפנות למסלול הטיפול הנכון',
+      'המסמך מלווה את הנציג בתחילת השיחה בלבד — ברגע שסוג התקלה ברור, עוברים למסלול הטיפול המתאים',
+      'אין לבצע דיבאג של גלישה, שיחות או הודעות לפני שווידאת שהקו פתוח לשירות בחו"ל ושהמכשיר רשום לרשת זרה'],
+    questions:[
+      {q:'האם הקו פתוח לשירותי חו"ל / נדידה?',hint:'בדיקת בסיס במערכת',answers:[
+        {text:'כן, פתוח',note:'',go:'q:1'},
+        {text:'לא',note:'פתח את השירות לפי ההרשאות והתהליך הקיים, הנחה מצב טיסה או כיבוי־הדלקה, ובדוק שוב חיבור לרשת',go:'q:1'}]},
+      {q:'האם קיימת חבילת חו"ל בתוקף?',hint:'בדוק: החבילה פעילה, תאריכים תקינים, המדינה כלולה בחבילה, החבילה לא נוצלה במלואה',answers:[
+        {text:'כן, החבילה תקינה',note:'',go:'q:2'},
+        {text:'נמצאה בעיה בחבילה',note:'טפל בהתאם לממצא לפני המשך האבחון',go:'q:2'}]},
+      {q:'האם מופיע במכשיר שם של רשת סלולרית?',hint:'שאל את הלקוח',answers:[
+        {text:'כן, מופיעה רשת',note:'',go:'q:3'},
+        {text:'לא מופיעה רשת / "אין שירות"',note:'עצור את אבחון הגלישה/שיחות/הודעות. רק לאחר שהמכשיר נרשם לרשת ניתן להמשיך לבדוק את השירות שאינו עובד',go:'item:pdf_012'}]},
+      {q:'מה לא עובד כרגע?',hint:'שאל: "מה לא עובד כרגע — קליטה, גלישה, שיחות או הודעות?"',answers:[
+        {text:'גלישה',note:'',go:'q:4'},
+        {text:'הוצאת שיחות',note:'',go:'q:6'},
+        {text:'קבלת שיחות',note:'',go:'q:7'},
+        {text:'הודעות SMS',note:'ודא שהמכשיר רשום לרשת, ושאל אם הבעיה בשליחה, בקבלה או בשניהם',go:'item:pdf_016'}]},
+      {q:'ההגדרות במכשיר תקינות?',hint:'בדוק במכשיר: נתונים סלולריים פעילים, נדידת נתונים פעילה, ובמכשיר עם שני קווים — קו wecom נבחר לגלישה',answers:[
+        {text:'תקין',note:'',go:'q:5'},
+        {text:'לא תקין',note:'תקן בהתאם למסמך התפעול המתאים ובדוק שוב',go:''}]},
+      {q:'הגלישה לא עובדת בכלל, או שרק אפליקציה מסוימת לא עובדת?',hint:'',answers:[
+        {text:'אין גלישה בכלל',note:'',go:'item:pdf_013'},
+        {text:'רק אפליקציה מסוימת',note:'',go:'item:pdf_014'}]},
+      {q:'האם הלקוח מקבל שיחות?',hint:'ודא שהמכשיר רשום לרשת',answers:[
+        {text:'כן',note:'',go:'item:pdf_015'},
+        {text:'לא',note:'קיימת תקלה גם ביוצאות וגם בנכנסות — המשך לפי הממצאים',go:'item:pdf_015'}]},
+      {q:'האם הלקוח מצליח להוציא שיחות?',hint:'ודא שהמכשיר רשום לרשת',answers:[
+        {text:'כן',note:'',go:'item:pdf_015'},
+        {text:'לא',note:'תקלה בשני הכיוונים — המשך לפי הממצאים',go:'item:pdf_015'}]}
+    ],
+    outro:['לאחר כל שינוי במערכת: הנחה את הלקוח לבצע מצב טיסה והחזרה למצב רגיל, או כיבוי־הדלקה',
+      'לאחר מכן בדוק שוב: האם המכשיר נרשם לרשת, והאם השירות שבגינו פנה הלקוח עובד']
+  }
+};
+
+function nbStageItems(s){ return (s.items||[]).map(function(i){return typeof i==='object'?i:{text:i,img:null};}); }
+
+function nbBodyFromStages(doc){
+  var st=doc.stages||[];
+  switch(doc.kind){
+    case 'O': return {groups:st.map(function(s){return {title:s.title,steps:nbStageItems(s).map(function(i){return {text:i.text,img:i.img||null};})};})};
+    case 'I': return {html:st.map(function(s){
+      return '<h3>'+s.title+'</h3><ul>'+nbStageItems(s).map(function(i){return '<li>'+i.text+(i.img?'<br><img src="'+i.img+'">':'')+'</li>';}).join('')+'</ul>';
+    }).join('')};
+    case 'T': return {scripts:st.map(function(s){return {situation:s.title,lines:nbStageItems(s).map(function(i){return i.text;})};})};
+    case 'E':
+      var b={when:[],to:[],conditions:[],document:[],extra:[]};
+      st.forEach(function(s){
+        var t=nbPlain(s.title), L=nbStageItems(s).map(function(i){return i.text;});
+        if(/מתי/.test(t)) b.when=b.when.concat(L);
+        else if(/למי|לאן/.test(t)) b.to=b.to.concat(L);
+        else if(/ודא|תנאי/.test(t)) b.conditions=b.conditions.concat(L);
+        else if(/מתעד|תיעוד|לתעד/.test(t)) b.document=b.document.concat(L);
+        else b.extra.push({title:s.title,lines:L});
+      });
+      return b;
+    case 'M':
+      return {intro:[].concat.apply([],st.map(function(s){return nbStageItems(s).map(function(i){return i.text;});})),questions:[],outro:[]};
+  }
+  return null;
+}
+
+// Content to display for an item: its own body, a built-in diagnosis, or a
+// conversion of its steps. null → show the classic step view.
+function nbGetBody(doc){
+  if(nbIsStageKind(doc.kind)) return null;
+  if(doc.body) return doc.body;
+  if(NB_SEED_BODIES[doc.id]) return NB_SEED_BODIES[doc.id];
+  if(doc.kind==='M') return null; // prose diagnosis without questions yet
+  return (doc.stages&&doc.stages.length)?nbBodyFromStages(doc):null;
+}
+// Content to load into the editor (never null for typed kinds).
+function nbBodyForEditor(doc){
+  var b=doc.body||NB_SEED_BODIES[doc.id]||nbBodyFromStages(doc)||nbEmptyBody(doc.kind);
+  return JSON.parse(JSON.stringify(b));
+}
+function nbEmptyBody(k){
+  switch(k){
+    case 'O': return {groups:[{title:'',steps:[{text:'',img:null}]}]};
+    case 'I': return {html:''};
+    case 'T': return {scripts:[{situation:'',lines:[]}]};
+    case 'E': return {when:[],to:[],conditions:[],document:[],extra:[]};
+    case 'M': return {intro:[],questions:[{q:'',hint:'',answers:[{text:'',note:'',go:''},{text:'',note:'',go:''}]}],outro:[]};
+  }
+  return {};
+}
+
+// ── Rich text cleaning (type I) ──
+// Keeps structure (headings, lists, tables, links, images) and drops
+// everything else — including the styling Word adds when pasting.
+var NB_RICH_TAGS={H2:1,H3:1,H4:1,P:1,BR:1,B:1,STRONG:1,I:1,EM:1,U:1,UL:1,OL:1,LI:1,A:1,TABLE:1,THEAD:1,TBODY:1,TR:1,TH:1,TD:1,IMG:1,BLOCKQUOTE:1,HR:1};
+function nbSanitizeRich(html){
+  var tpl=document.createElement('template');
+  tpl.innerHTML=String(html||'');
+  (function clean(node){
+    Array.prototype.slice.call(node.childNodes).forEach(function(ch){
+      if(ch.nodeType===3) return;
+      if(ch.nodeType!==1){ ch.remove(); return; }
+      var tag=ch.tagName.toUpperCase();
+      if(/^(SCRIPT|STYLE|META|LINK|TITLE|XML|IFRAME|OBJECT|EMBED|FORM|INPUT|BUTTON|SELECT|TEXTAREA)$/.test(tag)||tag.indexOf(':')!==-1){ ch.remove(); return; }
+      clean(ch);
+      if(!NB_RICH_TAGS[tag]){
+        if(tag==='DIV'||tag==='H1'||tag==='H5'||tag==='H6'){
+          var p=document.createElement(tag==='DIV'?'p':(tag==='H1'?'h2':'h4'));
+          while(ch.firstChild) p.appendChild(ch.firstChild);
+          ch.replaceWith(p);
+        } else {
+          ch.replaceWith.apply(ch,Array.prototype.slice.call(ch.childNodes));
+        }
+        return;
+      }
+      Array.prototype.slice.call(ch.attributes).forEach(function(a){
+        var n=a.name.toLowerCase(), v=a.value;
+        var keep=(tag==='A'&&n==='href'&&/^(https?:|mailto:|tel:)/i.test(v))
+          ||(tag==='IMG'&&n==='src'&&/^(https?:|data:image\/(png|jpe?g|gif|webp);base64,)/i.test(v))
+          ||((tag==='TD'||tag==='TH')&&(n==='colspan'||n==='rowspan'));
+        if(!keep) ch.removeAttribute(a.name);
+      });
+      // Images/links whose address was unsafe and got removed are dropped.
+      if(tag==='IMG'&&!ch.getAttribute('src')){ ch.remove(); return; }
+      if(tag==='A'&&!ch.getAttribute('href')){ ch.replaceWith.apply(ch,Array.prototype.slice.call(ch.childNodes)); return; }
+      if(tag==='A'){ ch.setAttribute('target','_blank'); ch.setAttribute('rel','noopener'); }
+    });
+  })(tpl.content);
+  return tpl.innerHTML.replace(/<p>(\s|&nbsp;|<br>)*<\/p>/g,'').trim();
+}
+
+// Drops empty rows so saved items stay clean.
+function nbCleanBody(k,b){
+  b=JSON.parse(JSON.stringify(b||nbEmptyBody(k)));
+  var nonEmpty=function(s){return String(s||'').trim()!=='';};
+  switch(k){
+    case 'O':
+      b.groups=(b.groups||[]).map(function(g){return {title:(g.title||'').trim(),steps:(g.steps||[]).filter(function(s){return nonEmpty(s.text)||s.img;})};})
+        .filter(function(g){return g.steps.length;});
+      break;
+    case 'I': b.html=nbSanitizeRich(b.html); break;
+    case 'T':
+      b.scripts=(b.scripts||[]).map(function(s){return {situation:(s.situation||'').trim(),lines:(s.lines||[]).filter(nonEmpty)};})
+        .filter(function(s){return s.lines.length||s.situation;});
+      break;
+    case 'E':
+      ['when','to','conditions','document'].forEach(function(f){b[f]=(b[f]||[]).filter(nonEmpty);});
+      b.extra=(b.extra||[]).map(function(x){return {title:(x.title||'').trim(),lines:(x.lines||[]).filter(nonEmpty)};}).filter(function(x){return x.lines.length;});
+      break;
+    case 'M':
+      b.intro=(b.intro||[]).filter(nonEmpty); b.outro=(b.outro||[]).filter(nonEmpty);
+      b.questions=(b.questions||[]).map(function(q){return {q:(q.q||'').trim(),hint:(q.hint||'').trim(),
+        answers:(q.answers||[]).filter(function(a){return nonEmpty(a.text);}).map(function(a){return {text:a.text.trim(),note:(a.note||'').trim(),go:a.go||''};})};});
+      break;
+  }
+  return b;
+}
+function nbBodyHasContent(k,b){
+  switch(k){
+    case 'O': return b.groups.length>0;
+    case 'I': return nbPlain(b.html).trim()!==''||/<img/i.test(b.html);
+    case 'T': return b.scripts.some(function(s){return s.lines.length;});
+    case 'E': return ['when','to','conditions','document'].some(function(f){return b[f].length;})||b.extra.length>0;
+    case 'M': return b.questions.some(function(q){return q.q&&q.answers.length;});
+  }
+  return true;
+}
+
+// ── AGENT VIEWS ─────────────────────────────────────────────────────────
+function nbKindBodyHTML(doc){
+  var b=nbGetBody(doc);
+  if(!b) return null;
+  var img=function(src){return src?'<img class="kv-img" src="'+src+'" onclick="event.stopPropagation();nbOpenLightbox(this.src)">':'';};
+  switch(doc.kind){
+    case 'O':
+      return '<div class="kv-o">'+b.groups.map(function(g){
+        return '<div class="o-group">'+(g.title?'<div class="o-title">'+g.title+'</div>':'')
+          +'<ol class="o-steps">'+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+'</ol></div>';
+      }).join('')+'</div>';
+    case 'I':
+      return '<div class="kv-rich">'+b.html+'</div>';
+    case 'T':
+      return '<div class="kv-t">'+b.scripts.map(function(s){
+        return '<div class="t-block">'+(s.situation?'<div class="t-sit">'+s.situation+'</div>':'')
+          +s.lines.map(function(l){
+            var anchor=/^\s*(עוגן|anchor)\s*:/i.test(nbPlain(l));
+            return '<div class="t-line'+(anchor?' anchor':'')+'"><div class="t-text">'+l+'</div><button class="t-copy" onclick="nbCopyLine(this)" title="העתק">העתק</button></div>';
+          }).join('')+'</div>';
+      }).join('')+'</div>';
+    case 'E':
+      var sec=function(icon,title,lines,cls){
+        return '<div class="e-sec '+cls+'"><div class="e-title"><span class="e-icon">'+icon+'</span>'+title+'</div>'
+          +(lines&&lines.length?'<ul>'+lines.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul>'
+            :'<div class="e-missing">⚠ לא הוגדר — יש להשלים מול הגורם המקצועי האחראי</div>')+'</div>';
+      };
+      return '<div class="kv-e">'
+        +sec('⏱','מתי מפסיקים טיפול ומעבירים',b.when,'e-when')
+        +sec('➜','למי מעבירים',b.to,'e-to')
+        +sec('✓','תנאים שחייבים להתקיים לפני ההעברה',b.conditions,'e-cond')
+        +sec('✎','מה חובה לתעד',b.document,'e-doc')
+        +(b.extra||[]).map(function(x){return '<div class="e-sec e-extra"><div class="e-title">'+x.title+'</div><ul>'+x.lines.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>';}).join('')
+        +'</div>';
+    case 'M':
+      return '<div class="kv-m">'
+        +(b.intro.length?'<div class="m-intro">'+b.intro.map(function(l){return '<div>'+l+'</div>';}).join('')+'</div>':'')
+        +'<div class="m-flow" id="m-flow" data-doc="'+nbEsc(doc.id)+'"></div>'
+        +(b.outro.length?'<div class="m-outro"><div class="m-outro-title">הנחיות כלליות</div><ul>'+b.outro.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>':'')
+        +'</div>';
+  }
+  return null;
+}
+
+function nbCopyLine(btn){
+  var t=btn.parentNode.querySelector('.t-text');
+  var text=(t?t.innerText:'').replace(/^\s*(עוגן|anchor)\s*:\s*/i,'');
+  var done=function(){ btn.textContent='✓ הועתק'; setTimeout(function(){btn.textContent='העתק';},1500); };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done,function(){});
+  else { var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');done();}catch(e){} ta.remove(); }
+}
+
+// ── Guided diagnosis (type M, spec §5 "מסלול מונחה") ──
+var nbMPath=[]; // [{q, a}] answers chosen so far
+
+function nbMStart(){ nbMPath=[]; nbMRender(); }
+function nbMBack(i){ nbMPath=nbMPath.slice(0,i); nbMRender(); }
+function nbMAnswer(qi,ai){ nbMPath.push({q:qi,a:ai}); nbMRender(); }
+
+function nbMRender(){
+  var el=document.getElementById('m-flow');
+  if(!el) return;
+  var doc=window.dynamicDocs[el.getAttribute('data-doc')];
+  var b=doc&&nbGetBody(doc);
+  if(!b||!b.questions.length){ el.innerHTML='<div class="info-box">טרם הוגדרו שאלות אבחון.</div>'; return; }
+  var html='';
+  // The answers given so far — click one to go back and change it.
+  if(nbMPath.length){
+    html+='<div class="m-trail">'+nbMPath.map(function(p,i){
+      var q=b.questions[p.q], a=q&&q.answers[p.a];
+      return '<button class="m-trail-item" onclick="nbMBack('+i+')" title="חזור לשאלה זו"><span class="m-trail-q">'+(q?q.q:'')+'</span><span class="m-trail-a">'+(a?a.text:'')+'</span></button>';
+    }).join('')+'</div>';
+  }
+  var cur=0, last=null;
+  if(nbMPath.length){
+    last=nbMPath[nbMPath.length-1];
+    var la=b.questions[last.q]&&b.questions[last.q].answers[last.a];
+    if(la&&/^q:\d+$/.test(la.go)) cur=parseInt(la.go.slice(2)); else cur=-1;
+  }
+  var lastAnswer=last?b.questions[last.q].answers[last.a]:null;
+  if(lastAnswer&&lastAnswer.note) html+='<div class="m-note">'+lastAnswer.note+'</div>';
+  if(cur>=0&&b.questions[cur]){
+    var q=b.questions[cur];
+    html+='<div class="m-q"><div class="m-q-num">שאלה '+(nbMPath.length+1)+'</div><div class="m-q-text">'+q.q+'</div>'
+      +(q.hint?'<div class="m-q-hint">'+q.hint+'</div>':'')
+      +'<div class="m-answers">'+q.answers.map(function(a,ai){
+        return '<button class="m-answer" onclick="nbMAnswer('+cur+','+ai+')">'+a.text+'</button>';
+      }).join('')+'</div></div>';
+  } else {
+    // End of the path: send the agent to the item, or close with the note.
+    var go=lastAnswer&&lastAnswer.go||'';
+    var target=go.indexOf('item:')===0?window.dynamicDocs[go.slice(5)]:null;
+    if(target){
+      html+='<div class="m-result"><div class="m-result-label">המשך הטיפול:</div>'
+        +'<button class="m-go" onclick="showDynamicDoc(\''+nbEsc(target.id)+'\')">'+nbKindBadge(target.kind)+'<span>'+target.topic+'</span><span class="m-go-arrow">←</span></button></div>';
+    } else if(go.indexOf('item:')===0){
+      html+='<div class="info-box">פריט הידע שאליו מפנה התשובה כבר לא קיים. יש לעדכן את מסמך האבחון.</div>';
+    } else {
+      html+='<div class="m-result"><div class="m-result-label">סוף האבחון</div></div>';
+    }
+  }
+  if(nbMPath.length) html+='<button class="m-restart" onclick="nbMStart()">↺ התחל אבחון מחדש</button>';
+  el.innerHTML=html;
+}
+
+// ── EDITORS (in "פריט ידע חדש", replacing the step builder for O/I/T/E/M) ──
+function nbCurKind(){ var d=nbState.s1&&nbState.s1.s1data; return (d&&d.kind)||'R'; }
+function nbBody(k){
+  nbState._bodies=nbState._bodies||{};
+  if(!nbState._bodies[k]) nbState._bodies[k]=nbEmptyBody(k);
+  return nbState._bodies[k];
+}
+// Generic edits addressed by a path like "groups.0.steps.2.text".
+function nbPathGet(obj,path){ return path.split('.').reduce(function(o,k){return o==null?o:o[k];},obj); }
+function nbPathParent(obj,path){ var p=path.split('.'); var last=p.pop(); return {parent:p.length?nbPathGet(obj,p.join('.')):obj,key:last}; }
+function nbBSet(el){
+  var b=nbBody(nbCurKind()), r=nbPathParent(b,el.getAttribute('data-path'));
+  r.parent[r.key]=el.hasAttribute('data-lines')?nbLines(el.value):el.value;
+  nbSaveDraft(); nbUpdateSummary();
+}
+function nbBAdd(path,tpl){
+  var b=nbBody(nbCurKind()), arr=nbPathGet(b,path);
+  if(Array.isArray(arr)) arr.push(JSON.parse(tpl));
+  nbRenderKindEditor();
+}
+function nbBDel(path){
+  var b=nbBody(nbCurKind()), r=nbPathParent(b,path);
+  if(Array.isArray(r.parent)) r.parent.splice(parseInt(r.key),1);
+  nbRenderKindEditor();
+}
+// Deleting a question shifts the numbers of the ones after it, so fix the
+// "go to question N" links.
+function nbMDelQuestion(i){
+  var b=nbBody('M');
+  b.questions.splice(i,1);
+  b.questions.forEach(function(q){q.answers.forEach(function(a){
+    var m=/^q:(\d+)$/.exec(a.go||''); if(!m) return;
+    var n=parseInt(m[1]); a.go=n===i?'':(n>i?'q:'+(n-1):a.go);
+  });});
+  nbRenderKindEditor();
+}
+function nbRenderKindEditor(){
+  var el=document.getElementById('nb-kind-editor');
+  if(el) el.innerHTML=nbKindEditorHTML(nbCurKind());
+  nbSaveDraft(); nbUpdateSummary();
+}
+
+function nbTA(path,val,ph,rows,lines){
+  return '<textarea class="s1-input ke-ta" rows="'+(rows||2)+'" data-path="'+path+'"'+(lines?' data-lines="1"':'')+' oninput="nbBSet(this)" placeholder="'+nbEsc(ph||'')+'">'+nbEsc(lines?(val||[]).join('\n'):(val||''))+'</textarea>';
+}
+function nbIN(path,val,ph){
+  return '<input class="s1-input" data-path="'+path+'" oninput="nbBSet(this)" value="'+nbEsc(val||'')+'" placeholder="'+nbEsc(ph||'')+'">';
+}
+function nbDelBtn(onclick,title){ return '<button type="button" class="ke-del" onclick="'+onclick+'" title="'+(title||'מחק')+'">✕</button>'; }
+function nbAddBtn(path,tpl,label){ return '<button type="button" class="ke-add" onclick="nbBAdd(\''+path+'\',\''+nbEsc(JSON.stringify(tpl))+'\')">'+label+'</button>'; }
+
+function nbKindEditorHTML(k){
+  var b=nbBody(k), K=NB_KINDS[k], h='';
+  h+='<div class="ke-head">'+nbKindBadge(k)+'<div><div class="ke-title">תוכן '+K.full+'</div><div class="ke-sub">'+K.hint+'</div></div></div>';
+  switch(k){
+    case 'O':
+      h+='<div class="s1-help">שלבי ביצוע ממוספרים. אפשר לחלק לקבוצות — למשל לפי יצרן מכשיר או לפי מערכת.</div>';
+      h+=b.groups.map(function(g,gi){
+        return '<div class="ke-card"><div class="ke-row">'+nbIN('groups.'+gi+'.title',g.title,'כותרת קבוצה (אופציונלי) — לדוגמה: Samsung')+nbDelBtn('nbBDel(\'groups.'+gi+'\')','מחק קבוצה')+'</div>'
+          +'<ol class="ke-steps">'+g.steps.map(function(s,si){
+            return '<li><div class="ke-row">'+nbTA('groups.'+gi+'.steps.'+si+'.text',s.text,'תיאור השלב',1)+nbDelBtn('nbBDel(\'groups.'+gi+'.steps.'+si+'\')','מחק שלב')+'</div>'
+              +(s.img?'<img class="ke-thumb" src="'+s.img+'">':'')+'</li>';
+          }).join('')+'</ol>'
+          +nbAddBtn('groups.'+gi+'.steps',{text:'',img:null},'+ שלב')+'</div>';
+      }).join('');
+      h+=nbAddBtn('groups',{title:'',steps:[{text:'',img:null}]},'+ קבוצת שלבים');
+      break;
+    case 'I':
+      var tb=[['h3','כותרת'],['h4','תת-כותרת'],['p','פסקה'],['b','<b>B</b>'],['ul','• רשימה'],['ol','1. רשימה'],['link','🔗 קישור'],['table','▦ טבלה'],['img','🖼 תמונה'],['clear','נקה עיצוב']];
+      h+='<div class="s1-help">עורך טקסט מלא: כותרות, רשימות, טבלאות, קישורים ותמונות. אפשר להדביק ישירות ממסמך Word.</div>'
+        +'<div class="rich-toolbar">'+tb.map(function(t){return '<button type="button" onmousedown="event.preventDefault()" onclick="nbRichCmd(\''+t[0]+'\')">'+t[1]+'</button>';}).join('')
+        +'<input type="file" accept="image/*" id="nb-rich-img" style="display:none" onchange="nbRichImage(this)"></div>'
+        +'<div class="rich-edit kv-rich" id="nb-rich" contenteditable="true" oninput="nbRichSync()" onpaste="nbRichPaste(event)">'+(b.html||'')+'</div>';
+      break;
+    case 'T':
+      h+='<div class="s1-help">לכל מצב: ניסוחים מומלצים לנציג, שורה לכל ניסוח. שורה שמתחילה ב"עוגן:" תודגש כמשפט מפתח.</div>';
+      h+=b.scripts.map(function(s,i){
+        return '<div class="ke-card"><div class="ke-row">'+nbIN('scripts.'+i+'.situation',s.situation,'מצב / התנגדות — לדוגמה: התנגדות למחיר')+nbDelBtn('nbBDel(\'scripts.'+i+'\')','מחק')+'</div>'
+          +nbTA('scripts.'+i+'.lines',s.lines,'"אני מבין אותך…"\nעוגן: "יש זול — ויש חכם"',4,true)+'</div>';
+      }).join('');
+      h+=nbAddBtn('scripts',{situation:'',lines:[]},'+ מצב נוסף');
+      break;
+    case 'E':
+      [['when','⏱ מתי מפסיקים טיפול ומעבירים','לדוגמה: לאחר שבוצעו כל הבדיקות במסלול והשירות עדיין לא עובד'],
+       ['to','➜ למי מעבירים','תור / צוות / גורם, ואיך מעבירים'],
+       ['conditions','✓ תנאים שחייבים להתקיים לפני ההעברה','שורה לכל תנאי'],
+       ['document','✎ מה חובה לתעד','שורה לכל פרט שחובה לתעד']].forEach(function(f){
+        h+='<div class="ke-card"><div class="s1-label">'+f[1]+'</div>'+nbTA(f[0],b[f[0]],f[2],3,true)+'</div>';
+      });
+      h+=(b.extra||[]).map(function(x,i){
+        return '<div class="ke-card"><div class="ke-row">'+nbIN('extra.'+i+'.title',x.title,'כותרת סעיף נוסף')+nbDelBtn('nbBDel(\'extra.'+i+'\')','מחק סעיף')+'</div>'+nbTA('extra.'+i+'.lines',x.lines,'שורה לכל פריט',3,true)+'</div>';
+      }).join('');
+      h+=nbAddBtn('extra',{title:'',lines:[]},'+ סעיף נוסף');
+      break;
+    case 'M':
+      var docs=window.dynamicDocs||{};
+      var editing=window.nbEditingDocId;
+      var itemOpts=Object.keys(docs).map(function(id){return docs[id];}).filter(function(d){return d&&d.id!==editing;})
+        .sort(function(a,c){return nbPlain(a.topic).localeCompare(nbPlain(c.topic),'he');});
+      h+='<div class="s1-help">שאלות אבחון לנציג. כל תשובה ממשיכה לשאלה אחרת, מפנה לפריט ידע (לרוב מסלול טיפול R), או מסיימת עם הנחיה.</div>';
+      h+='<div class="ke-card"><div class="s1-label">פתיח (מטרה, כללים לפני שמתחילים)</div>'+nbTA('intro',b.intro,'שורה לכל הנחיה',3,true)+'</div>';
+      h+=b.questions.map(function(q,qi){
+        return '<div class="ke-card ke-q"><div class="ke-row"><span class="ke-qnum">שאלה '+(qi+1)+'</span>'+nbIN('questions.'+qi+'.q',q.q,'השאלה — לדוגמה: האם מופיע במכשיר שם של רשת?')+nbDelBtn('nbMDelQuestion('+qi+')','מחק שאלה')+'</div>'
+          +nbIN('questions.'+qi+'.hint',q.hint,'הנחיה לנציג (אופציונלי) — מה לבדוק או לשאול')
+          +'<div class="ke-answers">'+q.answers.map(function(a,ai){
+            var p='questions.'+qi+'.answers.'+ai;
+            var opts='<option value="">■ סיום (עם ההנחיה)</option>'
+              +'<optgroup label="המשך לשאלה">'+b.questions.map(function(q2,i2){return i2===qi?'':'<option value="q:'+i2+'"'+(a.go==='q:'+i2?' selected':'')+'>שאלה '+(i2+1)+': '+nbEsc(nbPlain(q2.q).slice(0,40))+'</option>';}).join('')+'</optgroup>'
+              +'<optgroup label="פתח פריט ידע">'+itemOpts.map(function(d){return '<option value="item:'+nbEsc(d.id)+'"'+(a.go==='item:'+d.id?' selected':'')+'>['+d.kind+'] '+nbEsc(nbPlain(d.topic).slice(0,50))+'</option>';}).join('')+'</optgroup>';
+            return '<div class="ke-answer"><div class="ke-row">'+nbIN(p+'.text',a.text,'תשובה')
+              +'<select class="s1-input ke-go" data-path="'+p+'.go" onchange="nbBSet(this)">'+opts+'</select>'+nbDelBtn('nbBDel(\''+p+'\')','מחק תשובה')+'</div>'
+              +nbIN(p+'.note',a.note,'הנחיה לנציג אחרי בחירת התשובה (אופציונלי)')+'</div>';
+          }).join('')+'</div>'
+          +nbAddBtn('questions.'+qi+'.answers',{text:'',note:'',go:''},'+ תשובה')+'</div>';
+      }).join('');
+      h+=nbAddBtn('questions',{q:'',hint:'',answers:[{text:'',note:'',go:''},{text:'',note:'',go:''}]},'+ שאלה');
+      h+='<div class="ke-card"><div class="s1-label">הנחיות כלליות (בסוף)</div>'+nbTA('outro',b.outro,'שורה לכל הנחיה',2,true)+'</div>';
+      break;
+  }
+  return h;
+}
+
+// ── Rich text editor commands (type I) ──
+function nbRichSync(){
+  var el=document.getElementById('nb-rich');
+  if(!el) return;
+  nbBody('I').html=el.innerHTML;
+  nbSaveDraft();
+}
+function nbRichCmd(c){
+  var el=document.getElementById('nb-rich');
+  if(!el) return;
+  el.focus();
+  if(c==='h3'||c==='h4'||c==='p') document.execCommand('formatBlock',false,c);
+  else if(c==='b') document.execCommand('bold');
+  else if(c==='ul') document.execCommand('insertUnorderedList');
+  else if(c==='ol') document.execCommand('insertOrderedList');
+  else if(c==='link'){ var u=prompt('כתובת הקישור (https://…)'); if(u&&/^(https?:|mailto:|tel:)/i.test(u)) document.execCommand('createLink',false,u); }
+  else if(c==='table') document.execCommand('insertHTML',false,'<table><thead><tr><th>כותרת</th><th>כותרת</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p><br></p>');
+  else if(c==='img'){ var f=document.getElementById('nb-rich-img'); if(f) f.click(); return; }
+  else if(c==='clear'){ document.execCommand('removeFormat'); document.execCommand('formatBlock',false,'p'); }
+  nbRichSync();
+}
+function nbRichImage(input){
+  var file=input.files&&input.files[0];
+  if(!file) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    var el=document.getElementById('nb-rich');
+    if(el){ el.focus(); document.execCommand('insertImage',false,ev.target.result); nbRichSync(); }
+    input.value='';
+  };
+  r.readAsDataURL(file);
+}
+// Pasting from Word/web: keep the structure, drop the styling.
+function nbRichPaste(e){
+  var cd=e.clipboardData||window.clipboardData;
+  if(!cd) return;
+  var html=cd.getData('text/html');
+  e.preventDefault();
+  if(html) document.execCommand('insertHTML',false,nbSanitizeRich(html));
+  else document.execCommand('insertText',false,cd.getData('text/plain'));
+  nbRichSync();
+}
+
+// Short description of the typed content for the summary panel.
+function nbBodySummaryHTML(k){
+  var b=nbCleanBody(k,nbBody(k)), txt;
+  switch(k){
+    case 'O': txt=b.groups.length+' קבוצות, '+b.groups.reduce(function(n,g){return n+g.steps.length;},0)+' שלבים'; break;
+    case 'I': txt=nbPlain(b.html).trim().length+' תווים של טקסט'; break;
+    case 'T': txt=b.scripts.length+' מצבים, '+b.scripts.reduce(function(n,s){return n+s.lines.length;},0)+' ניסוחים'; break;
+    case 'E': txt=['when','to','conditions','document'].filter(function(f){return b[f].length;}).length+' מתוך 4 סעיפי חובה מולאו'; break;
+    case 'M': txt=b.questions.length+' שאלות אבחון'; break;
+  }
+  return '<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:600;letter-spacing:.6px;color:var(--muted);margin-bottom:8px">תוכן – '+NB_KINDS[k].full+'</div>'
+    +'<div style="background:var(--input-bg);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:13px;color:var(--text)">'+txt+(nbBodyHasContent(k,b)?'':' <span style="color:var(--red)">— עדיין אין תוכן</span>')+'</div></div>';
+}
 
 // ── LOCAL PERSISTENCE ────────────────────────────────────────────────────
 // Keeps created knowledge items and the in-progress "פריט ידע חדש" form
