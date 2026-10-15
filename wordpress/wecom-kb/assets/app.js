@@ -191,7 +191,7 @@ function showView(id){
   document.querySelectorAll('.snav-item').forEach(function(i){i.classList.remove('active')});
   var sm=document.getElementById('snav-'+id);
   if(sm) sm.classList.add('active');
-  ['library','new'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(t==='library'&&['browsing','churn','article','topic','tracking'].indexOf(id)!==-1))});
+  ['library','new','tracking'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(t==='library'&&['browsing','churn','article','topic'].indexOf(id)!==-1))});
   if(id==='library'){var sl=document.getElementById('snav-library');if(sl)sl.classList.toggle('active',nbCurrentWorld==='all');}
   if(id==='library'){
     renderLibrary('all');
