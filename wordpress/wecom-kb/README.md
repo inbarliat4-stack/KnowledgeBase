@@ -1,28 +1,28 @@
 # wecom knowledge base: WordPress plugin
 
-This folder turns the GitHub Pages prototype (`../index.html`) into a WordPress plugin. The data that each browser used to keep in `localStorage` (library, trash, version history) moves into the WordPress database, so everyone shares one library.
+This plugin turns the wecom knowledge-base prototype into a WordPress plugin. The data that each browser used to keep in `localStorage` (library, trash, version history) moves into the WordPress database, so everyone shares one library.
+
+**Where the source lives.** The front-end is designed in the prototype repository, [`wecom_BackOffice`](https://github.com/inbarliat4-stack/wecom_BackOffice), in the file `index.html`. The plugin itself is developed in that repository's `wordpress/wecom-kb/` folder. This repository is a copy of that folder, history included, published as its own project.
 
 ```
-wordpress/
-├── build.cjs                 ← regenerates the front-end assets from ../index.html
-└── wecom-kb/                 ← the plugin (zip this folder to install)
-    ├── wecom-kb.php          ← bootstrap, page template, access control
-    ├── includes/
-    │   ├── class-store.php      ← DB table wp_wecom_kb_versions (live library + history)
-    │   ├── class-sanitizer.php  ← server-side cleaning + base64 image → Media Library
-    │   ├── class-rest.php       ← REST API
-    │   └── class-admin.php      ← Tools → "wecom מאגר ידע" (status, export, import)
-    ├── templates/
-    │   ├── app.php           ← full-screen page template
-    │   └── app-body.html     ← GENERATED: <body> of index.html
-    └── assets/
-        ├── app.css / app.js  ← GENERATED: <style> / <script> of index.html
-        └── wp-bridge.js/.css ← hand-written WordPress layer (persistence, read-only mode)
+wecom-kb/
+├── wecom-kb.php          ← bootstrap, page template, access control
+├── includes/
+│   ├── class-store.php      ← DB table wp_wecom_kb_versions (live library + history)
+│   ├── class-sanitizer.php  ← server-side cleaning + base64 image → Media Library
+│   ├── class-rest.php       ← REST API
+│   └── class-admin.php      ← Tools → "wecom מאגר ידע" (status, export, import)
+├── templates/
+│   ├── app.php           ← full-screen page template
+│   └── app-body.html     ← GENERATED: <body> of index.html
+└── assets/
+    ├── app.css / app.js  ← GENERATED: <style> / <script> of index.html
+    └── wp-bridge.js/.css ← hand-written WordPress layer (persistence, read-only mode)
 ```
 
 ## Install
 
-1. Zip the `wecom-kb` folder and upload it in **Plugins → Add New → Upload**, or copy it to `wp-content/plugins/`.
+1. Upload `wecom-kb.zip` in **Plugins → Add New Plugin → Upload Plugin**, or copy this folder to `wp-content/plugins/wecom-kb/`. If you use GitHub's "Download ZIP" instead, rename the folder inside it to `wecom-kb` first. Otherwise WordPress installs it as a separate plugin (`wecom-kb-plugin-main`), and later updates won't replace it.
 2. Activate it. Activation creates the DB table and a page at **/kb/** that uses the template *"wecom – מאגר ידע (מסך מלא)"*. Any other page can use that template too. The page has no public content: the template sends logged-out visitors to the login screen, and the page is left out of the sitemap.
 3. Open the page while logged in as an editor. On first load, the built-in content from `index.html` is saved as version #1.
 4. To move content people created on the GitHub Pages version, go to **Tools → wecom מאגר ידע → ייבוא**. The page has a console one-liner that exports a browser's `localStorage` to a JSON file. Do this from the browser where the content was created, because that data never left that browser.
@@ -30,7 +30,7 @@ wordpress/
 ## How it works
 
 - **The front-end is the prototype, unchanged.** `build.cjs` copies the CSS, JS and HTML out of `index.html`. `wp-bridge.js` loads right after `app.js` and replaces only the persistence functions (`nbLoadLibrary`, `nbSaveLibrary`, `nbGetHistory`, `nbRestoreHistorySnapshot`). Everything else runs as in the prototype.
-- **Design changes stay in `index.html`.** Edit and preview it as before, then run `node wordpress/build.cjs` and deploy the plugin. Never edit the generated files by hand.
+- **Design changes stay in `index.html`.** In the `wecom_BackOffice` repository, edit and preview it as before, then run `node wordpress/build.cjs` to regenerate this plugin's assets. Never edit the generated files by hand.
 - **Data model.** The app works with one JSON document, `{topics, docs, worlds, trash, seedVersion}`. It follows the spec's hierarchy: content world → topic → knowledge items. Each item (`docs[id]`) has a type `kind` (M/R/O/E/S/T/I), `worlds`, `topicIds`, `tags`, `desc` and `owner`. R/S items keep their content in `stages`; the other types use a type-specific `body`, described at the top of the "TYPE-SPECIFIC CONTENT" section in `index.html`. Each save inserts a row in `wp_wecom_kb_versions`. The newest row is the live library, and older rows are the version history (the newest 200 are kept; change this with the `wecom_kb_history_max` filter). History rows now record who made each change.
 - **Initial page load** inlines the library into the page (`window.WECOM_KB`), so the app's synchronous start-up code didn't need to change.
 - **Concurrent edits.** Every save sends the version it was based on. If someone else saved in between, the server returns `409`, and the editor chooses between keeping their version (the other one stays in history) and reloading the latest.
