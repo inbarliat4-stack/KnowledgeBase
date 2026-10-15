@@ -227,7 +227,7 @@ function nbRenderLibFilters(){
     +[{id:'all',name:'הכל'}].concat(WORLDS).map(function(w){
       return '<button class="filter-btn world-btn'+(nbCurrentWorld===w.id?' active':'')+'" onclick="filterWorld(\''+nbEsc(w.id)+'\')">'+nbEsc(w.name)+'</button>';
     }).join('')
-    +'<button class="filter-btn world-btn ghost nb-edit-only" onclick="nbManageWorlds()" title="ניהול עולמות תוכן">⚙ ניהול</button>';
+    +'<button class="filter-btn world-btn ghost nb-edit-only nb-admin-only" onclick="nbManageWorlds()" title="ניהול עולמות תוכן">⚙ ניהול</button>';
   var kel=document.getElementById('lib-kinds');
   if(kel) kel.innerHTML='<span class="filter-label">סוג פריט</span>'
     +'<button class="filter-btn world-btn'+(nbCurrentKind==='all'?' active':'')+'" onclick="filterKind(\'all\')">הכל</button>'
@@ -2691,6 +2691,79 @@ document.addEventListener("DOMContentLoaded", function(){
   nbRenderSidebar();
   nbRenderLibFilters();
   renderLibrary('all');
+});
+
+// ── DEMO ROLE GATE (static prototype only) ──────────────────────────────
+// An entry screen to demonstrate what each role sees (spec §11). This is a
+// DEMO, not access control: a static site can't protect anything, and its
+// content is readable in the page source. Real logins and permissions are
+// enforced by the WordPress plugin, which skips this gate (window.WECOM_KB).
+var NB_ROLES={
+  admin:{name:'מנהל מערכת',icon:'🛡️',desc:'הכל: יצירה, עריכה ומחיקה של פריטי ידע, סל מיחזור, היסטוריית גרסאות, וניהול עולמות התוכן'},
+  editor:{name:'עורך תוכן',icon:'✏️',desc:'יצירה ועריכה של פריטי ידע, סל מיחזור והיסטוריית גרסאות'},
+  agent:{name:'נציג שירות',icon:'🎧',desc:'צפייה בלבד: ספרייה, חיפוש, אבחון מונחה ותסריטים — בלי עריכה'}
+};
+var NB_ROLE_KEY='wecom_kb_demo_role';
+function nbGetRole(){ try{ return sessionStorage.getItem(NB_ROLE_KEY); }catch(e){ return null; } }
+
+function nbShowGate(){
+  var overlay=document.createElement('div');
+  overlay.id='nb-gate';
+  overlay.innerHTML='<div class="gate-card">'
+    +'<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'')+'</div>'
+    +'<h1 class="gate-title">מאגר ידע פנימי</h1>'
+    +'<div class="gate-sub">בחרו תפקיד כדי להיכנס</div>'
+    +'<div class="gate-roles">'+Object.keys(NB_ROLES).map(function(r){
+      var R=NB_ROLES[r];
+      return '<button class="gate-role" onclick="nbEnterAs(\''+r+'\')"><span class="gate-icon">'+R.icon+'</span>'
+        +'<span class="gate-role-name">'+R.name+'</span><span class="gate-role-desc">'+R.desc+'</span></button>';
+    }).join('')+'</div>'
+    +'<div class="gate-note">גרסת הדגמה: בחירת התפקיד מציגה מה כל משתמש רואה. ההרשאות האמיתיות, עם שם משתמש וסיסמה, מנוהלות באתר ה-WordPress.</div>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  document.body.classList.add('gate-open');
+}
+
+function nbEnterAs(role){
+  try{ sessionStorage.setItem(NB_ROLE_KEY,role); }catch(e){}
+  var g=document.getElementById('nb-gate'); if(g) g.remove();
+  document.body.classList.remove('gate-open');
+  nbApplyRole(role);
+  showView('library');
+}
+
+function nbApplyRole(role){
+  document.body.classList.add('role-'+role);
+  if(role==='agent'){
+    document.body.classList.add('wkb-readonly');
+    // Same lock-down as the WordPress read-only mode.
+    var noop=function(){};
+    ['nbEditDoc','nbConfirmDeleteDoc','nbConfirmDeleteTopic','nbOpenTrash','nbOpenHistory','nbGoNew','nbCreateDoc',
+     'nbRestoreFromTrash','nbPermanentlyDeleteFromTrash','nbNewItemForTopic','nbManageWorlds','nbAddWorld','nbRenameWorld'].forEach(function(fn){ window[fn]=noop; });
+    var origShowView=window.showView;
+    window.showView=function(id){ if(id==='new') return; return origShowView.apply(this,arguments); };
+  }
+  if(role==='editor'){ window.nbManageWorlds=window.nbAddWorld=window.nbRenameWorld=function(){}; }
+  var nav=document.querySelector('.topnav');
+  if(nav&&!document.getElementById('role-badge')){
+    var R=NB_ROLES[role];
+    var b=document.createElement('div');
+    b.id='role-badge';
+    b.className='role-badge';
+    b.innerHTML='<span class="rb-icon">'+R.icon+'</span><span class="rb-name">'+R.name+'</span><button onclick="nbSwitchUser()" title="כניסה בתפקיד אחר">החלף</button>';
+    nav.appendChild(b);
+  }
+}
+
+function nbSwitchUser(){
+  try{ sessionStorage.removeItem(NB_ROLE_KEY); }catch(e){}
+  location.reload();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  if(window.WECOM_KB) return; // WordPress: real login and permissions
+  var r=nbGetRole();
+  if(NB_ROLES[r]) nbApplyRole(r); else nbShowGate();
 });
 
 // Single delegated listener for option clicks

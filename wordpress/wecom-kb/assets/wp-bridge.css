@@ -45,6 +45,7 @@
 .wkb-readonly #snav-trash,
 .wkb-readonly #snav-history,
 .wkb-readonly #mob-new,
+.wkb-readonly #mob-trash,
 .wkb-readonly .tc-del,
 .wkb-readonly .nb-edit-only,
 .wkb-readonly [onclick^="nbEditDoc"],

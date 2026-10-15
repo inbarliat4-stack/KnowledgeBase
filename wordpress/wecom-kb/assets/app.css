@@ -1005,6 +1005,30 @@ select.s1-input{height:40px;cursor:pointer}
 .rc-where{font-size:11px;color:var(--muted-l);margin-right:auto}
 .result-card mark,.rc-snippet mark{background:#FFE58F;color:inherit;border-radius:3px;padding:0 1px}
 .search-count{display:inline-block}
+
+/* ── DEMO ROLE GATE ── */
+body.gate-open{overflow:hidden}
+#nb-gate{position:fixed;inset:0;z-index:10000;background:var(--navy);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;direction:rtl}
+.gate-card{background:var(--white);border-radius:20px;padding:32px 28px;max-width:720px;width:100%;box-shadow:var(--shadow-lg);text-align:center;margin:auto}
+.gate-brand{background:var(--navy);border-radius:12px;display:inline-flex;padding:10px 16px;margin-bottom:16px}
+.gate-brand img{height:34px;width:auto;display:block}
+.gate-title{font-size:24px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.gate-sub{font-size:14px;color:var(--muted);margin-bottom:22px}
+.gate-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.gate-role{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-family:Rubik,sans-serif;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;transition:all var(--t)}
+.gate-role:hover,.gate-role:focus-visible{border-color:var(--red);background:var(--red-l);box-shadow:var(--shadow-md);outline:none}
+.gate-icon{font-size:28px;line-height:1}
+.gate-role-name{font-size:16px;font-weight:700;color:var(--navy)}
+.gate-role-desc{font-size:12.5px;color:var(--text-2);line-height:1.5}
+.gate-note{font-size:12px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 14px;line-height:1.55}
+.role-badge{display:flex;align-items:center;gap:6px;margin-inline-start:12px;flex-shrink:0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:3px 4px 3px 12px;color:#fff;font-size:12.5px;font-weight:600;white-space:nowrap}
+.role-badge button{font-family:Rubik,sans-serif;font-size:11.5px;font-weight:600;color:var(--navy);background:#fff;border:none;border-radius:14px;padding:4px 10px;cursor:pointer}
+@media(max-width:640px){.gate-roles{grid-template-columns:1fr}.gate-card{padding:24px 18px}.role-badge .rb-name{display:none}.role-badge{margin-inline-start:8px;padding-left:4px}}
+/* Read-only (agent) and editor restrictions — mirrors the WordPress plugin's rules. */
+.wkb-readonly #snav-new,.wkb-readonly #snav-trash,.wkb-readonly #snav-history,.wkb-readonly #mob-new,.wkb-readonly #mob-trash,
+.wkb-readonly .tc-del,.wkb-readonly .nb-edit-only,.wkb-readonly [onclick^="nbEditDoc"],
+.wkb-readonly [onclick^="nbConfirmDeleteDoc"],.wkb-readonly [data-action="new"],
+.role-editor .nb-admin-only{display:none!important}
 @media(max-width:640px){
   /* One swipeable line per filter row, so results stay near the top. */
   .lib-filter-row,#lib-filters{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:0 14px 2px}
