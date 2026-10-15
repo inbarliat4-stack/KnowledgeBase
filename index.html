@@ -990,6 +990,42 @@ select.s1-input{height:40px;cursor:pointer}
 .rich-edit{min-height:220px;border:1.5px solid var(--border);border-radius:0 0 var(--rs) var(--rs);padding:12px 14px;background:var(--white);outline:none}
 .rich-edit:focus{border-color:var(--navy-m)}
 @media(max-width:640px){.ke-row{flex-wrap:wrap}.ke-go{max-width:none;width:100%}}
+
+/* ── SEARCH ── */
+.nav-search input::-webkit-search-cancel-button{filter:invert(1);opacity:.6;cursor:pointer}
+.filter-btn.kind-btn{background:var(--white);font-weight:500}
+.filter-btn.kind-btn b{font-weight:800;margin-left:2px}
+.tag-chip.clickable{cursor:pointer;transition:all var(--t)}
+.tag-chip.clickable:hover{border-color:var(--navy-m);color:var(--navy);background:var(--navy-l)}
+.search-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:16px}
+.search-q{font-size:16px;font-weight:700;color:var(--navy);margin-left:10px}
+.search-count{font-size:12.5px;color:var(--muted)}
+.search-clear{font-family:Rubik,sans-serif;font-size:12.5px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer}
+.search-clear:hover{color:var(--red);border-color:var(--red-m)}
+.search-section{font-size:11.5px;font-weight:700;letter-spacing:.5px;color:var(--muted);margin:6px 2px 8px}
+.result-list{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.result-card{background:var(--white);border:1px solid var(--border);border-right:4px solid var(--kind);border-radius:10px;padding:12px 16px;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow var(--t),transform var(--t);display:flex;flex-direction:column;gap:5px;min-width:0}
+.result-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.rc-top{display:flex;align-items:center;gap:8px;min-width:0}
+.rc-title{font-size:15px;font-weight:700;color:var(--navy);line-height:1.35;min-width:0;word-break:break-word}
+.rc-path{font-size:12px;color:var(--muted)}
+.rc-path a{color:var(--navy-m);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.rc-desc{font-size:13px;color:var(--text-2);line-height:1.55}
+.rc-snippet{font-size:13px;color:var(--text-2);line-height:1.6;background:var(--bg);border-radius:8px;padding:7px 10px}
+.rc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rc-where{font-size:11px;color:var(--muted-l);margin-right:auto}
+.result-card mark,.rc-snippet mark{background:#FFE58F;color:inherit;border-radius:3px;padding:0 1px}
+.search-count{display:inline-block}
+@media(max-width:640px){
+  /* One swipeable line per filter row, so results stay near the top. */
+  .lib-filter-row,#lib-filters{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:0 14px 2px}
+  .lib-filter-row::-webkit-scrollbar,#lib-filters::-webkit-scrollbar{display:none}
+  .lib-filter-row .filter-btn,#lib-filters .filter-btn{flex-shrink:0;white-space:nowrap}
+  .filter-label{flex-shrink:0}
+  #lib-filters{margin-bottom:14px!important}
+  .search-head{padding:10px 12px}
+  .search-count{display:block;margin-top:2px}
+}
 </style>
 <script>
 var TOPICS=[
@@ -1165,10 +1201,24 @@ function nbTopicInWorld(t,world){
   return nbTopicItems(t.id).some(function(d){return d.worlds.indexOf(world)!==-1;});
 }
 
+// Item-level filters (world + document type) shared by browsing and search.
+function nbItemPassesFilters(d){
+  return (nbCurrentWorld==='all'||d.worlds.indexOf(nbCurrentWorld)!==-1)
+    &&(nbCurrentKind==='all'||d.kind===nbCurrentKind);
+}
+// A topic is shown when it has an item matching the world/type filters
+// (or always, when neither filter is set).
+function nbTopicMatchesFilters(t){
+  if(nbCurrentWorld==='all'&&nbCurrentKind==='all') return true;
+  return nbTopicItems(t.id).some(nbItemPassesFilters);
+}
+function nbCatMatches(cat,c){ return cat==='all'||c===cat||(cat==='tech'&&c==='tech2'); }
+
 function renderLibrary(cat){
   nbCurrentLibCat=cat;
+  if(nbSearchQuery){ nbRenderSearch(); return; }
   var f=TOPICS.filter(function(t){
-    return (cat==='all'||t.cat===cat||(cat==='tech'&&t.cat==='tech2'))&&nbTopicInWorld(t,nbCurrentWorld);
+    return nbCatMatches(cat,t.cat)&&nbTopicMatchesFilters(t);
   });
   var title=document.getElementById('lib-count');
   if(title) title.textContent=f.length;
@@ -1180,6 +1230,12 @@ function renderLibrary(cat){
 
 var nbCurrentLibCat='all';
 var nbCurrentWorld='all';
+var nbCurrentKind='all';
+function filterKind(kind){
+  nbCurrentKind=kind;
+  nbRenderLibFilters();
+  renderLibrary(nbCurrentLibCat);
+}
 function filterLibrary(cat,btn){
   document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.remove('active')});
   if(btn) btn.classList.add('active');
@@ -1201,6 +1257,13 @@ function nbRenderLibFilters(){
       return '<button class="filter-btn world-btn'+(nbCurrentWorld===w.id?' active':'')+'" onclick="filterWorld(\''+nbEsc(w.id)+'\')">'+nbEsc(w.name)+'</button>';
     }).join('')
     +'<button class="filter-btn world-btn ghost" onclick="nbManageWorlds()" title="ניהול עולמות תוכן">⚙ ניהול</button>';
+  var kel=document.getElementById('lib-kinds');
+  if(kel) kel.innerHTML='<span class="filter-label">סוג פריט</span>'
+    +'<button class="filter-btn world-btn'+(nbCurrentKind==='all'?' active':'')+'" onclick="filterKind(\'all\')">הכל</button>'
+    +NB_KIND_ORDER.map(function(k){
+      var K=NB_KINDS[k], on=nbCurrentKind===k;
+      return '<button class="filter-btn kind-btn'+(on?' active':'')+'" style="'+(on?'background:'+K.color+';border-color:'+K.color+';color:#fff':'color:'+K.color)+'" onclick="filterKind(\''+k+'\')" title="'+nbEsc(K.full)+'"><b>'+k+'</b> '+K.label+'</button>';
+    }).join('');
 }
 
 // Sidebar: content worlds + categories, with live counts.
@@ -1256,24 +1319,180 @@ function nbRenameWorld(i,name){
   nbRenderLibFilters();nbRenderSidebar();
 }
 
-function searchTopics(query){
-  query=(query||'').trim();
-  if(!query){ renderLibrary(nbCurrentLibCat||'all'); return; }
-  if(!document.getElementById('view-library').classList.contains('active')) showView('library');
-  var q=query.toLowerCase();
-  var matches=TOPICS.filter(function(t){
-    return (t.title&&t.title.toLowerCase().indexOf(q)!==-1)
-      || (t.desc&&t.desc.toLowerCase().indexOf(q)!==-1)
-      || (CAT[t.cat]&&CAT[t.cat].toLowerCase().indexOf(q)!==-1);
+// ── SEARCH (spec §7) ────────────────────────────────────────────────────
+// Free text across item names, descriptions, tags, owners, topic names and
+// the full content of every item type. Every word must appear somewhere in
+// the item. "#tag" searches tags only. Results are the knowledge items
+// themselves (plus matching topics), filtered by world / type / category.
+var nbSearchQuery='';
+
+function searchTopics(query){ nbSearch(query); }
+
+function nbSearch(query){
+  nbSearchQuery=(query||'').trim();
+  var inp=document.getElementById('nb-search');
+  if(inp&&inp.value!==nbSearchQuery) inp.value=nbSearchQuery;
+  var lib=document.getElementById('view-library');
+  if(nbSearchQuery&&lib&&!lib.classList.contains('active')) showView('library');
+  else renderLibrary(nbCurrentLibCat||'all');
+}
+function nbClearSearch(){ nbSearch(''); }
+function nbSearchTag(tag){ nbSearch('#'+tag); window.scrollTo(0,0); }
+
+// Lower-case, unify Hebrew quote marks, drop niqqud and markup.
+function nbNorm(s){
+  return nbPlain(s).toLowerCase()
+    .replace(/[״“”]/g,'"').replace(/[׳‘’`]/g,"'")
+    .replace(/[֑-ׇ]/g,'').replace(/\s+/g,' ');
+}
+
+// All searchable text of an item's content, whatever its type.
+function nbContentText(d){
+  var parts=[];
+  var b=nbGetBody(d);
+  if(b){
+    switch(d.kind){
+      case 'O': b.groups.forEach(function(g){parts.push(g.title);g.steps.forEach(function(s){parts.push(s.text);});}); break;
+      case 'I': parts.push(String(b.html||'').replace(/<(\/?(p|h\d|li|tr|td|th|br|div)[^>]*)>/gi,' ')); break;
+      case 'T': b.scripts.forEach(function(s){parts.push(s.situation);parts=parts.concat(s.lines);}); break;
+      case 'E': parts=parts.concat(b.when,b.to,b.conditions,b.document); (b.extra||[]).forEach(function(x){parts.push(x.title);parts=parts.concat(x.lines);}); break;
+      case 'M': parts=parts.concat(b.intro,b.outro); b.questions.forEach(function(q){parts.push(q.q,q.hint);q.answers.forEach(function(a){parts.push(a.text,a.note);});}); break;
+    }
+  } else {
+    (d.stages||[]).forEach(function(s){parts.push(s.title);nbStageItems(s).forEach(function(i){parts.push(i.text);});});
+  }
+  // The two hand-designed documents keep their text in their own pages.
+  if(d._isViewDoc){ var v=document.getElementById('view-'+d._isViewDoc); if(v) parts.push(v.innerText); }
+  return parts.filter(Boolean).map(nbPlain).join(' · ');
+}
+
+// Finds a query word in a text. Hebrew one-letter prefixes (ה ו ב ל מ ש כ)
+// are tolerated, so "הגלישה" also finds "גלישה". Returns the matched form.
+function nbFindToken(text,tok){
+  if(text.indexOf(tok)!==-1) return tok;
+  if(tok.length>3&&'הובלמשכ'.indexOf(tok.charAt(0))!==-1&&text.indexOf(tok.slice(1))!==-1) return tok.slice(1);
+  return null;
+}
+
+function nbSearchItems(query){
+  var docs=window.dynamicDocs||{};
+  var tagMode=query.charAt(0)==='#';
+  var tokens=tagMode?[nbNorm(query.slice(1)).trim()]:nbNorm(query).split(' ').filter(function(t){return t.length>1||/\d/.test(t);});
+  if(!tokens.length||!tokens[0]) return [];
+  var results=[];
+  Object.keys(docs).forEach(function(k){
+    var d=docs[k];
+    if(!d||!nbItemPassesFilters(d)) return;
+    var topics=TOPICS.filter(function(t){return d.topicIds.indexOf(t.id)!==-1;});
+    if(nbCurrentLibCat!=='all'&&!topics.some(function(t){return nbCatMatches(nbCurrentLibCat,t.cat);})) return;
+    var tags=d.tags.map(nbNorm);
+    if(tagMode){
+      if(!tags.some(function(t){return t===tokens[0]||t.indexOf(tokens[0])!==-1;})) return;
+      results.push({d:d,topics:topics,score:10,where:['תגית'],matched:[]});
+      return;
+    }
+    var f={title:nbNorm(d.topic),tags:tags.join(' '),desc:nbNorm(d.desc),owner:nbNorm(d.owner),
+      topics:topics.map(function(t){return nbNorm(t.title);}).join(' '),content:null};
+    var score=0, where={}, matched=[];
+    for(var i=0;i<tokens.length;i++){
+      var tok=tokens[i], hit=false;
+      if(nbFindToken(f.title,tok)){score+=10;where['שם']=1;hit=true;}
+      if(nbFindToken(f.tags,tok)){score+=8;where['תגיות']=1;hit=true;}
+      if(nbFindToken(f.desc,tok)){score+=5;where['תיאור']=1;hit=true;}
+      if(nbFindToken(f.topics,tok)){score+=4;where['נושא']=1;hit=true;}
+      if(nbFindToken(f.owner,tok)){score+=2;where['אחראי']=1;hit=true;}
+      if(f.content===null) f.content=nbNorm(nbContentText(d));
+      var cm=nbFindToken(f.content,tok);
+      if(cm){score+=1+Math.min(f.content.split(cm).length-1,5);where['תוכן']=1;hit=true;}
+      if(!hit) return; // every word must appear somewhere
+      matched.push(nbFindToken(f.title,tok)||cm||tok);
+    }
+    // The exact phrase ranks far above the words scattered around (or
+    // found inside longer words, e.g. "זרה" inside "חזרה").
+    if(tokens.length>1){
+      var phrase=tokens.join(' ');
+      if(f.title.indexOf(phrase)!==-1) score+=25;
+      else if((f.desc+' '+f.tags+' '+f.content).indexOf(phrase)!==-1){ score+=15; matched.unshift(phrase); }
+    }
+    results.push({d:d,topics:topics,score:score,where:Object.keys(where),matched:matched});
   });
+  return results.sort(function(a,b){return b.score-a.score;});
+}
+
+function nbSearchTopicsList(query){
+  if(query.charAt(0)==='#') return [];
+  var tokens=nbNorm(query).split(' ').filter(function(t){return t.length>1;});
+  if(!tokens.length) return [];
+  return TOPICS.filter(function(t){
+    if(!nbCatMatches(nbCurrentLibCat,t.cat)||!nbTopicMatchesFilters(t)) return false;
+    var txt=nbNorm(t.title+' '+(t.desc||''));
+    return tokens.every(function(tok){return nbFindToken(txt,tok);});
+  });
+}
+
+// Escapes text and wraps the matched words in <mark>.
+function nbHighlight(text,words){
+  var safe=nbEsc(nbPlain(text));
+  var ws=(words||[]).filter(function(w){return w&&w.length>1;}).map(function(w){return nbEsc(w).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');});
+  if(!ws.length) return safe;
+  return safe.replace(new RegExp('('+ws.join('|')+')','gi'),'<mark>$1</mark>');
+}
+// A short excerpt of the content around the first matched word.
+function nbSnippet(d,words){
+  var text=nbPlain(nbContentText(d)).replace(/\s+/g,' ');
+  var low=nbNorm(text), pos=-1;
+  (words||[]).some(function(w){var i=low.indexOf(w);if(i!==-1){pos=i;return true;}return false;});
+  if(pos===-1) return '';
+  var start=Math.max(0,pos-60), end=Math.min(text.length,pos+110);
+  return (start>0?'…':'')+nbHighlight(text.slice(start,end),words)+(end<text.length?'…':'');
+}
+
+function nbRenderSearch(){
   var el=document.getElementById('library-content');
   if(!el) return;
-  if(!matches.length){
-    el.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px 10px;font-size:14px">לא נמצאו תוצאות עבור "'+query+'"</div>';
-    return;
+  var q=nbSearchQuery;
+  var items=nbSearchItems(q), topics=nbSearchTopicsList(q);
+  var count=document.getElementById('lib-count');
+  if(count) count.textContent=topics.length;
+  var filtersOn=nbCurrentWorld!=='all'||nbCurrentKind!=='all'||nbCurrentLibCat!=='all';
+  var html='<div class="search-head"><div><span class="search-q">'+(q.charAt(0)==='#'?'תגית ':'')+'<bdi>"'+nbEsc(q.charAt(0)==='#'?q.slice(1):q)+'"</bdi></span>'
+    +'<span class="search-count">'+items.length+' פריטי ידע'+(topics.length?' · '+topics.length+' נושאים':'')+(filtersOn?' · לפי הסינון שנבחר':'')+'</span></div>'
+    +'<button class="search-clear" onclick="nbClearSearch()">✕ נקה חיפוש</button></div>';
+  if(!items.length&&!topics.length){
+    html+='<div class="empty-state">לא נמצאו תוצאות'+(filtersOn?'. נסו להסיר את הסינון של עולם התוכן / סוג הפריט / הקטגוריה.':'. נסו מילה אחרת או פחות מילים.')+'</div>';
   }
-  el.innerHTML='<div class="topic-grid">'+matches.map(cardHTML).join('')+'</div>';
-  setTimeout(function(){document.querySelectorAll('#library-content .fade-in:not(.visible)').forEach(function(el2,i){setTimeout(function(){el2.classList.add('visible')},i*40)})},50);
+  if(items.length){
+    html+='<div class="search-section">פריטי ידע</div><div class="result-list">'+items.map(function(r){
+      var d=r.d, snip=r.where.indexOf('תוכן')!==-1?nbSnippet(d,r.matched):'';
+      return '<div class="result-card fade-in" style="--kind:'+(NB_KINDS[d.kind]||NB_KINDS.R).color+'" onclick="nbOpenResult(\''+nbEsc(d.id)+'\')">'
+        +'<div class="rc-top">'+nbKindBadge(d.kind)
+        +'<span class="rc-title">'+nbHighlight(d.topic,r.matched)+'</span></div>'
+        +'<div class="rc-path">'+(r.topics.length?r.topics.map(function(t){return '<a onclick="event.stopPropagation();nbOpenTopic('+t.id+')">'+nbEsc(nbPlain(t.title))+'</a>';}).join(' · '):'ללא נושא')
+        +' · '+d.worlds.map(function(w){return nbEsc(nbWorldName(w));}).join(', ')+'</div>'
+        +(d.desc?'<div class="rc-desc">'+nbHighlight(d.desc,r.matched)+'</div>':'')
+        +(snip?'<div class="rc-snippet">'+snip+'</div>':'')
+        +'<div class="rc-foot">'+(d.tags.length?'<span class="ic-tags">'+d.tags.map(nbTagChip).join('')+'</span>':'')
+        +'<span class="rc-where">נמצא ב: '+r.where.join(', ')+'</span></div>'
+        +'</div>';
+    }).join('')+'</div>';
+  }
+  if(topics.length){
+    html+='<div class="search-section">נושאים</div><div class="topic-grid">'+topics.map(cardHTML).join('')+'</div>';
+  }
+  el.innerHTML=html;
+  setTimeout(function(){document.querySelectorAll('#library-content .fade-in:not(.visible)').forEach(function(e2,i){setTimeout(function(){e2.classList.add('visible')},i*30)})},30);
+}
+
+// Open a result in the context of its first topic (for the back button and sibling strip).
+function nbOpenResult(docId){
+  var d=window.dynamicDocs[docId];
+  if(!d) return;
+  nbCurrentTopicId=d.topicIds.length?d.topicIds[0]:null;
+  showDynamicDoc(docId);
+}
+
+function nbTagChip(tg){
+  return '<span class="tag-chip clickable" data-tag="'+nbEsc(tg)+'" onclick="event.stopPropagation();nbSearchTag(this.getAttribute(\'data-tag\'))" title="כל הפריטים עם התגית">#'+nbEsc(tg)+'</span>';
 }
 
 function filterCategory(cat){
@@ -1338,7 +1557,7 @@ function nbItemCardHTML(d){
     +'<div class="ic-top">'+nbKindBadge(d.kind)+'<span class="ic-worlds">'+d.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')+'</span></div>'
     +'<div class="ic-title">'+d.topic+'</div>'
     +(d.desc?'<div class="ic-desc">'+d.desc+'</div>':'')
-    +(d.tags.length?'<div class="ic-tags">'+d.tags.map(function(tg){return '<span class="tag-chip">#'+nbEsc(tg)+'</span>';}).join('')+'</div>':'')
+    +(d.tags.length?'<div class="ic-tags">'+d.tags.map(nbTagChip).join('')+'</div>':'')
     +'<div class="ic-foot">'+(d.updatedAt?'עודכן '+nbFmtDate(d.updatedAt):'תוכן מובנה')+(d.owner?' · אחראי: '+nbEsc(d.owner):'')+'</div>'
     +'</div>';
 }
@@ -1457,7 +1676,7 @@ function nbItemMetaHTML(doc){
 }
 function nbItemFieldsHTML(doc){
   var rows=[];
-  if(doc.tags.length) rows.push('<div class="ic-tags">'+doc.tags.map(function(tg){return '<span class="tag-chip">#'+nbEsc(tg)+'</span>';}).join('')+'</div>');
+  if(doc.tags.length) rows.push('<div class="ic-tags">'+doc.tags.map(nbTagChip).join('')+'</div>');
   var meta=[];
   meta.push(doc.updatedAt?'עודכן לאחרונה: '+nbFmtDate(doc.updatedAt):'תוכן מובנה');
   if(doc.owner) meta.push('גורם מקצועי אחראי: '+nbEsc(doc.owner));
@@ -3596,14 +3815,14 @@ document.addEventListener('change', function(e){
   <div class="nav-label"><span class="label-desktop">מאגר ידע פנימי</span><span class="label-mobile">מאגר<br>ידע<br>פנימי</span></div>
   <div class="nav-search">
     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,.55)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" placeholder="חפש נושא, תקלה, נוהל…" oninput="searchTopics(this.value)"/>
+    <input type="search" id="nb-search" placeholder="חיפוש בכל הידע: שם, תוכן, תגית (#eSIM)…" oninput="nbSearch(this.value)" onkeydown="if(event.key==='Escape'){nbClearSearch();this.blur();}" autocomplete="off"/>
   </div>
 </nav>
 <div class="app-shell">
 <nav class="sidebar-nav">
   <div class="snav-section">
     <div class="snav-title">ראשי</div>
-    <div class="snav-item active" id="snav-library" onclick="nbCurrentWorld='all';nbRenderLibFilters();nbRenderSidebar();showView('library')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span> ספריית ידע <span class="snav-badge">51</span></div>
+    <div class="snav-item active" id="snav-library" onclick="nbCurrentWorld='all';nbCurrentKind='all';nbSearchQuery='';var si=document.getElementById('nb-search');if(si)si.value='';nbRenderLibFilters();nbRenderSidebar();showView('library')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span> ספריית ידע <span class="snav-badge">51</span></div>
     <div class="snav-item" id="snav-new" onclick="showView('new')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span> פריט ידע חדש</div>
     <div class="snav-item" id="snav-trash" onclick="nbOpenTrash()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span> סל מיחזור <span class="snav-badge" id="nb-trash-count-nav" style="display:none"></span></div>
     <div class="snav-item" id="snav-history" onclick="nbOpenHistory()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg></span> היסטוריית גרסאות <span class="snav-badge" id="nb-history-count-nav" style="display:none"></span></div>
@@ -3616,6 +3835,7 @@ document.addEventListener('change', function(e){
 <div id="view-library" class="view active">
   <div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>ספריית ידע – <span id="lib-count">51</span> נושאים</div><div class="page-sub">עולם תוכן ← נושא ← פריטי ידע | לחצו על נושא כדי לראות את כל פריטי הידע שבו</div></div>
   <div class="lib-filter-row" id="lib-worlds"></div>
+  <div class="lib-filter-row" id="lib-kinds"></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="lib-filters">
     <button class="filter-btn active" onclick="filterLibrary('all',this)">הכל</button>
     <button class="filter-btn" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
