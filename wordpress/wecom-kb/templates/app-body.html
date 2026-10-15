@@ -16,6 +16,7 @@
     <div class="snav-item active" id="snav-library" onclick="nbCurrentWorld='all';nbCurrentKind='all';nbSearchQuery='';var si=document.getElementById('nb-search');if(si)si.value='';nbRenderLibFilters();nbRenderSidebar();showView('library')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span> ספריית ידע <span class="snav-badge">51</span></div>
     <div class="snav-item" id="snav-new" onclick="showView('new')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span> פריט ידע חדש</div>
     <div class="snav-item" id="snav-trash" onclick="nbOpenTrash()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span> סל מיחזור <span class="snav-badge" id="nb-trash-count-nav" style="display:none"></span></div>
+    <div class="snav-item nb-edit-only" id="snav-tracking" onclick="nbOpenTracking()"><span class="snav-icon">📋</span> מעקב מסמכים</div>
     <div class="snav-item" id="snav-history" onclick="nbOpenHistory()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg></span> היסטוריית גרסאות <span class="snav-badge" id="nb-history-count-nav" style="display:none"></span></div>
   </div>
   <div id="snav-dynamic"></div>
@@ -37,6 +38,11 @@
     <button class="filter-btn" onclick="filterLibrary('ops',this)">🎧 שיחה</button>
   </div>
   <div id="library-content"></div>
+</div>
+
+<!-- TRACKING (editors) -->
+<div id="view-tracking" class="view">
+  <div id="tracking-content"></div>
 </div>
 
 <!-- TOPIC -->

@@ -20,7 +20,7 @@ class Wecom_KB_Sanitizer {
 	const MAX_DEPTH = 32;
 
 	/** Keys whose values are identifiers, never displayed text. */
-	const ID_KEYS = array( 'id', 'dynId', 'docId', 'trashId', 'cat', 'pri', '_isViewDoc', 'kind', 'worlds' );
+	const ID_KEYS = array( 'id', 'dynId', 'docId', 'trashId', 'cat', 'pri', '_isViewDoc', 'kind', 'worlds', 'status' );
 
 	/** Keys whose values are image URLs. */
 	const IMAGE_KEYS = array( 'img', 'images' );

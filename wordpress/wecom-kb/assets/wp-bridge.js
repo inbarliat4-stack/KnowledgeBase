@@ -302,7 +302,8 @@
     var noop = function () {};
     ['nbEditDoc', 'nbConfirmDeleteDoc', 'nbConfirmDeleteTopic', 'nbOpenTrash', 'nbOpenHistory',
       'nbGoNew', 'nbCreateDoc', 'nbRestoreFromTrash', 'nbPermanentlyDeleteFromTrash',
-      'nbNewItemForTopic', 'nbManageWorlds', 'nbAddWorld', 'nbRenameWorld'].forEach(function (fn) {
+      'nbNewItemForTopic', 'nbManageWorlds', 'nbAddWorld', 'nbRenameWorld',
+      'nbSetStatus', 'nbOpenTracking', 'nbExportTracking'].forEach(function (fn) {
       window[fn] = noop;
     });
 
