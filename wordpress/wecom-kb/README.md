@@ -22,7 +22,7 @@ wecom-kb/
 
 ## Install
 
-1. Upload `wecom-kb.zip` in **Plugins → Add New Plugin → Upload Plugin**, or copy this folder to `wp-content/plugins/wecom-kb/`. If you use GitHub's "Download ZIP" instead, rename the folder inside it to `wecom-kb` first. Otherwise WordPress installs it as a separate plugin (`wecom-kb-plugin-main`), and later updates won't replace it.
+1. Upload `wecom-kb.zip` in **Plugins → Add New Plugin → Upload Plugin**, or copy this folder to `wp-content/plugins/wecom-kb/`. If you use GitHub's "Download ZIP" instead, rename the folder inside it to `wecom-kb` first. Otherwise WordPress installs it as a separate plugin (`KnowledgeBase-main`), and later updates won't replace it.
 2. Activate it. Activation creates the DB table and a page at **/kb/** that uses the template *"wecom – מאגר ידע (מסך מלא)"*. Any other page can use that template too. The page has no public content: the template sends logged-out visitors to the login screen, and the page is left out of the sitemap.
 3. Open the page while logged in as an editor. On first load, the built-in content from `index.html` is saved as version #1.
 4. To move content people created on the GitHub Pages version, go to **Tools → wecom מאגר ידע → ייבוא**. The page has a console one-liner that exports a browser's `localStorage` to a JSON file. Do this from the browser where the content was created, because that data never left that browser.
