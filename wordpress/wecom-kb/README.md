@@ -37,6 +37,20 @@ wecom-kb/
 - **Images.** The prototype embeds pasted images as base64. The server moves them into the Media Library (deduplicated by hash) and stores URLs instead. This includes images inside the rich text of information (I) items.
 - **Drafts.** The in-progress "פריט ידע חדש" draft stays in `localStorage`, because it is personal to each editor's browser.
 
+## Source documents → drafts (AI conversion)
+
+Editors can upload a source document (PDF, Word `.docx` or `.txt`, up to 20 MB). Claude converts it into a draft in the app's structure. Nothing reaches agents without an editor's approval (spec §8):
+
+- **New item.** In "פריט ידע חדש", under "יצירת פריט ממסמך מקור", the draft opens in the form with the conversion's notes (contradictions, broken references, open items) and status "ממתין לאישור". The editor picks the topic and worlds and saves.
+- **Existing item.** In the item's editor panel, "עדכון ממסמך מקור" stores the conversion as a proposed revision (`doc.revision`) next to the published content, and flags it "נדרשת לבדיקה". The review screen shows both versions side by side, with approve / edit before publishing / reject.
+- **Source files.** The original file is kept in the Media Library and linked from the item (`doc.source`).
+
+**Setup:** Tools → wecom מאגר ידע → "המרת מסמכי מקור". Enter an Anthropic API key, or define `WECOM_KB_ANTHROPIC_KEY` in `wp-config.php`, which takes precedence. Without a key the feature stays off and editors see a note.
+
+**How it works** (`includes/class-importer.php`): `POST /wp-json/wecom-kb/v1/import` (edit capability + `upload_files`). PDFs are sent as a base64 `document` block. Word files are converted to structured text on the server (headings, lists, tables, highlighted runs as `⟦…⟧`, comments), which needs PHP's `ZipArchive`. The request uses `claude-opus-5-5` with `output_config.format` (a JSON schema, so the draft always parses), `effort: high`, and `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`), which retries a safety-classifier refusal on the recommended fallback model. It's a single non-streaming `wp_remote_post` with a 600 s timeout, so very long documents may need splitting. The endpoint can be redirected with the `wecom_kb_anthropic_endpoint` filter (used for testing).
+
+**Privacy and cost:** the document's content is sent to Anthropic's API. A typical document costs a few cents to tens of cents.
+
 ## Permissions
 
 | Who | Capability (filter) | Gets |

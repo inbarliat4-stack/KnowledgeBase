@@ -13,6 +13,22 @@ class Wecom_KB_Admin {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_post_wecom_kb_export', array( __CLASS__, 'export' ) );
 		add_action( 'admin_post_wecom_kb_import', array( __CLASS__, 'import' ) );
+		add_action( 'admin_post_wecom_kb_ai_key', array( __CLASS__, 'save_ai_key' ) );
+	}
+
+	public static function save_ai_key() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'אין הרשאה.', 403 );
+		}
+		check_admin_referer( 'wecom_kb_ai_key' );
+		$key = isset( $_POST['wecom_kb_key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['wecom_kb_key'] ) ) ) : '';
+		if ( isset( $_POST['remove'] ) ) {
+			delete_option( Wecom_KB_Importer::OPTION_KEY );
+		} elseif ( '' !== $key ) {
+			update_option( Wecom_KB_Importer::OPTION_KEY, $key, false ); // not autoloaded
+		}
+		wp_safe_redirect( add_query_arg( 'wecom_kb_notice', 'ai_saved', admin_url( 'tools.php?page=wecom-kb' ) ) );
+		exit;
 	}
 
 	public static function menu() {
@@ -42,6 +58,8 @@ class Wecom_KB_Admin {
 
 			<?php if ( 'imported' === $notice ) : ?>
 				<div class="notice notice-success"><p>הייבוא הושלם. הגרסה הקודמת נשמרה בהיסטוריית הגרסאות.</p></div>
+			<?php elseif ( 'ai_saved' === $notice ) : ?>
+				<div class="notice notice-success"><p>הגדרות המרת המסמכים נשמרו.</p></div>
 			<?php elseif ( $notice ) : ?>
 				<div class="notice notice-error"><p><?php echo esc_html( $notice ); ?></p></div>
 			<?php endif; ?>
@@ -75,6 +93,31 @@ class Wecom_KB_Admin {
 					</td>
 				</tr>
 			</table>
+
+			<h2>המרת מסמכי מקור (AI)</h2>
+			<p style="max-width:760px">עורכים יכולים להעלות מסמך מקור (PDF, Word או טקסט) והמערכת ממירה אותו לטיוטת פריט ידע במבנה המתאים. הטיוטה לא מתפרסמת אוטומטית: עורך בודק ומאשר אותה.
+				<br><strong>לתשומת לב:</strong> תוכן המסמך נשלח לשירות של Anthropic לצורך ההמרה. ודאו שמדיניות החברה מאפשרת זאת. העלות היא בערך כמה סנטים עד עשרות סנטים למסמך.</p>
+			<?php if ( defined( 'WECOM_KB_ANTHROPIC_KEY' ) && WECOM_KB_ANTHROPIC_KEY ) : ?>
+				<p>✅ מפתח API מוגדר בקובץ <code>wp-config.php</code> (WECOM_KB_ANTHROPIC_KEY).</p>
+			<?php else : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<input type="hidden" name="action" value="wecom_kb_ai_key">
+					<?php wp_nonce_field( 'wecom_kb_ai_key' ); ?>
+					<p>
+						<?php if ( Wecom_KB_Importer::enabled() ) : ?>
+							✅ מוגדר מפתח API שמסתיים ב-<code><?php echo esc_html( substr( Wecom_KB_Importer::api_key(), -4 ) ); ?></code>.
+						<?php else : ?>
+							המרת מסמכים כבויה — אין מפתח API.
+						<?php endif; ?>
+					</p>
+					<input type="password" name="wecom_kb_key" autocomplete="off" placeholder="sk-ant-..." style="width:360px;direction:ltr">
+					<?php submit_button( Wecom_KB_Importer::enabled() ? 'החלף מפתח' : 'שמור מפתח', 'primary', 'submit', false ); ?>
+					<?php if ( Wecom_KB_Importer::enabled() ) : ?>
+						<?php submit_button( 'הסר מפתח', 'delete', 'remove', false ); ?>
+					<?php endif; ?>
+					<p class="description">מפתח נוצר בכתובת console.anthropic.com. לאבטחה מוגברת אפשר להגדיר אותו בקובץ wp-config.php: <code>define( 'WECOM_KB_ANTHROPIC_KEY', '...' );</code></p>
+				</form>
+			<?php endif; ?>
 
 			<h2>ייצוא</h2>
 			<p>הורדת הספרייה הנוכחית כקובץ JSON (גיבוי).</p>

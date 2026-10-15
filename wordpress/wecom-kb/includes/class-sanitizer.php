@@ -22,8 +22,8 @@ class Wecom_KB_Sanitizer {
 	/** Keys whose values are identifiers, never displayed text. */
 	const ID_KEYS = array( 'id', 'dynId', 'docId', 'trashId', 'cat', 'pri', '_isViewDoc', 'kind', 'worlds', 'status' );
 
-	/** Keys whose values are image URLs. */
-	const IMAGE_KEYS = array( 'img', 'images' );
+	/** Keys whose values are image or file URLs. */
+	const IMAGE_KEYS = array( 'img', 'images', 'url' );
 
 	/** @var array data-URL => attachment URL, for images converted in this request. */
 	private $images = array();

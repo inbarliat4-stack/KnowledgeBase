@@ -296,6 +296,31 @@
     );
   };
 
+  // ── Source-document import (spec §8) ────────────────────────────────────
+  // The app calls this; the server stores the file as the source document
+  // and asks Claude for a draft. Resolves to {draft, source, usage}.
+  window.NB_CAN_IMPORT = !!CFG.canImport;
+  window.nbImportSourceDoc = function (file, opts, retried) {
+    opts = opts || {};
+    var fd = new FormData();
+    fd.append('file', file);
+    fd.append('kind', opts.kind || '');
+    fd.append('catalog', opts.catalog || '');
+    fd.append('current', opts.current || '');
+    return fetch(CFG.restUrl + 'import', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'X-WP-Nonce': CFG.nonce }, body: fd
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.ok) return j;
+        if (!retried && j.code === 'rest_cookie_invalid_nonce') {
+          return refreshNonce().then(function () { return window.nbImportSourceDoc(file, opts, true); });
+        }
+        throw { status: r.status, code: j.code, message: j.message || ('HTTP ' + r.status) };
+      });
+    });
+  };
+
   // ── Read-only mode (agents without edit rights) ─────────────────────────
 
   if (!CFG.canEdit) {
@@ -303,7 +328,9 @@
     ['nbEditDoc', 'nbConfirmDeleteDoc', 'nbConfirmDeleteTopic', 'nbOpenTrash', 'nbOpenHistory',
       'nbGoNew', 'nbCreateDoc', 'nbRestoreFromTrash', 'nbPermanentlyDeleteFromTrash',
       'nbNewItemForTopic', 'nbManageWorlds', 'nbAddWorld', 'nbRenameWorld',
-      'nbSetStatus', 'nbOpenTracking', 'nbExportTracking'].forEach(function (fn) {
+      'nbSetStatus', 'nbOpenTracking', 'nbExportTracking',
+      'nbStartImport', 'nbStartSourceUpdate', 'nbOpenReview', 'nbApproveRevision', 'nbEditRevision', 'nbRejectRevision',
+      'nbImportSourceDoc'].forEach(function (fn) {
       window[fn] = noop;
     });
 

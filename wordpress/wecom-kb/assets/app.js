@@ -191,7 +191,7 @@ function showView(id){
   document.querySelectorAll('.snav-item').forEach(function(i){i.classList.remove('active')});
   var sm=document.getElementById('snav-'+id);
   if(sm) sm.classList.add('active');
-  ['library','new','tracking'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(t==='library'&&['browsing','churn','article','topic'].indexOf(id)!==-1))});
+  ['library','new','tracking'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(t==='library'&&['browsing','churn','article','topic'].indexOf(id)!==-1)||(t==='tracking'&&id==='review'))});
   if(id==='library'){var sl=document.getElementById('snav-library');if(sl)sl.classList.toggle('active',nbCurrentWorld==='all');}
   if(id==='library'){
     renderLibrary('all');
@@ -566,7 +566,7 @@ function nbOpenTopic(id){
 function nbItemCardHTML(d){
   var k=NB_KINDS[d.kind]||NB_KINDS.R;
   return '<div class="item-card fade-in'+(nbActive(d)?'':' inactive')+'" style="--kind:'+k.color+'" onclick="showDynamicDoc(\''+nbEsc(d.id)+'\')">'
-    +'<div class="ic-top"><span class="ic-badges">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'</span><span class="ic-worlds">'+d.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')+'</span></div>'
+    +'<div class="ic-top"><span class="ic-badges">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'<span class="nb-edit-only">'+nbReviewBadge(d)+'</span></span><span class="ic-worlds">'+d.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')+'</span></div>'
     +'<div class="ic-title">'+d.topic+'</div>'
     +(d.desc?'<div class="ic-desc">'+d.desc+'</div>':'')
     +(d.tags.length?'<div class="ic-tags">'+d.tags.map(nbTagChip).join('')+'</div>':'')
@@ -658,6 +658,8 @@ function nbApplyS1Fields(doc,d){
   if(newStatus==='published'&&doc.status!=='published') doc.publishedAt=Date.now();
   doc.status=newStatus;
   doc.track={state:d.trackState||'',priority:d.trackPriority||'',gap:(d.trackGap||'').trim(),source:(d.trackSource||'').trim()};
+  if(d.source) doc.source=d.source; // the uploaded source document (spec §8)
+  if(d.fromRevision) delete doc.revision; // a proposed update was reviewed and saved
   doc.updatedAt=Date.now();
 }
 
@@ -686,7 +688,7 @@ function nbSiblingStripHTML(doc){
     }).join('')+'</div>';
 }
 function nbItemMetaHTML(doc){
-  return '<div class="article-meta">'+nbKindBadge(doc.kind)+nbStatusBadge(doc)
+  return '<div class="article-meta">'+nbKindBadge(doc.kind)+nbStatusBadge(doc)+'<span class="nb-edit-only">'+nbReviewBadge(doc)+'</span>'
     +doc.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
     +'</div>';
 }
@@ -711,13 +713,242 @@ function nbTrackPanelHTML(doc){
   if(doc.publishedAt) cells.push('<div><span>פורסם</span><b>'+nbFmtDate(doc.publishedAt)+'</b></div>');
   if(t.source) cells.push('<div class="wide"><span>מקור ידע</span><b>'+nbEsc(t.source)+'</b></div>');
   if(t.gap) cells.push('<div class="wide gap"><span>פער / פעולה נדרשת</span><b>'+nbEsc(t.gap)+'</b></div>');
+  if(doc.source) cells.push('<div class="wide"><span>מסמך מקור</span><b>'+nbSourceLink(doc.source)+'</b></div>');
+  var canImport=typeof window.nbImportSourceDoc==='function'&&window.NB_CAN_IMPORT;
+  var actions=(doc.revision?'<button type="button" class="tp-btn warn" onclick="nbOpenReview(\''+nbEsc(doc.id)+'\')">🔎 גרסה מוצעת ממתינה — השווה ואשר</button>':'')
+    +(canImport?'<button type="button" class="tp-btn" onclick="nbStartSourceUpdate(\''+nbEsc(doc.id)+'\')">📄 עדכון ממסמך מקור</button>':'');
   return '<div class="track-panel nb-edit-only">'
     +'<div class="tp-head"><span class="tp-title">מעקב עריכה</span><label>סטטוס '
     +'<select onchange="nbSetStatus(\''+nbEsc(doc.id)+'\',this.value)">'
     +NB_STATUS_ORDER.map(function(s){return '<option value="'+s+'"'+(doc.status===s?' selected':'')+'>'+NB_STATUSES[s].label+'</option>';}).join('')
     +'</select></label></div>'
     +(cells.length?'<div class="tp-grid">'+cells.join('')+'</div>':'')
+    +(actions?'<div class="tp-actions">'+actions+'</div>':'')
     +'</div>';
+}
+
+// ── SOURCE DOCUMENTS → DRAFTS (spec §8) ─────────────────────────────────
+// An editor uploads the source document (PDF / Word / text). On WordPress the
+// server stores it and Claude converts it into a draft in the app's structure
+// (window.nbImportSourceDoc, from wp-bridge.js). Nothing reaches agents until
+// an editor approves: new items start as "ממתין לאישור"; for an existing item
+// the conversion is kept as a proposed revision next to the published version.
+
+// Codes and titles of existing items, so references in the source resolve.
+function nbCatalogText(){
+  var docs=window.dynamicDocs||{};
+  return Object.keys(docs).map(function(k){return docs[k];}).filter(Boolean).map(function(d){
+    return nbPlain(d.topic)+' · '+((NB_KINDS[d.kind]||{}).full||'');
+  }).sort().join('\n');
+}
+// Plain-text version of an item, sent along when converting an update.
+function nbItemToText(d){
+  return nbPlain(d.topic)+'\n'+(d.desc||'')+'\n'+nbContentText(d).split(' · ').join('\n');
+}
+
+// Converts the structured draft returned by the server into item fields.
+function nbDraftToItem(draft,source){
+  var k=NB_KINDS[draft.kind]?draft.kind:'R';
+  var code=(draft.code||'').trim();
+  var item={kind:k,topic:(code?code+' · ':'')+(draft.title||'').trim(),desc:(draft.desc||'').trim(),
+    tags:(draft.tags||[]).filter(Boolean),stages:[],source:source||null,_issues:(draft.issues||[]).filter(Boolean)};
+  var lines=function(a){return (a||[]).map(function(s){return String(s||'').trim();}).filter(Boolean);};
+  switch(k){
+    case 'R': case 'S':
+      item.stages=(draft.stages||[]).map(function(s,i){
+        return {num:String(i+1),title:(s.title||'').trim(),items:lines(s.items).map(function(t){return {text:t,img:null};}),images:[]};
+      }).filter(function(s){return s.title||s.items.length;});
+      break;
+    case 'O':
+      item.body={groups:(draft.groups||[]).map(function(g){return {title:(g.title||'').trim(),steps:lines(g.steps).map(function(t){return {text:t,img:null};})};}).filter(function(g){return g.steps.length;})};
+      break;
+    case 'I': item.body={html:nbSanitizeRich(draft.html||'')}; break;
+    case 'T': item.body={scripts:(draft.scripts||[]).map(function(s){return {situation:(s.situation||'').trim(),lines:lines(s.lines)};})}; break;
+    case 'E':
+      var e=draft.escalation||{};
+      item.body={when:lines(e.when),to:lines(e.to),conditions:lines(e.conditions),document:lines(e.document),
+        extra:(e.extra||[]).map(function(x){return {title:(x.title||'').trim(),lines:lines(x.lines)};}).filter(function(x){return x.lines.length;})};
+      break;
+    case 'M':
+      var dg=draft.diagnosis||{};
+      item.body={intro:lines(dg.intro),outro:lines(dg.outro),questions:(dg.questions||[]).map(function(q){
+        return {q:(q.q||'').trim(),hint:(q.hint||'').trim(),answers:(q.answers||[]).map(function(a){
+          var go='', note=(a.note||'').trim(), n=a.go_question;
+          if(typeof n==='number'&&n>=0) go='q:'+n;
+          else if(a.go_code){
+            var t=nbFindByCode(String(a.go_code).trim());
+            if(t) go='item:'+t.id; else note=(note?note+' ':'')+'(מסמך '+a.go_code+')';
+          }
+          return {text:(a.text||'').trim(),note:note,go:go};
+        })};
+      })};
+      break;
+  }
+  return item;
+}
+
+// "Busy" overlay while the conversion runs (usually 30 seconds to 2 minutes).
+function nbBusy(msg){
+  var o=document.getElementById('nb-busy');
+  if(!o){ o=document.createElement('div'); o.id='nb-busy'; o.className='nb-overlay'; document.body.appendChild(o); }
+  o.innerHTML='<div class="nb-modal busy-card"><div class="busy-spin"></div><div class="busy-msg">'+msg+'</div>'
+    +'<div class="nb-modal-sub">ההמרה נמשכת בדרך כלל בין חצי דקה לשתי דקות. אפשר להמשיך לעבוד בלשונית אחרת.</div></div>';
+}
+function nbBusyDone(){ var o=document.getElementById('nb-busy'); if(o) o.remove(); }
+function nbImportError(err){
+  nbBusyDone();
+  nbConfirmGeneric('ההמרה לא הצליחה',nbEsc((err&&err.message)||'שגיאה לא ידועה')+'<br><span style="font-size:12px">אפשר לנסות שוב, או להזין את התוכן ידנית.</span>','הבנתי','var(--navy)',function(){});
+}
+
+// Import box at the top of "פריט ידע חדש" (new items only).
+function nbRenderImportBox(){
+  var el=document.getElementById('nb-import-box');
+  if(!el) return;
+  var d=nbState.s1&&nbState.s1.s1data||{};
+  var issues=(d.issues||[]).length?'<div class="import-issues"><div class="ii-title">⚠ לבדיקתך לפני השמירה — הערות מההמרה:</div><ul>'
+      +d.issues.map(function(x){return '<li>'+nbEsc(x)+'</li>';}).join('')+'</ul></div>':'';
+  var src=d.source?'<div class="import-src">מסמך מקור: '+nbSourceLink(d.source)+'</div>':'';
+  if(window.nbEditingDocId){ el.innerHTML=issues+src; return; }
+  var body;
+  if(typeof window.nbImportSourceDoc!=='function'){
+    body='<div class="import-note">זמין באתר ה-WordPress: העלאת מסמך מקור (PDF / Word) והמרה אוטומטית לטיוטה. בגרסת ההדגמה הזו אין שרת שמבצע את ההמרה.</div>';
+  } else if(!window.NB_CAN_IMPORT){
+    body='<div class="import-note">המרת מסמכים לא הוגדרה עדיין. מנהל המערכת צריך להזין מפתח API בהגדרות התוסף (כלים ← wecom מאגר ידע).</div>';
+  } else {
+    body='<div class="import-row"><input type="file" id="nb-import-file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">'
+      +'<select id="nb-import-kind" class="s1-input"><option value="">סוג: זיהוי אוטומטי</option>'
+      +NB_KIND_ORDER.map(function(k){return '<option value="'+k+'">'+k+' · '+NB_KINDS[k].full+'</option>';}).join('')+'</select>'
+      +'<button type="button" class="nb-btn" onclick="nbStartImport()">המר לטיוטה</button></div>'
+      +'<div class="import-note">הטיוטה נפתחת כאן לבדיקה ונשמרת בסטטוס "ממתין לאישור" — לא מוצגת לנציגים עד שתאשרו ותפרסמו.</div>';
+  }
+  el.innerHTML='<div class="import-box nb-edit-only"><div class="import-title">📄 יצירת פריט ממסמך מקור</div>'+body+'</div>'+issues+src;
+}
+
+function nbStartImport(){
+  var f=document.getElementById('nb-import-file');
+  var file=f&&f.files&&f.files[0];
+  if(!file){ alert('בחרו קובץ PDF, Word או טקסט'); return; }
+  var kind=(document.getElementById('nb-import-kind')||{}).value||'';
+  nbBusy('ממיר את "'+nbEsc(file.name)+'" לטיוטה…');
+  window.nbImportSourceDoc(file,{kind:kind,catalog:nbCatalogText()}).then(function(res){
+    nbBusyDone();
+    var item=nbDraftToItem(res.draft,res.source);
+    item.status='pending';
+    item.worlds=[]; item.topicIds=[];
+    item.track={state:'קיים',source:res.source?res.source.name:'',gap:'',priority:''};
+    nbFillForm(item,null);
+    nbState.s1.applied=false; // editor picks topic and worlds before saving
+    nbRender(); nbRenderImportBox();
+  }).catch(nbImportError);
+}
+
+function nbSourceLink(src){
+  if(!src||!/^https?:\/\//i.test(src.url||'')) return nbEsc((src&&src.name)||'');
+  return '<a href="'+nbEsc(src.url)+'" target="_blank" rel="noopener">'+nbEsc(src.name||'מסמך מקור')+'</a>';
+}
+function nbReviewBadge(d){ return d&&d.revision?'<span class="status-badge review">נדרשת לבדיקה</span>':''; }
+
+// Existing item: upload an updated source document → proposed revision.
+function nbStartSourceUpdate(docId){
+  var d=window.dynamicDocs[docId];
+  if(!d) return;
+  var inp=document.createElement('input');
+  inp.type='file'; inp.accept='.pdf,.docx,.txt';
+  inp.onchange=function(){
+    var file=inp.files&&inp.files[0];
+    if(!file) return;
+    nbBusy('ממיר את "'+nbEsc(file.name)+'" ומשווה לגרסה הנוכחית…');
+    window.nbImportSourceDoc(file,{kind:d.kind,catalog:nbCatalogText(),current:nbItemToText(d)}).then(function(res){
+      nbBusyDone();
+      var item=nbDraftToItem(res.draft,res.source);
+      d.revision={item:{kind:item.kind,topic:item.topic,desc:item.desc,tags:item.tags,stages:item.stages,body:item.body||null},
+        issues:item._issues,source:res.source||null,createdAt:Date.now()};
+      nbSaveLibrary('הוצעה גרסה חדשה ממסמך מקור: '+nbPlain(d.topic));
+      nbOpenReview(docId);
+    }).catch(nbImportError);
+  };
+  inp.click();
+}
+
+// Read-only outline of an item (any type), used to compare versions side by side.
+function nbOutlineHTML(it){
+  var h='<div class="ol-head">'+nbKindBadge(it.kind)+'<div class="ol-title">'+nbEsc(nbPlain(it.topic))+'</div>'
+    +(it.desc?'<div class="ol-desc">'+nbEsc(it.desc)+'</div>':'')
+    +((it.tags||[]).length?'<div class="ic-tags">'+it.tags.map(function(t){return '<span class="tag-chip">#'+nbEsc(t)+'</span>';}).join('')+'</div>':'')+'</div>';
+  var ul=function(a){return a&&a.length?'<ul>'+a.map(function(x){return '<li>'+nbEsc(nbPlain(x))+'</li>';}).join('')+'</ul>':'';};
+  var b=it.body||(nbIsStageKind(it.kind)?null:nbGetBody(it));
+  if(nbIsStageKind(it.kind)||!b){
+    h+='<ol class="ol-stages">'+(it.stages||[]).map(function(s){return '<li><b>'+nbEsc(nbPlain(s.title))+'</b>'+ul(nbStageItems(s).map(function(i){return i.text;}))+'</li>';}).join('')+'</ol>';
+  } else switch(it.kind){
+    case 'O': h+=b.groups.map(function(g){return (g.title?'<h4>'+nbEsc(g.title)+'</h4>':'')+'<ol>'+g.steps.map(function(s){return '<li>'+nbEsc(nbPlain(s.text))+'</li>';}).join('')+'</ol>';}).join(''); break;
+    case 'I': h+='<div class="kv-rich">'+nbSanitizeRich(b.html)+'</div>'; break;
+    case 'T': h+=b.scripts.map(function(s){return '<h4>'+nbEsc(s.situation)+'</h4>'+ul(s.lines);}).join(''); break;
+    case 'E':
+      [['when','מתי מעבירים'],['to','למי מעבירים'],['conditions','תנאים לפני ההעברה'],['document','מה לתעד']].forEach(function(f){
+        h+='<h4>'+f[1]+'</h4>'+(b[f[0]]&&b[f[0]].length?ul(b[f[0]]):'<div class="e-missing">⚠ לא הוגדר</div>');
+      });
+      (b.extra||[]).forEach(function(x){ h+='<h4>'+nbEsc(x.title)+'</h4>'+ul(x.lines); });
+      break;
+    case 'M':
+      h+=ul(b.intro)+'<ol class="ol-stages">'+b.questions.map(function(q,qi){
+        return '<li><b>'+nbEsc(q.q)+'</b>'+(q.hint?'<div class="ol-desc">'+nbEsc(q.hint)+'</div>':'')+'<ul>'+q.answers.map(function(a){
+          var to=/^q:\d+$/.test(a.go)?'שאלה '+(parseInt(a.go.slice(2))+1):(a.go.indexOf('item:')===0?nbPlain((window.dynamicDocs[a.go.slice(5)]||{}).topic||a.go):'סיום');
+          return '<li>'+nbEsc(a.text)+' ← <b>'+nbEsc(to)+'</b>'+(a.note?'<div class="ol-desc">'+nbEsc(a.note)+'</div>':'')+'</li>';
+        }).join('')+'</ul></li>';
+      }).join('')+'</ol>'+ul(b.outro);
+      break;
+  }
+  return h;
+}
+
+function nbOpenReview(docId){
+  var d=window.dynamicDocs[docId];
+  if(!d||!d.revision){ showDynamicDoc(docId); return; }
+  var r=d.revision, el=document.getElementById('review-content');
+  el.innerHTML='<div class="article-back" onclick="showDynamicDoc(\''+nbEsc(docId)+'\')">← חזרה לפריט</div>'
+    +'<div class="page-header"><div class="page-title">🔎 בדיקת גרסה מוצעת</div>'
+    +'<div class="page-sub">נוצרה מהמסמך '+nbSourceLink(r.source)+' ב-'+nbFmtDate(r.createdAt)+'. הנציגים ממשיכים לראות את הגרסה המפורסמת עד שתאשרו.</div></div>'
+    +((r.issues||[]).length?'<div class="import-issues"><div class="ii-title">⚠ הערות מההמרה — לבדיקתך:</div><ul>'+r.issues.map(function(x){return '<li>'+nbEsc(x)+'</li>';}).join('')+'</ul></div>':'')
+    +'<div class="review-actions">'
+      +'<button class="nb-btn approve" onclick="nbApproveRevision(\''+nbEsc(docId)+'\')">✓ אשר ופרסם</button>'
+      +'<button class="nb-btn" onclick="nbEditRevision(\''+nbEsc(docId)+'\')">✎ ערוך לפני פרסום</button>'
+      +'<button class="nb-btn ghost" onclick="nbRejectRevision(\''+nbEsc(docId)+'\')">✕ דחה</button></div>'
+    +'<div class="review-grid"><div class="review-col"><div class="rc-label">הגרסה המפורסמת היום</div>'+nbOutlineHTML(d)+'</div>'
+    +'<div class="review-col proposed"><div class="rc-label">הגרסה המוצעת מהמסמך</div>'+nbOutlineHTML(r.item)+'</div></div>';
+  nbEnhance(el.querySelector('.review-grid'));
+  showView('review');
+}
+function nbApproveRevision(docId){
+  var d=window.dynamicDocs[docId];
+  if(!d||!d.revision) return;
+  var r=d.revision.item;
+  ['kind','topic','desc','tags','stages'].forEach(function(f){ d[f]=JSON.parse(JSON.stringify(r[f])); });
+  if(r.body) d.body=JSON.parse(JSON.stringify(r.body)); else delete d.body;
+  d.source=d.revision.source||d.source;
+  d.status='published'; d.publishedAt=Date.now(); d.updatedAt=Date.now();
+  delete d.revision;
+  nbSaveLibrary('אושרה ופורסמה גרסה ממסמך מקור: '+nbPlain(d.topic));
+  nbRenderSidebar(); renderLibrary(nbCurrentLibCat||'all');
+  showDynamicDoc(docId);
+}
+function nbEditRevision(docId){
+  var d=window.dynamicDocs[docId];
+  if(!d||!d.revision) return;
+  var tmp=JSON.parse(JSON.stringify(d));
+  var r=d.revision.item;
+  ['kind','topic','desc','tags','stages'].forEach(function(f){ tmp[f]=JSON.parse(JSON.stringify(r[f])); });
+  if(r.body) tmp.body=JSON.parse(JSON.stringify(r.body)); else delete tmp.body;
+  tmp.source=d.revision.source; tmp._issues=d.revision.issues; tmp._fromRevision=true; tmp.status='published';
+  nbFillForm(tmp,docId);
+}
+function nbRejectRevision(docId){
+  var d=window.dynamicDocs[docId];
+  if(!d||!d.revision) return;
+  nbConfirmGeneric('דחיית הגרסה המוצעת','הגרסה המפורסמת תישאר כמו שהיא. הגרסה המוצעת תימחק (קובץ המקור נשאר בספריית המדיה).','דחה','var(--red)',function(){
+    delete d.revision;
+    nbSaveLibrary('נדחתה גרסה מוצעת: '+nbPlain(d.topic));
+    showDynamicDoc(docId);
+  });
 }
 
 // ── TRACKING VIEW: the knowledge-map tracking sheet, inside the app ──
@@ -732,7 +963,7 @@ function nbTrackRows(){
       topics:TOPICS.filter(function(t){return d.topicIds.indexOf(t.id)!==-1;}).map(function(t){return nbPlain(t.title);})};
   }).filter(function(r){
     var f=nbTrackFilter;
-    return f==='all'||(NB_STATUSES[f]&&r.d.status===f)||(f==='gap'&&r.t.gap)||(f==='high'&&r.t.priority==='גבוהה');
+    return f==='all'||(NB_STATUSES[f]&&r.d.status===f)||(f==='gap'&&r.t.gap)||(f==='high'&&r.t.priority==='גבוהה')||(f==='review'&&r.d.revision);
   }).sort(function(a,b){
     if(!!a.code!==!!b.code) return a.code?-1:1;
     // Same order as the knowledge map: diagnosis → routes → operations → help → escalation → specialist.
@@ -747,7 +978,7 @@ function nbRenderTracking(){
   var all=Object.keys(window.dynamicDocs||{}).map(function(k){return window.dynamicDocs[k];}).filter(Boolean);
   var count=function(fn){return all.filter(fn).length;};
   var chips=[['all','הכל',all.length]].concat(NB_STATUS_ORDER.map(function(s){return [s,NB_STATUSES[s].label,count(function(d){return d.status===s;})];}))
-    .concat([['gap','עם פער פתוח',count(function(d){return d.track&&d.track.gap;})],['high','עדיפות גבוהה',count(function(d){return d.track&&d.track.priority==='גבוהה';})]]);
+    .concat([['review','נדרשת לבדיקה',count(function(d){return !!d.revision;})],['gap','עם פער פתוח',count(function(d){return d.track&&d.track.gap;})],['high','עדיפות גבוהה',count(function(d){return d.track&&d.track.priority==='גבוהה';})]]);
   var rows=nbTrackRows();
   el.innerHTML='<div class="page-header"><div class="page-title">📋 מעקב מסמכים</div>'
       +'<div class="page-sub">סטטוס, מצב התוכן ופערים לכל פריט ידע — לעורכים בלבד. לחיצה על שורה פותחת את הפריט.</div></div>'
@@ -760,7 +991,7 @@ function nbRenderTracking(){
         return '<tr onclick="showDynamicDoc(\''+nbEsc(r.d.id)+'\')">'
           +'<td class="tt-code">'+nbEsc(r.code)+'</td><td class="tt-title">'+nbEsc(r.title)+'</td>'
           +'<td>'+nbKindBadge(r.d.kind,true)+'</td><td class="tt-muted">'+nbEsc(r.topics.join(', '))+'</td>'
-          +'<td>'+nbStatusBadge(r.d,true)+'</td><td>'+nbEsc(r.t.state||'')+'</td>'
+          +'<td>'+nbStatusBadge(r.d,true)+nbReviewBadge(r.d)+'</td><td>'+nbEsc(r.t.state||'')+'</td>'
           +'<td>'+(r.t.priority?'<span class="prio prio-'+(r.t.priority==='גבוהה'?'h':r.t.priority==='בינונית'?'m':'l')+'">'+nbEsc(r.t.priority)+'</span>':'')+'</td>'
           +'<td class="tt-gap">'+nbEsc(r.t.gap||'')+'</td><td>'+nbEsc(r.d.owner||'')+'</td>'
           +'<td class="tt-muted">'+nbFmtDate(r.d.updatedAt)+'</td></tr>';
@@ -771,7 +1002,7 @@ function nbRenderTracking(){
         return '<div class="track-card" onclick="showDynamicDoc(\''+nbEsc(r.d.id)+'\')">'
           +'<div class="tc2-top">'+nbKindBadge(r.d.kind,true)+(r.code?'<span class="tt-code">'+nbEsc(r.code)+'</span>':'')
           +'<span class="tc2-title">'+nbEsc(r.title)+'</span></div>'
-          +'<div class="tc2-badges">'+nbStatusBadge(r.d,true)
+          +'<div class="tc2-badges">'+nbStatusBadge(r.d,true)+nbReviewBadge(r.d)
           +(r.t.state?'<span class="tc2-chip">'+nbEsc(r.t.state)+'</span>':'')
           +(r.t.priority?'<span class="prio prio-'+prioCls+'">עדיפות '+nbEsc(r.t.priority)+'</span>':'')+'</div>'
           +(r.t.gap?'<div class="tc2-gap"><span>פער / פעולה נדרשת</span>'+nbEsc(r.t.gap)+'</div>':'')
@@ -1271,7 +1502,12 @@ function nbEditDoc(docId){
 function nbEditDocImpl(docId){
   var doc=window.dynamicDocs[docId];
   if(!doc) return;
+  nbFillForm(doc,docId);
+}
 
+// Loads an item into the "פריט ידע חדש" form. editingId: the item being
+// edited, or null for a new item (e.g. a draft converted from a source document).
+function nbFillForm(doc,editingId){
   // Reset form state
   NB_STAGES.forEach(function(s){ nbState[s.id]={picked:[],custom:[],applied:false,s1data:{}}; }); nbState._bodies={};
   nbCustomStages=[];
@@ -1280,7 +1516,8 @@ function nbEditDocImpl(docId){
   // Restore s1 data
   nbState['s1'].s1data={topic:doc.topic,desc:doc.desc||'',kind:doc.kind,worlds:(doc.worlds||[]).slice(),
     tags:(doc.tags||[]).join(', '),owner:doc.owner||'',topicId:doc.topicIds&&doc.topicIds.length?String(doc.topicIds[0]):'',cat:doc.cat,
-    status:doc.status,trackState:(doc.track||{}).state||'',trackPriority:(doc.track||{}).priority||'',trackGap:(doc.track||{}).gap||'',trackSource:(doc.track||{}).source||''};
+    status:doc.status,trackState:(doc.track||{}).state||'',trackPriority:(doc.track||{}).priority||'',trackGap:(doc.track||{}).gap||'',trackSource:(doc.track||{}).source||'',
+    source:doc.source||null,issues:doc._issues||null,fromRevision:!!doc._fromRevision};
   // Typed items: load their content (or a conversion of their old steps) into the editor.
   nbState._bodies={};
   if(!nbIsStageKind(doc.kind)) nbState._bodies[doc.kind]=nbBodyForEditor(doc);
@@ -1289,7 +1526,7 @@ function nbEditDocImpl(docId){
   // Restore stage selections (rebuilding any custom, user-created stages
   // that don't match one of the fixed NB_STAGES definitions), preserving
   // the order the stages were saved in
-  doc.stages.forEach(function(savedStage){
+  (doc.stages||[]).forEach(function(savedStage){
     // Only a stable stage id is trustworthy for matching. "num" alone is NOT
     // reliable: built-in knowledge items number their own content stages
     // starting at "1", which would otherwise collide with Stage 1's num
@@ -1319,10 +1556,11 @@ function nbEditDocImpl(docId){
   });
 
   // Store docId being edited
-  window.nbEditingDocId=docId;
+  window.nbEditingDocId=editingId||null;
 
   showView('new');
   nbRender();
+  nbRenderImportBox();
 
   // Scroll to top
   window.scrollTo(0,0);
@@ -1332,7 +1570,7 @@ function nbEditDocImpl(docId){
     var sumBox=document.getElementById('nb-summary');
     if(sumBox){
       var createBtn=sumBox.querySelector('button');
-      if(createBtn) createBtn.textContent='💾 שמור שינויים';
+      if(createBtn) createBtn.textContent=editingId?'💾 שמור שינויים':'✚ צור פריט ידע חדש';
     }
     nbUpdateSummary();
   }, 100);
@@ -1612,6 +1850,7 @@ NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s
 function nbRender(){
   var el=document.getElementById('nb-stages');
   if(!el) return;
+  nbRenderImportBox();
   var order=nbGetStageOrder();
   var allStages=nbGetAllStages();
   var orderedStages=order.map(function(id){return allStages.filter(function(s){return s.id===id;})[0];}).filter(Boolean);
@@ -2950,7 +3189,8 @@ function nbApplyRole(role){
     var noop=function(){};
     ['nbEditDoc','nbConfirmDeleteDoc','nbConfirmDeleteTopic','nbOpenTrash','nbOpenHistory','nbGoNew','nbCreateDoc',
      'nbRestoreFromTrash','nbPermanentlyDeleteFromTrash','nbNewItemForTopic','nbManageWorlds','nbAddWorld','nbRenameWorld',
-     'nbSetStatus','nbOpenTracking','nbExportTracking'].forEach(function(fn){ window[fn]=noop; });
+     'nbSetStatus','nbOpenTracking','nbExportTracking',
+     'nbStartImport','nbStartSourceUpdate','nbOpenReview','nbApproveRevision','nbEditRevision','nbRejectRevision'].forEach(function(fn){ window[fn]=noop; });
     var origShowView=window.showView;
     window.showView=function(id){ if(id==='new') return; return origShowView.apply(this,arguments); };
   }

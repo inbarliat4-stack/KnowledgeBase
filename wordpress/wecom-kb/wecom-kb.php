@@ -2,7 +2,7 @@
 /**
  * Plugin Name: wecom – מאגר ידע פנימי
  * Description: פלטפורמת הידע לנציגי שירות ותמיכה של wecom. מוסיף תבנית עמוד "wecom – מאגר ידע" ושומר את הספרייה, סל המיחזור והיסטוריית הגרסאות במסד הנתונים של WordPress.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Text Domain: wecom-kb
@@ -10,7 +10,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WECOM_KB_VERSION', '1.1.0' );
+define( 'WECOM_KB_VERSION', '1.2.0' );
 define( 'WECOM_KB_FILE', __FILE__ );
 define( 'WECOM_KB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WECOM_KB_URL', plugin_dir_url( __FILE__ ) );
@@ -20,6 +20,7 @@ require_once WECOM_KB_DIR . 'includes/class-store.php';
 require_once WECOM_KB_DIR . 'includes/class-sanitizer.php';
 require_once WECOM_KB_DIR . 'includes/class-rest.php';
 require_once WECOM_KB_DIR . 'includes/class-admin.php';
+require_once WECOM_KB_DIR . 'includes/class-importer.php';
 
 /**
  * Capability needed to open the knowledge base (agents).
@@ -61,6 +62,7 @@ function wecom_kb_activate() {
 
 add_action( 'plugins_loaded', array( 'Wecom_KB_Store', 'maybe_upgrade' ) );
 add_action( 'rest_api_init', array( 'Wecom_KB_Rest', 'register_routes' ) );
+add_action( 'rest_api_init', array( 'Wecom_KB_Importer', 'register_routes' ) );
 Wecom_KB_Admin::init();
 
 // ── Page template ───────────────────────────────────────────────────────────
@@ -113,6 +115,8 @@ function wecom_kb_boot_data() {
 		'restUrl'   => esc_url_raw( rest_url( 'wecom-kb/v1/' ) ),
 		'nonce'     => wp_create_nonce( 'wp_rest' ),
 		'canEdit'   => current_user_can( wecom_kb_edit_cap() ),
+		// Source-document conversion is available (an API key is configured).
+		'canImport' => current_user_can( wecom_kb_edit_cap() ) && current_user_can( 'upload_files' ) && Wecom_KB_Importer::enabled(),
 		'user'      => array(
 			'id'   => $user->ID,
 			'name' => $user->display_name,
