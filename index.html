@@ -828,60 +828,127 @@ html{overflow-x:hidden}body{font-family:"Rubik",sans-serif;background:var(--bg);
   display: none !important;
 }
 
+/* ── KNOWLEDGE ARCHITECTURE: worlds → topics → typed items ── */
+.kind-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 9px 2px 8px;border-radius:20px;border:1px solid;white-space:nowrap;line-height:1.5}
+.kind-badge b{font-weight:800;font-size:11px;letter-spacing:.2px}
+.kind-badge.sm{padding:0 6px;font-size:10.5px;min-width:20px;justify-content:center}
+.world-chip{display:inline-flex;align-items:center;font-size:11px;font-weight:500;color:var(--navy-m);background:var(--navy-l);border-radius:20px;padding:2px 9px;white-space:nowrap}
+.tag-chip{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 7px;white-space:nowrap}
+.tc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid var(--border)}
+.tc-count{font-size:11.5px;font-weight:600;color:var(--navy-m)}
+.tc-count.empty{color:var(--muted-l);font-weight:500}
+.tc-kinds{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.empty-state{text-align:center;color:var(--muted);padding:44px 12px;font-size:14px;background:var(--white);border:1px dashed var(--border-strong);border-radius:var(--r)}
+.lib-filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.filter-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;margin-left:4px}
+.filter-btn.world-btn.ghost{background:transparent;box-shadow:none;border-style:dashed;color:var(--muted)}
+/* topic view */
+.topic-head{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+.topic-title{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.3}
+.topic-desc{font-size:13.5px;color:var(--text-2);margin-bottom:12px}
+.topic-kinds{display:flex;gap:6px;flex-wrap:wrap}
+.topic-kind-pill{font-size:12px;font-weight:500;border-radius:20px;padding:3px 11px}
+.topic-kind-pill b{font-weight:800;margin-left:2px}
+.item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.item-card{background:var(--white);border:1px solid var(--border);border-top:3px solid var(--kind);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow-sm);transition:box-shadow var(--t),transform var(--t);min-width:0}
+.item-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.ic-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.ic-worlds{display:flex;gap:4px;flex-wrap:wrap}
+.ic-title{font-size:15px;font-weight:700;color:var(--navy);line-height:1.35;word-break:break-word}
+.ic-desc{font-size:12.5px;color:var(--text-2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ic-tags{display:flex;gap:4px;flex-wrap:wrap}
+.ic-foot{font-size:11px;color:var(--muted-l);margin-top:auto;padding-top:4px}
+.nb-add-item{margin-top:16px;width:100%;height:42px;background:var(--white);color:var(--red);border:1.5px dashed var(--red-m);border-radius:var(--rs);font-family:Rubik,sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:background var(--t)}
+.nb-add-item:hover{background:var(--red-l)}
+/* item page */
+.sibling-strip{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--r);max-width:960px}
+.ss-label{font-size:12px;color:var(--muted);margin-left:4px}
+.ss-label a{color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ss-item{display:inline-flex;align-items:center;gap:5px;font-family:Rubik,sans-serif;font-size:12.5px;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ss-item:hover{border-color:var(--navy-m);color:var(--navy)}
+.ss-item.current{background:var(--navy);border-color:var(--navy);color:#fff}
+.article-head .ic-tags{margin-top:10px}
+.item-fields{font-size:11.5px;color:var(--muted);margin-top:8px}
+.special-meta{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px}
+.special-meta .article-meta{margin-bottom:4px}
+/* stage-1 form */
+.s1-box{background:var(--white);border:1.5px dashed var(--border-strong);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.s1-label{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.s1-sublabel{font-size:11.5px;font-weight:600;color:var(--muted);margin:10px 0 6px}
+.s1-help{font-size:11.5px;color:var(--muted);margin:-2px 0 8px;line-height:1.5}
+.s1-input{width:100%;border:1.5px solid var(--border);border-radius:var(--rs);padding:8px 11px;font-family:Rubik,sans-serif;font-size:13.5px;color:var(--text);background:var(--input-bg);outline:none;direction:rtl}
+.s1-input:focus{border-color:var(--navy-m)}
+select.s1-input{height:40px;cursor:pointer}
+.world-pick{display:flex;gap:6px;flex-wrap:wrap}
+.world-toggle{font-family:Rubik,sans-serif;font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--input-bg);color:var(--text-2);cursor:pointer}
+.world-toggle.on{background:var(--ok-bg);border-color:var(--ok-b);color:var(--ok);font-weight:600}
+.kind-radio{align-items:flex-start}
+/* small modal (content worlds) */
+.nb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.nb-modal{background:#fff;border-radius:16px;padding:22px;max-width:440px;width:100%;max-height:80vh;overflow-y:auto;font-family:Rubik,sans-serif;direction:rtl}
+.nb-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.nb-modal-title{font-size:16px;font-weight:700;color:var(--navy)}
+.nb-modal-sub{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.55}
+.nb-x{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:4px 8px}
+.nb-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.nb-input{flex:1;min-width:0;height:36px;border:1.5px solid var(--border);border-radius:var(--rs);padding:0 10px;font-family:Rubik,sans-serif;font-size:13.5px;color:var(--text);background:var(--input-bg);outline:none}
+.nb-row-meta{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.nb-btn{height:36px;padding:0 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--rs);font-family:Rubik,sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+@media(max-width:640px){.topic-head{padding:16px}.topic-title{font-size:19px}.item-grid{grid-template-columns:1fr}}
 </style>
 <script>
 var TOPICS=[
-  {id:1,cat:'sim',wave:1,pri:'hh',title:'הפעלת SIM פיזי חדש',desc:'שלבי הפעלה, זיהוי לקוח, בדיקת סטטוס קו, מה לומר ללקוח'},
-  {id:2,cat:'sim',wave:1,pri:'hh',title:'הפעלת eSIM – קוד QR',desc:'דרישות מקדימות, שליחת QR, סריקה, טעויות נפוצות, אימות'},
-  {id:3,cat:'sim',wave:1,pri:'h',title:'מעבר SIM פיזי ↔ eSIM',desc:'בדיקת תאימות, ביטול פרופיל ישן, הפקה מחדש'},
-  {id:4,cat:'sim',wave:1,pri:'h',title:'תקלה אחרי הפעלת SIM/eSIM',desc:'אבחון, רענון קו, APN, הסלמה'},
-  {id:5,cat:'sim',wave:1,pri:'h',title:'QR לא נסרק / קוד לא התקבל',desc:'סיבות, שליחה מחדש, בדיקת מצלמה, חלופות'},
-  {id:6,cat:'sim',wave:2,pri:'m',title:'החלפת SIM אבוד/גנוב',desc:'חסימה מיידית, אימות מוגבר, הנפקה חדשה'},
-  {id:7,cat:'sim',wave:2,pri:'m',title:'בירור סטטוס משלוח SIM',desc:'בדיקת הזמנה, שליח, נקודת איסוף'},
-  {id:8,cat:'sim',wave:2,pri:'m',title:'איסוף SIM מהום סנטר',desc:'תנאי איסוף, מה לקוח צריך להביא'},
-  {id:9,cat:'sim',wave:2,pri:'m',title:'תאימות מכשיר – VoLTE/eSIM/5G',desc:'בדיקת דגם, גרסת מערכת, הסבר מגבלות'},
-  {id:10,cat:'sim',wave:2,pri:'m',title:'קווים שנרכשו ולא הופעלו',desc:'בדיקת סטטוס, הדרכת הפעלה, סגירת טיפול'},
-  {id:11,cat:'tech',wave:1,pri:'hh',title:'אין גלישה סלולרית',desc:'אבחון, חבילה וקו, נתונים, APN, איפוס, הסלמה',active:true},
-  {id:12,cat:'tech',wave:1,pri:'h',title:'גלישה איטית / ניתוקים',desc:'אזור, דור רשת, עומס, מכשיר, שיפור',active:true},
-  {id:13,cat:'intl',wave:1,pri:'h',title:'הגדרת APN במכשיר',desc:'בחו"ל: ערך APN נדרש, איפוס לברירת מחדל, לפי יצרן'},
-  {id:14,cat:'tech',wave:1,pri:'h',title:'אין קליטה / אין שירות',desc:'רשת, SIM, מצב טיסה, אזור גיאוגרפי, איפוס'},
-  {id:15,cat:'tech',wave:1,pri:'h',title:'לא מצליח להוציא/לקבל שיחות',desc:'חסימות, חוב, VoLTE, קליטה, מצב קו'},
-  {id:16,cat:'tech',wave:2,pri:'m',title:'שיחות מתנתקות / שמע ירוד',desc:'אזור, מכשיר, VoLTE, קליטה, SIM'},
-  {id:17,cat:'tech',wave:2,pri:'m',title:'בעיות VoLTE ומכשירים ישנים',desc:'זיהוי חוסר תמיכה, חלופות, הסבר'},
-  {id:18,cat:'tech',wave:2,pri:'m',title:'בעיות SMS וקודי אימות',desc:'קבלת SMS, חסימות, קודי בנקים, איפוס'},
-  {id:19,cat:'tech',wave:2,pri:'m',title:'Hotspot לא עובד',desc:'תמיכה בחבילה, APN, הגדרות שיתוף'},
-  {id:20,cat:'tech',wave:1,pri:'h',title:'טרבלשוטינג בסיסי: כיבוי ואיפוס',desc:'סדר פעולות אחיד, הסבר ללקוח, מתי להסלים'},
-  {id:21,cat:'billing',wave:1,pri:'hh',title:'בירור חיוב גבוה / לא מזוהה',desc:'פירוק חיוב, השוואה לחודשים, שירותים נלווים'},
-  {id:22,cat:'billing',wave:1,pri:'hh',title:'הסבר חשבונית וסעיפי חיוב',desc:'מבנה חשבונית, קבועים/משתנים, זיכויים, מע"מ'},
-  {id:23,cat:'billing',wave:1,pri:'h',title:'תשלום חוב / חסימת קו',desc:'בדיקת יתרה, אפשרויות תשלום, הסרת חסימה'},
-  {id:24,cat:'billing',wave:1,pri:'h',title:'עדכון אמצעי תשלום / אשראי',desc:'אימות לקוח, עדכון כרטיס, פג תוקף, הוראת קבע'},
-  {id:25,cat:'billing',wave:2,pri:'m',title:'זיכויים והחזרים',desc:'בדיקת זכאות, SLA, עדכון לקוח, הסלמה'},
-  {id:26,cat:'billing',wave:2,pri:'m',title:'שליחת חשבונית / אישור תשלום',desc:'סוגי מסמכים, אימות, זמני שליחה'},
-  {id:27,cat:'plans',wave:1,pri:'h',title:'שינוי מסלול / הוזלת חבילה',desc:'מסלול נוכחי, הצעות זמינות, השפעה על התחייבויות'},
-  {id:28,cat:'plans',wave:1,pri:'h',title:'צירוף קו / שדרוג 5G',desc:'תנאי הצטרפות, בדיקת מכשיר, עלויות, הפעלה'},
-  {id:29,cat:'plans',wave:1,pri:'h',title:'ניתוק / ביטול קו',desc:'אימות, סיבת ניתוק, שימור, מועד, אישור'},
-  {id:30,cat:'plans',wave:3,pri:'l',title:'הקפאת קו זמנית',desc:'תנאי הקפאה, משך, עלות, חזרה לפעילות'},
-  {id:31,cat:'plans',wave:2,pri:'m',title:'העברת בעלות על קו',desc:'מסמכים, אימות שני צדדים, השפעה על חיובים'},
-  {id:32,cat:'plans',wave:1,pri:'h',title:'עדכון פרטי לקוח',desc:'כתובת, מייל, טלפון, פרטי חיוב, אימות'},
-  {id:33,cat:'plans',wave:2,pri:'m',title:'ניוד מספרים',desc:'שלבי ניוד, סטטוס, זמני השלמה, תקלות'},
-  {id:34,cat:'intl',wave:1,pri:'m',title:'רכישת חבילת חו"ל לפני טיסה',desc:'התאמת חבילה, מדינות, נפח, מועד הפעלה'},
-  {id:35,cat:'intl',wave:2,pri:'m',title:'תקלת גלישה/קליטה בחו"ל',desc:'Roaming, בחירת רשת ידנית, APN'},
-  {id:36,cat:'intl',wave:2,pri:'m',title:'בירור תעריפי חו"ל / חיוב אחרי חזרה',desc:'הסבר תעריפים, חריגה, טיפול'},
-  {id:42,cat:'intl',wave:1,pri:'hh',title:"אבחון מרכזי לתקלות ושירות בחו\"ל",desc:"זיהוי תקלה ראשוני, הפניה למסלול הנכון: קליטה, גלישה, שיחות, הודעות"},
-  {id:43,cat:'intl',wave:1,pri:'hh',title:"אין קליטה / רישום לרשת בחו\"ל",desc:"שירות נדידה, נדידת נתונים, בחירת רשת ידנית, ארה\"ב"},
-  {id:44,cat:'intl',wave:1,pri:'h',title:"אין גלישה בחו\"ל",desc:"בדיקות מערכת, APN, זהות רשת, ריענון SIM, איפוס רשת"},
-  {id:45,cat:'intl',wave:2,pri:'m',title:"תקלה באפליקציה מסוימת בחו\"ל",desc:"הרשאות נתונים, חוסך נתונים, הפניה לספק האפליקציה"},
-  {id:46,cat:'intl',wave:2,pri:'h',title:"תקלות שיחות בחו\"ל",desc:"שיחות יוצאות/נכנסות, קידומת חיוג, רשת מארחת, VoLTE"},
-  {id:47,cat:'intl',wave:2,pri:'h',title:"תקלות הודעות בחו\"ל",desc:"שליחה/קבלה, קוד אימות, רשת מארחת, זהות רשת"},
-  {id:48,cat:'intl',wave:2,pri:'m',title:"הפעלת נדידת נתונים במכשיר",desc:"לפי יצרן: iPhone, Samsung, שיאומי, וואווי, פיקסל ועוד"},
-  {id:50,cat:'intl',wave:3,pri:'l',title:"תפעול STK ושינוי זהות רשת בחו\"ל",desc:"מתי לבצע שינוי זהות פרטנר, מתי להימנע (מסמך חלקי)"},
-  {id:51,cat:'intl',wave:2,pri:'m',title:"בחירת רשת ידנית בחו\"ל",desc:"חיבור ידני למפעיל מאושר, לפי יצרן, ארה\"ב בנפרד"},
-  {id:52,cat:'intl',wave:2,pri:'h',title:"העברה למומחה בתקלת חו\"ל",desc:"מתי להעביר, מה לתעד לפני ההעברה"},
-  {id:37,cat:'ops',wave:1,pri:'h',title:'זיהוי ואימות לקוח',desc:'פרטים נדרשים לכל פעולה, אימות מוגבר, ניסוח'},
-  {id:38,cat:'ops',wave:2,pri:'m',title:'ניתוב והעברת שיחה',desc:'מתי להעביר, מה לתעד, מניעת העברה חוזרת'},
-  {id:39,cat:'ops',wave:2,pri:'m',title:'תיאום Callback / מעקב',desc:'מתי לפתוח, SLA, עדכון לקוח, סגירת מעגל'},
-  {id:40,cat:'ops',wave:3,pri:'m',title:'תלונות, הסלמות, קושי תקשורתי',desc:'לקוח מתוסכל, בקשת מנהל, מחסום שפה'},
-  {id:41,cat:'ops',wave:1,pri:'hh',title:'דיבאג נטישה',desc:'זיהוי לקוח מאותת נטישה, 3 מסלולי טיפול, תסריטי שיחה והתנגדויות',active:true,dynId:'view-churn-doc'},
+  {id:1,cat:'sim',title:'הפעלת SIM פיזי חדש',desc:'שלבי הפעלה, זיהוי לקוח, בדיקת סטטוס קו, מה לומר ללקוח'},
+  {id:2,cat:'sim',title:'הפעלת eSIM – קוד QR',desc:'דרישות מקדימות, שליחת QR, סריקה, טעויות נפוצות, אימות'},
+  {id:3,cat:'sim',title:'מעבר SIM פיזי ↔ eSIM',desc:'בדיקת תאימות, ביטול פרופיל ישן, הפקה מחדש'},
+  {id:4,cat:'sim',title:'תקלה אחרי הפעלת SIM/eSIM',desc:'אבחון, רענון קו, APN, הסלמה'},
+  {id:5,cat:'sim',title:'QR לא נסרק / קוד לא התקבל',desc:'סיבות, שליחה מחדש, בדיקת מצלמה, חלופות'},
+  {id:6,cat:'sim',title:'החלפת SIM אבוד/גנוב',desc:'חסימה מיידית, אימות מוגבר, הנפקה חדשה'},
+  {id:7,cat:'sim',title:'בירור סטטוס משלוח SIM',desc:'בדיקת הזמנה, שליח, נקודת איסוף'},
+  {id:8,cat:'sim',title:'איסוף SIM מהום סנטר',desc:'תנאי איסוף, מה לקוח צריך להביא'},
+  {id:9,cat:'sim',title:'תאימות מכשיר – VoLTE/eSIM/5G',desc:'בדיקת דגם, גרסת מערכת, הסבר מגבלות'},
+  {id:10,cat:'sim',title:'קווים שנרכשו ולא הופעלו',desc:'בדיקת סטטוס, הדרכת הפעלה, סגירת טיפול'},
+  {id:11,cat:'tech',title:'אין גלישה סלולרית',desc:'אבחון, חבילה וקו, נתונים, APN, איפוס, הסלמה'},
+  {id:12,cat:'tech',title:'גלישה איטית / ניתוקים',desc:'אזור, דור רשת, עומס, מכשיר, שיפור'},
+  {id:13,cat:'intl',title:'הגדרת APN במכשיר',desc:'בחו"ל: ערך APN נדרש, איפוס לברירת מחדל, לפי יצרן'},
+  {id:14,cat:'tech',title:'אין קליטה / אין שירות',desc:'רשת, SIM, מצב טיסה, אזור גיאוגרפי, איפוס'},
+  {id:15,cat:'tech',title:'לא מצליח להוציא/לקבל שיחות',desc:'חסימות, חוב, VoLTE, קליטה, מצב קו'},
+  {id:16,cat:'tech',title:'שיחות מתנתקות / שמע ירוד',desc:'אזור, מכשיר, VoLTE, קליטה, SIM'},
+  {id:17,cat:'tech',title:'בעיות VoLTE ומכשירים ישנים',desc:'זיהוי חוסר תמיכה, חלופות, הסבר'},
+  {id:18,cat:'tech',title:'בעיות SMS וקודי אימות',desc:'קבלת SMS, חסימות, קודי בנקים, איפוס'},
+  {id:19,cat:'tech',title:'Hotspot לא עובד',desc:'תמיכה בחבילה, APN, הגדרות שיתוף'},
+  {id:20,cat:'tech',title:'טרבלשוטינג בסיסי: כיבוי ואיפוס',desc:'סדר פעולות אחיד, הסבר ללקוח, מתי להסלים'},
+  {id:21,cat:'billing',title:'בירור חיוב גבוה / לא מזוהה',desc:'פירוק חיוב, השוואה לחודשים, שירותים נלווים'},
+  {id:22,cat:'billing',title:'הסבר חשבונית וסעיפי חיוב',desc:'מבנה חשבונית, קבועים/משתנים, זיכויים, מע"מ'},
+  {id:23,cat:'billing',title:'תשלום חוב / חסימת קו',desc:'בדיקת יתרה, אפשרויות תשלום, הסרת חסימה'},
+  {id:24,cat:'billing',title:'עדכון אמצעי תשלום / אשראי',desc:'אימות לקוח, עדכון כרטיס, פג תוקף, הוראת קבע'},
+  {id:25,cat:'billing',title:'זיכויים והחזרים',desc:'בדיקת זכאות, SLA, עדכון לקוח, הסלמה'},
+  {id:26,cat:'billing',title:'שליחת חשבונית / אישור תשלום',desc:'סוגי מסמכים, אימות, זמני שליחה'},
+  {id:27,cat:'plans',title:'שינוי מסלול / הוזלת חבילה',desc:'מסלול נוכחי, הצעות זמינות, השפעה על התחייבויות'},
+  {id:28,cat:'plans',title:'צירוף קו / שדרוג 5G',desc:'תנאי הצטרפות, בדיקת מכשיר, עלויות, הפעלה'},
+  {id:29,cat:'plans',title:'ניתוק / ביטול קו',desc:'אימות, סיבת ניתוק, שימור, מועד, אישור'},
+  {id:30,cat:'plans',title:'הקפאת קו זמנית',desc:'תנאי הקפאה, משך, עלות, חזרה לפעילות'},
+  {id:31,cat:'plans',title:'העברת בעלות על קו',desc:'מסמכים, אימות שני צדדים, השפעה על חיובים'},
+  {id:32,cat:'plans',title:'עדכון פרטי לקוח',desc:'כתובת, מייל, טלפון, פרטי חיוב, אימות'},
+  {id:33,cat:'plans',title:'ניוד מספרים',desc:'שלבי ניוד, סטטוס, זמני השלמה, תקלות'},
+  {id:34,cat:'intl',title:'רכישת חבילת חו"ל לפני טיסה',desc:'התאמת חבילה, מדינות, נפח, מועד הפעלה'},
+  {id:35,cat:'intl',title:'תקלת גלישה/קליטה בחו"ל',desc:'Roaming, בחירת רשת ידנית, APN'},
+  {id:36,cat:'intl',title:'בירור תעריפי חו"ל / חיוב אחרי חזרה',desc:'הסבר תעריפים, חריגה, טיפול'},
+  {id:42,cat:'intl',title:"אבחון מרכזי לתקלות ושירות בחו\"ל",desc:"זיהוי תקלה ראשוני, הפניה למסלול הנכון: קליטה, גלישה, שיחות, הודעות"},
+  {id:43,cat:'intl',title:"אין קליטה / רישום לרשת בחו\"ל",desc:"שירות נדידה, נדידת נתונים, בחירת רשת ידנית, ארה\"ב"},
+  {id:44,cat:'intl',title:"אין גלישה בחו\"ל",desc:"בדיקות מערכת, APN, זהות רשת, ריענון SIM, איפוס רשת"},
+  {id:45,cat:'intl',title:"תקלה באפליקציה מסוימת בחו\"ל",desc:"הרשאות נתונים, חוסך נתונים, הפניה לספק האפליקציה"},
+  {id:46,cat:'intl',title:"תקלות שיחות בחו\"ל",desc:"שיחות יוצאות/נכנסות, קידומת חיוג, רשת מארחת, VoLTE"},
+  {id:47,cat:'intl',title:"תקלות הודעות בחו\"ל",desc:"שליחה/קבלה, קוד אימות, רשת מארחת, זהות רשת"},
+  {id:48,cat:'intl',title:"הפעלת נדידת נתונים במכשיר",desc:"לפי יצרן: iPhone, Samsung, שיאומי, וואווי, פיקסל ועוד"},
+  {id:50,cat:'intl',title:"תפעול STK ושינוי זהות רשת בחו\"ל",desc:"מתי לבצע שינוי זהות פרטנר, מתי להימנע (מסמך חלקי)"},
+  {id:51,cat:'intl',title:"בחירת רשת ידנית בחו\"ל",desc:"חיבור ידני למפעיל מאושר, לפי יצרן, ארה\"ב בנפרד"},
+  {id:52,cat:'intl',title:"העברה למומחה בתקלת חו\"ל",desc:"מתי להעביר, מה לתעד לפני ההעברה"},
+  {id:37,cat:'ops',title:'זיהוי ואימות לקוח',desc:'פרטים נדרשים לכל פעולה, אימות מוגבר, ניסוח'},
+  {id:38,cat:'ops',title:'ניתוב והעברת שיחה',desc:'מתי להעביר, מה לתעד, מניעת העברה חוזרת'},
+  {id:39,cat:'ops',title:'תיאום Callback / מעקב',desc:'מתי לפתוח, SLA, עדכון לקוח, סגירת מעגל'},
+  {id:40,cat:'ops',title:'תלונות, הסלמות, קושי תקשורתי',desc:'לקוח מתוסכל, בקשת מנהל, מחסום שפה'},
+  {id:41,cat:'ops',title:'דיבאג נטישה',desc:'זיהוי לקוח מאותת נטישה, 3 מסלולי טיפול, תסריטי שיחה והתנגדויות'},
 ];
 // Snapshot of the highest topic id shipped in the code itself. Used later to
 // tell "genuinely user-created" topics (added through the app) apart from
@@ -890,10 +957,83 @@ var NB_SEED_MAX_TOPIC_ID = Math.max.apply(null, TOPICS.map(function(t){return t.
 // Bump this whenever the hardcoded TOPICS/dynamicDocs seed content changes in
 // the code, so a browser with older saved data doesn't keep masking it.
 var NB_SEED_VERSION = 27;
-var PRI={hh:'גבוה מאוד',h:'גבוה',m:'בינוני',l:'נמוך'};
+// ── KNOWLEDGE ARCHITECTURE (spec §2–3) ──────────────────────────────────
+// עולם תוכן → נושא → פריטי ידע. A knowledge item (window.dynamicDocs entry)
+// belongs to one or more topics (item.topicIds) and one or more content
+// worlds (item.worlds), and has one of the 7 document types (item.kind).
+var NB_KINDS={
+  M:{label:'אבחון',full:'מסמך מרכזי / אבחון',color:'#6D3FD1',bg:'#F1ECFC',hint:'נקודת כניסה לנושא – מזהה את סוג המקרה ומנתב למסלול המתאים'},
+  R:{label:'טיפול',full:'מסלול טיפול',color:'#D9361B',bg:'#FFEDE6',hint:'טיפול מלא בתרחיש – מהתשאול ועד פתרון או מעבר לשלב הבא'},
+  O:{label:'תפעול',full:'מסמך תפעול',color:'#2E5CE0',bg:'#EBF1FF',hint:'הוראות לביצוע פעולה ספציפית במערכת, במכשיר או בתהליך'},
+  E:{label:'הסלמה',full:'מסמך הסלמה',color:'#B45309',bg:'#FEF3E2',hint:'מתי מפסיקים טיפול, למי מעבירים ומה חובה לתעד'},
+  S:{label:'מומחה',full:'מסלול מומחה',color:'#0E7490',bg:'#E3F5F8',hint:'המשך טיפול לבעל תפקיד מקצועי או דרג מתקדם'},
+  T:{label:'תסריט',full:'תסריטי שיחה',color:'#0E7A4F',bg:'#EDFAF3',hint:'ניסוחים מול לקוח: הסבר, תיאום ציפיות, התנגדות וסיום'},
+  I:{label:'מידע',full:'מסמך מידע',color:'#475569',bg:'#F1F3F6',hint:'מידע לדעת או למסור – ללא תהליך אבחון תקלה'}
+};
+var NB_KIND_ORDER=['M','R','O','E','S','T','I'];
+// Content worlds = departments. Editors can add more (stored with the library).
+var NB_DEFAULT_WORLDS=[{id:'service',name:'שירות'},{id:'tech',name:'טכני'},{id:'eng',name:'הנדסה'}];
+var WORLDS=NB_DEFAULT_WORLDS.slice();
+// Built-in documents: which topic(s) each belongs to and its document type.
+// Applied once to the built-in content; afterwards links live on the items.
+var NB_SEED_META={
+  'view-browsing-doc':{topics:[11],kind:'R'},'view-churn-doc':{topics:[41],kind:'R'},
+  pdf_001:{topics:[12],kind:'O'},pdf_002:{topics:[14],kind:'R'},pdf_003:{topics:[17],kind:'I'},
+  pdf_004:{topics:[35],kind:'R'},pdf_005:{topics:[20],kind:'O'},pdf_006:{topics:[40],kind:'T'},
+  pdf_007:{topics:[15],kind:'R'},pdf_008:{topics:[16],kind:'R'},pdf_009:{topics:[18],kind:'R'},
+  pdf_010:{topics:[35],kind:'R'},pdf_011:{topics:[42],kind:'M'},pdf_012:{topics:[43],kind:'R'},
+  pdf_013:{topics:[44],kind:'R'},pdf_014:{topics:[45],kind:'R'},pdf_015:{topics:[46],kind:'R'},
+  pdf_016:{topics:[47],kind:'R'},pdf_017:{topics:[48],kind:'O'},pdf_018:{topics:[13],kind:'O'},
+  pdf_019:{topics:[50],kind:'O'},pdf_020:{topics:[51],kind:'O'},pdf_021:{topics:[52],kind:'E'}
+};
+// Default department for existing items, by their old category.
+var NB_CAT_TO_WORLD={sim:'tech',tech:'tech',tech2:'tech',intl:'tech',billing:'service',plans:'service',ops:'service'};
+
+function nbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function nbWorldName(id){var w=WORLDS.find(function(x){return x.id===id;});return w?w.name:id;}
+function nbKindBadge(kind,small){
+  var k=NB_KINDS[kind]||NB_KINDS.R;
+  return '<span class="kind-badge'+(small?' sm':'')+'" style="color:'+k.color+';background:'+k.bg+';border-color:'+k.color+'33" title="'+nbEsc(k.full)+'"><b>'+(NB_KINDS[kind]?kind:'R')+'</b>'+(small?'':' '+k.label)+'</span>';
+}
+function nbTopicItems(topicId){
+  var docs=window.dynamicDocs||{};
+  return Object.keys(docs).map(function(k){return docs[k];}).filter(function(d){
+    return d&&d.topicIds&&d.topicIds.indexOf(topicId)!==-1;
+  }).sort(function(a,b){return NB_KIND_ORDER.indexOf(a.kind)-NB_KIND_ORDER.indexOf(b.kind);});
+}
+function nbFmtDate(ts){return ts?new Date(ts).toLocaleDateString('he-IL'):'';}
+
+// Brings any library (built-in seed, older saved data, restored history) to
+// the current model. Idempotent: safe to run after every load or restore.
+//  - old one-document-per-topic links (topic.dynId) become item.topicIds
+//  - waves/priorities are dropped (removed from the product)
+//  - missing item fields get defaults (type, worlds, tags, description)
+function nbNormalizeModel(){
+  var docs=window.dynamicDocs=window.dynamicDocs||{};
+  TOPICS.forEach(function(t){
+    if(t.dynId&&docs[t.dynId]){
+      var d=docs[t.dynId];
+      d.topicIds=d.topicIds||[];
+      if(d.topicIds.indexOf(t.id)===-1) d.topicIds.push(t.id);
+    }
+    delete t.dynId; delete t.active; delete t.wave; delete t.pri;
+    if(t.desc==null) t.desc='';
+  });
+  Object.keys(docs).forEach(function(k){
+    var d=docs[k]; if(!d) return;
+    var seed=NB_SEED_META[k];
+    if(!d.topicIds) d.topicIds=seed?seed.topics.slice():[];
+    if(!NB_KINDS[d.kind]) d.kind=seed?seed.kind:'R';
+    if(!Array.isArray(d.worlds)||!d.worlds.length) d.worlds=[NB_CAT_TO_WORLD[d.cat]||'service'];
+    if(typeof d.tags==='string') d.tags=d.tags.split(',').map(function(s){return s.trim();}).filter(Boolean);
+    if(!Array.isArray(d.tags)) d.tags=[];
+    if(d.desc==null) d.desc='';
+    if(d.owner==null) d.owner='';
+    delete d.wave;
+  });
+}
 var SIM_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:1px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg>';
 var CAT={sim:SIM_ICON+' SIM/eSIM',tech:'🔧 טכני',tech2:'🔧 טכני',billing:'💳 חיובים',plans:'📋 מסלולים',intl:'✈️ חו"ל',ops:'🎧 שיחה'};
-var WAVE={1:'גל 1 – מיידי',2:'גל 2 – חשוב',3:'גל 3 – משלים'};
 
 function setTocActive(el){
   document.querySelectorAll('.doc-toc-item').forEach(function(i){i.classList.remove('active')});
@@ -908,48 +1048,117 @@ function showView(id){
   document.querySelectorAll('.snav-item').forEach(function(i){i.classList.remove('active')});
   var sm=document.getElementById('snav-'+id);
   if(sm) sm.classList.add('active');
-  ['library','new'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(id==='browsing'&&t==='library')||(id==='churn'&&t==='library')||(id==='article'&&t==='library'))});
-  if(id==='library') renderLibrary('all');
+  ['library','new'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(t==='library'&&['browsing','churn','article','topic'].indexOf(id)!==-1))});
+  if(id==='library'){var sl=document.getElementById('snav-library');if(sl)sl.classList.toggle('active',nbCurrentWorld==='all');}
+  if(id==='library'){
+    renderLibrary('all');
+    var fb=document.querySelectorAll('#lib-filters .filter-btn');
+    fb.forEach(function(b,i){b.classList.toggle('active',i===0);});
+  }
   if(id==='new'&&!nbState['s1'].applied) nbRender();
   window.scrollTo(0,0);
   setTimeout(function(){document.querySelectorAll('#view-'+id+' .fade-in:not(.visible)').forEach(function(el,i){setTimeout(function(){el.classList.add('visible')},i*55)})},80);
 }
 
-function renderHotTopics(){ renderHomeWaves(); }
+// Waves were removed from the product (spec). Kept as a no-op for older callers.
+function renderHomeWaves(){}
 
-function renderHomeWaves(){
-  var container=document.getElementById('home-waves');
-  if(!container) return;
-  var wColors={1:'var(--red)',2:'#E06000',3:'#9A7700'};
-  var wLabels={1:'גל 1 – שכיח מאוד',2:'גל 2 – חשוב',3:'גל 3 – משלים'};
-  var html='';
-  [1,2,3].forEach(function(w){
-    var wt=TOPICS.filter(function(t){return t.wave===w;});
-    if(!wt.length) return;
-    html+='<div class="wave-label"><span class="wave-pill" style="background:'+wColors[w]+'">'+wLabels[w]+' — '+wt.length+' נושאים</span></div>';
-    html+='<div class="topic-grid">'+wt.map(cardHTML).join('')+'</div>';
-  });
-  container.innerHTML=html;
-  setTimeout(function(){
-    container.querySelectorAll('.fade-in:not(.visible)').forEach(function(el,i){
-      setTimeout(function(){el.classList.add('visible');},i*30);
-    });
-  },50);
+// A topic is shown under a content world when at least one of its items
+// belongs to that world.
+function nbTopicInWorld(t,world){
+  if(world==='all') return true;
+  return nbTopicItems(t.id).some(function(d){return d.worlds.indexOf(world)!==-1;});
 }
-
 
 function renderLibrary(cat){
   nbCurrentLibCat=cat;
-  var f=cat==='all'?TOPICS:TOPICS.filter(function(t){return t.cat===cat});
-  document.getElementById('library-content').innerHTML='<div class="topic-grid">'+f.map(cardHTML).join('')+'</div>';
+  var f=TOPICS.filter(function(t){
+    return (cat==='all'||t.cat===cat||(cat==='tech'&&t.cat==='tech2'))&&nbTopicInWorld(t,nbCurrentWorld);
+  });
+  var title=document.getElementById('lib-count');
+  if(title) title.textContent=f.length;
+  document.getElementById('library-content').innerHTML=f.length
+    ?'<div class="topic-grid">'+f.map(cardHTML).join('')+'</div>'
+    :'<div class="empty-state">אין נושאים בסינון הזה</div>';
   setTimeout(function(){document.querySelectorAll('#library-content .fade-in:not(.visible)').forEach(function(el,i){setTimeout(function(){el.classList.add('visible')},i*40)})},50);
 }
 
 var nbCurrentLibCat='all';
+var nbCurrentWorld='all';
 function filterLibrary(cat,btn){
-  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
-  btn.classList.add('active');
+  document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.remove('active')});
+  if(btn) btn.classList.add('active');
   renderLibrary(cat);
+}
+function filterWorld(world){
+  nbCurrentWorld=world;
+  nbRenderLibFilters();
+  nbRenderSidebar();
+  renderLibrary(nbCurrentLibCat);
+}
+
+// World filter row above the category filters (worlds are editable data).
+function nbRenderLibFilters(){
+  var el=document.getElementById('lib-worlds');
+  if(!el) return;
+  el.innerHTML='<span class="filter-label">עולם תוכן</span>'
+    +[{id:'all',name:'הכל'}].concat(WORLDS).map(function(w){
+      return '<button class="filter-btn world-btn'+(nbCurrentWorld===w.id?' active':'')+'" onclick="filterWorld(\''+nbEsc(w.id)+'\')">'+nbEsc(w.name)+'</button>';
+    }).join('')
+    +'<button class="filter-btn world-btn ghost" onclick="nbManageWorlds()" title="ניהול עולמות תוכן">⚙ ניהול</button>';
+}
+
+// Sidebar: content worlds + categories, with live counts.
+function nbRenderSidebar(){
+  var el=document.getElementById('snav-dynamic');
+  if(!el) return;
+  var cats=[['sim',SIM_ICON,'SIM / eSIM'],['tech','🔧','תמיכה טכנית'],['billing','💳','חיובים'],['plans','📋','מסלולים'],['intl','✈️','חו"ל ונדידה'],['ops','🎧','טיפול בשיחה']];
+  var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
+    +WORLDS.map(function(w){
+      var n=TOPICS.filter(function(t){return nbTopicInWorld(t,w.id);}).length;
+      return '<div class="snav-item'+(nbCurrentWorld===w.id?' active':'')+'" onclick="showView(\'library\');filterWorld(\''+nbEsc(w.id)+'\')"><span class="snav-icon">◆</span> '+nbEsc(w.name)+' <span class="snav-badge gray">'+n+'</span></div>';
+    }).join('')+'</div>'
+    +'<div class="snav-section"><div class="snav-title">קטגוריות</div>'
+    +cats.map(function(c){
+      var n=TOPICS.filter(function(t){return t.cat===c[0]||(c[0]==='tech'&&t.cat==='tech2');}).length;
+      return '<div class="snav-item" onclick="filterCategory(\''+c[0]+'\')"><span class="snav-icon">'+c[1]+'</span> '+c[2]+' <span class="snav-badge">'+n+'</span></div>';
+    }).join('')+'</div>';
+  el.innerHTML=html;
+}
+
+function nbManageWorlds(){
+  var existing=document.getElementById('nb-worlds-overlay');
+  if(existing) existing.remove();
+  var overlay=document.createElement('div');
+  overlay.id='nb-worlds-overlay';
+  overlay.className='nb-overlay';
+  overlay.innerHTML='<div class="nb-modal"><div class="nb-modal-head"><div class="nb-modal-title">עולמות תוכן</div><button class="nb-x" onclick="this.closest(\'.nb-overlay\').remove()">✕</button></div>'
+    +'<div class="nb-modal-sub">עולם תוכן הוא תחום או מחלקה (שירות, טכני, הנדסה…). פריט ידע יכול להשתייך לכמה עולמות.</div>'
+    +'<div id="nb-worlds-list">'+WORLDS.map(function(w,i){
+      var used=Object.keys(window.dynamicDocs||{}).filter(function(k){var d=window.dynamicDocs[k];return d&&d.worlds&&d.worlds.indexOf(w.id)!==-1;}).length;
+      return '<div class="nb-row"><input class="nb-input" value="'+nbEsc(w.name)+'" onchange="nbRenameWorld('+i+',this.value)"><span class="nb-row-meta">'+used+' פריטים</span></div>';
+    }).join('')+'</div>'
+    +'<div class="nb-row"><input class="nb-input" id="nb-new-world" placeholder="שם עולם תוכן חדש"><button class="nb-btn" onclick="nbAddWorld()">+ הוסף</button></div>'
+    +'</div>';
+  overlay.addEventListener('click',function(e){if(e.target===overlay) overlay.remove();});
+  document.body.appendChild(overlay);
+}
+function nbAddWorld(){
+  var inp=document.getElementById('nb-new-world');
+  var name=(inp&&inp.value||'').trim();
+  if(!name) return;
+  if(WORLDS.some(function(w){return w.name===name;})){alert('עולם תוכן בשם הזה כבר קיים');return;}
+  WORLDS.push({id:'w'+Date.now(),name:name});
+  nbSaveLibrary('נוסף עולם תוכן: '+name);
+  nbRenderLibFilters();nbRenderSidebar();nbManageWorlds();
+}
+function nbRenameWorld(i,name){
+  name=(name||'').trim();
+  if(!name||!WORLDS[i]) return;
+  var old=WORLDS[i].name;
+  WORLDS[i].name=name;
+  nbSaveLibrary('שם עולם תוכן שונה: '+old+' ← '+name);
+  nbRenderLibFilters();nbRenderSidebar();
 }
 
 function searchTopics(query){
@@ -974,78 +1183,84 @@ function searchTopics(query){
 
 function filterCategory(cat){
   showView('library');
-  var btns=document.querySelectorAll('.filter-btn');
+  var btns=document.querySelectorAll('#lib-filters .filter-btn');
   var cats=['all','sim','tech','billing','plans','intl','ops'];
   setTimeout(function(){filterLibrary(cat,btns[cats.indexOf(cat)])},100);
 }
 
 var CAT_RAIL={sim:'#2E5CE0',tech:'#3A4A5C',tech2:'#3A4A5C',billing:'#0E7A4F',plans:'#6D3FD1',intl:'#0891B2',ops:'#C2410C'};
 function cardHTML(t){
-  var activeBadge=t.active?'<span class="tc-active">✓ פעיל</span>':'';
   var railColor=CAT_RAIL[t.cat]||'#8A94A3';
-  var delBtn='<span class="tc-del" onclick="event.stopPropagation();nbConfirmDeleteTopic('+t.id+')" title="מחק פריט ידע">🗑️</span>';
+  var items=nbTopicItems(t.id);
+  var kinds=[];
+  items.forEach(function(d){if(kinds.indexOf(d.kind)===-1)kinds.push(d.kind);});
+  var delBtn='<span class="tc-del" onclick="event.stopPropagation();nbConfirmDeleteTopic('+t.id+')" title="מחק נושא">🗑️</span>';
   return '<div class="topic-card fade-in" onclick="nbOpenTopic('+t.id+')">'
     +'<div class="tc-rail" style="background:'+railColor+'"></div>'
     +'<div class="tc-body">'
     +delBtn
-    +'<div class="tc-top"><span class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||'📄 כללי')+'</span>'+activeBadge+'</div>'
+    +'<div class="tc-top"><span class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||'📄 כללי')+'</span></div>'
     +'<div class="tc-title">'+t.title+'</div>'
-    +'<div class="tc-desc">'+t.desc+'</div>'
-    +'<div class="tc-num">#'+t.id+'</div>'
+    +'<div class="tc-desc">'+(t.desc||'')+'</div>'
+    +'<div class="tc-foot">'
+    +(items.length
+      ?'<span class="tc-count">'+items.length+' '+(items.length===1?'פריט ידע':'פריטי ידע')+'</span><span class="tc-kinds">'+kinds.map(function(k){return nbKindBadge(k,true);}).join('')+'</span>'
+      :'<span class="tc-count empty">טרם נכתב תוכן</span>')
+    +'</div>'
     +'</div></div>';
 }
 
+// ── TOPIC VIEW (spec §6) ────────────────────────────────────────────────
+// Every knowledge item in the topic, identifiable at a glance by type.
+var nbCurrentTopicId=null;
+
 function nbOpenTopic(id){
   var t=TOPICS.find(function(x){return x.id===id;});
-  if(t&&t.dynId){showDynamicDoc(t.dynId);return;}
-  openArticle(id);
-}
-
-function openArticle(id){
-  if(id===11||id===12){showView('browsing');return;}
-  var t=TOPICS.find(function(x){return x.id===id;});
   if(!t) return;
-  if(t.dynId){showDynamicDoc(t.dynId);return;}
-  var pc={hh:'pri-hh',h:'pri-h',m:'pri-m',l:'pri-l'}[t.pri];
-  var el=document.getElementById('article-content');
-  el.innerHTML='';
-
-  var box=document.createElement('div');
-  box.className='article-box';
-
-  var head=document.createElement('div');
-  head.className='article-head';
-  head.innerHTML='<div class="article-meta">'
-    +'<span class="tb tb-opt">'+(CAT[t.cat]||'📄')+'</span>'
-    +'<span class="pri '+pc+'">'+PRI[t.pri]+'</span>'
+  nbCurrentTopicId=id;
+  var items=nbTopicItems(id);
+  var railColor=CAT_RAIL[t.cat]||'#8A94A3';
+  var el=document.getElementById('topic-content');
+  el.innerHTML='<div class="topic-head">'
+      +'<div class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||'📄 כללי')+'</div>'
+      +'<h1 class="topic-title">'+t.title+'</h1>'
+      +(t.desc?'<div class="topic-desc">'+t.desc+'</div>':'')
+      +'<div class="topic-kinds">'+NB_KIND_ORDER.map(function(k){
+        var n=items.filter(function(d){return d.kind===k;}).length;
+        return n?'<span class="topic-kind-pill" style="color:'+NB_KINDS[k].color+';background:'+NB_KINDS[k].bg+'"><b>'+k+'</b> '+NB_KINDS[k].label+' · '+n+'</span>':'';
+      }).join('')+'</div>'
     +'</div>'
-    +'<div class="article-title">'+t.title+'</div>'
-    +'<div class="article-sub">'+t.desc+'</div>';
-
-  var body=document.createElement('div');
-  body.className='article-body';
-  body.style.cssText='padding:16px;width:100%;box-sizing:border-box';
-  body.innerHTML='<div class="info-box">📝 מסמך זה עדיין לא נכתב. לחץ "פריט ידע חדש" ליצירתו.</div>';
-
-  var btn=document.createElement('button');
-  btn.textContent='✏️ צור פריט ידע חדש לנושא זה';
-  btn.style.cssText='margin-top:14px;background:var(--red);color:#fff;border:none;border-radius:var(--rs);padding:10px 18px;font-family:Rubik,sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;width:100%';
-  btn.addEventListener('click', function(){
-    window.nbLinkToTopicId = t.id;
-    // Pre-fill ONLY topic name — let user choose cat/wave freely
-    nbState['s1'].s1data = {topic: t.title, cat:'', wave:'', type:''};
-    nbState['s1'].applied = false; // user must confirm s1
-    showView('new');
-  });
-  body.appendChild(btn);
-
-  box.appendChild(head);
-  box.appendChild(body);
-  el.appendChild(box);
-  showView('article');
-  var back=document.querySelector('#view-article .article-back');
-  if(back) back.setAttribute('onclick',"showView('library')");
+    +(items.length
+      ?'<div class="item-grid">'+items.map(nbItemCardHTML).join('')+'</div>'
+      :'<div class="empty-state">📝 עדיין אין פריטי ידע בנושא זה.</div>')
+    +'<button class="nb-add-item" onclick="nbNewItemForTopic('+t.id+')">+ הוסף פריט ידע לנושא זה</button>';
+  showView('topic');
 }
+
+function nbItemCardHTML(d){
+  var k=NB_KINDS[d.kind]||NB_KINDS.R;
+  return '<div class="item-card fade-in" style="--kind:'+k.color+'" onclick="showDynamicDoc(\''+nbEsc(d.id)+'\')">'
+    +'<div class="ic-top">'+nbKindBadge(d.kind)+'<span class="ic-worlds">'+d.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')+'</span></div>'
+    +'<div class="ic-title">'+d.topic+'</div>'
+    +(d.desc?'<div class="ic-desc">'+d.desc+'</div>':'')
+    +(d.tags.length?'<div class="ic-tags">'+d.tags.map(function(tg){return '<span class="tag-chip">#'+nbEsc(tg)+'</span>';}).join('')+'</div>':'')
+    +'<div class="ic-foot">'+(d.updatedAt?'עודכן '+nbFmtDate(d.updatedAt):'תוכן מובנה')+(d.owner?' · אחראי: '+nbEsc(d.owner):'')+'</div>'
+    +'</div>';
+}
+
+function nbNewItemForTopic(topicId){
+  NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};});
+  nbCustomStages=[];
+  nbStageOrder=[];
+  window.nbEditingDocId=null;
+  window.nbLinkToTopicId=topicId;
+  nbState['s1'].s1data={topicId:String(topicId),kind:'R',worlds:[]};
+  showView('new');
+  nbRender();
+}
+
+// Kept for older links/calls: a topic always opens its topic view now.
+function openArticle(id){ nbOpenTopic(id); }
 
 
 function nbShowSuccessModal(topic){
@@ -1090,37 +1305,92 @@ function nbCloseMsg(el){
   if(p) p.remove();
 }
 
-function nbAddToLibrary(docId,topic,cat,wave,linkTopicId){
-  console.log('ADD TO LIBRARY: linkTopicId='+linkTopicId);
-  if(linkTopicId){
-    var linked=TOPICS.find(function(t){return t.id===linkTopicId;});
-    console.log('linked topic found:', linked?linked.title:'NOT FOUND');
-    if(linked){
-      linked.dynId=docId;
-      linked.active=true;
-      // Re-render both pages — title unchanged, badge added, onclick updated
-      renderLibrary('all');
-      renderHomeWaves();
-      nbSaveLibrary('נוצר: '+topic);
-      return;
-    }
+// Resolves the topic chosen in stage 1: an existing topic id, or "new" →
+// creates the topic. Returns the topic id, or null if nothing valid chosen.
+function nbResolveTopic(d){
+  if(d.topicId&&d.topicId!=='new'){
+    var id=parseInt(d.topicId);
+    if(TOPICS.some(function(t){return t.id===id;})) return id;
   }
-  // Standalone (no linked topic) — add new entry
-  var newId=TOPICS.length>0?Math.max.apply(null,TOPICS.map(function(t){return t.id;}))+1:41;
-  var waveNum=parseInt(wave)||2;
-  var catKey=cat||'tech';
-  TOPICS.push({id:newId,cat:catKey,wave:waveNum,pri:'h',title:topic||'פריט ידע חדש',desc:'פריט ידע',active:true,dynId:docId});
-  renderLibrary('all');
-  renderHomeWaves();
-  nbSaveLibrary('נוצר: '+(topic||'פריט ידע חדש'));
+  if(d.topicId==='new'&&(d.newTopic||'').trim()){
+    var newId=TOPICS.length>0?Math.max.apply(null,TOPICS.map(function(t){return t.id;}))+1:1;
+    TOPICS.push({id:newId,cat:d.cat||'tech',title:d.newTopic.trim(),desc:''});
+    return newId;
+  }
+  return null;
+}
+
+// Copies the stage-1 fields onto an item.
+function nbApplyS1Fields(doc,d){
+  doc.topic=(d.topic||'').trim();
+  doc.desc=(d.desc||'').trim();
+  doc.kind=NB_KINDS[d.kind]?d.kind:'R';
+  doc.worlds=(d.worlds&&d.worlds.length)?d.worlds.slice():[WORLDS[0]?WORLDS[0].id:'service'];
+  doc.tags=(d.tags||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  doc.owner=(d.owner||'').trim();
+  doc.updatedAt=Date.now();
+}
+
+function nbAddToLibrary(docId,title,topicId){
+  var doc=window.dynamicDocs[docId];
+  if(doc&&topicId) doc.topicIds=[topicId];
+  var t=TOPICS.find(function(x){return x.id===topicId;});
+  if(t){ var cat=t.cat; doc.cat=cat; }
+  nbRenderSidebar();
+  renderLibrary(nbCurrentLibCat||'all');
+  nbSaveLibrary('נוצר: '+title);
 }
 
 
+// "Other items in this topic" strip — move between M/R/O/E… without
+// searching again (spec §6).
+function nbSiblingStripHTML(doc){
+  var tid=(nbCurrentTopicId!=null&&doc.topicIds.indexOf(nbCurrentTopicId)!==-1)?nbCurrentTopicId:doc.topicIds[0];
+  var t=TOPICS.find(function(x){return x.id===tid;});
+  if(!t) return '';
+  var items=nbTopicItems(t.id);
+  if(items.length<2) return '';
+  return '<div class="sibling-strip"><span class="ss-label">בנושא <a onclick="nbOpenTopic('+t.id+')">'+t.title+'</a>:</span>'
+    +items.map(function(d){
+      return '<button class="ss-item'+(d.id===doc.id?' current':'')+'" onclick="showDynamicDoc(\''+nbEsc(d.id)+'\')">'+nbKindBadge(d.kind,true)+' '+d.topic+'</button>';
+    }).join('')+'</div>';
+}
+function nbItemMetaHTML(doc){
+  return '<div class="article-meta">'+nbKindBadge(doc.kind)
+    +doc.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
+    +'</div>';
+}
+function nbItemFieldsHTML(doc){
+  var rows=[];
+  if(doc.tags.length) rows.push('<div class="ic-tags">'+doc.tags.map(function(tg){return '<span class="tag-chip">#'+nbEsc(tg)+'</span>';}).join('')+'</div>');
+  var meta=[];
+  meta.push(doc.updatedAt?'עודכן לאחרונה: '+nbFmtDate(doc.updatedAt):'תוכן מובנה');
+  if(doc.owner) meta.push('גורם מקצועי אחראי: '+nbEsc(doc.owner));
+  meta.push('מזהה: '+nbEsc(doc.id));
+  rows.push('<div class="item-fields">'+meta.join(' · ')+'</div>');
+  return rows.join('');
+}
+// Back from an item returns to the topic it was opened from.
+function nbSetBack(sel,doc){
+  var back=document.querySelector(sel);
+  if(!back) return;
+  var tid=(nbCurrentTopicId!=null&&doc.topicIds.indexOf(nbCurrentTopicId)!==-1)?nbCurrentTopicId:doc.topicIds[0];
+  var t=TOPICS.find(function(x){return x.id===tid;});
+  if(t){ back.setAttribute('onclick','nbOpenTopic('+t.id+')'); back.textContent='← חזרה לנושא: '+t.title.replace(/<[^>]*>/g,''); }
+  else { back.setAttribute('onclick',"showView('library')"); back.textContent='← חזרה לספרייה'; }
+}
+
 function showDynamicDoc(docId){
-  if(docId==='view-churn-doc'){showView('churn');return;}
-  if(docId==='view-browsing-doc'){showView('browsing');return;}
   var doc=window.dynamicDocs[docId];
   if(!doc) return;
+  if(doc._isViewDoc){
+    // Hand-designed documents: keep their own page, add the shared header strip.
+    var strip=document.getElementById('special-strip-'+doc._isViewDoc);
+    if(strip) strip.innerHTML=nbSiblingStripHTML(doc)+'<div class="special-meta">'+nbItemMetaHTML(doc)+nbItemFieldsHTML(doc)+'</div>';
+    showView(doc._isViewDoc);
+    nbSetBack('#view-'+doc._isViewDoc+' .article-back',doc);
+    return;
+  }
 
   var stagesHtml=doc.stages.map(function(s){
     var items=s.items.map(function(item){
@@ -1145,11 +1415,13 @@ function showDynamicDoc(docId){
       +'<div style="padding-right:52px;margin-bottom:16px">'+items+stageImgHtml+'</div>';
   }).join('');
 
-  var html='<div class="article-box">'
+  var html=nbSiblingStripHTML(doc)
+    +'<div class="article-box">'
     +'<div class="article-head">'
-    +'<div class="article-meta"><span class="tb tb-sys">'+catLabel(doc.cat)+'</span><span class="tb tb-opt">נוצר: '+new Date().toLocaleDateString('he-IL')+'</span></div>'
+    +nbItemMetaHTML(doc)
     +'<div class="article-title">'+doc.topic+'</div>'
-    +'<div class="article-sub">פריט ידע דרך מנהלת הידע</div>'
+    +'<div class="article-sub">'+(doc.desc||(NB_KINDS[doc.kind]||NB_KINDS.R).full)+'</div>'
+    +nbItemFieldsHTML(doc)
     +'</div>'
     +'<div class="article-body">'
     +(doc.stages.length?stagesHtml:'<div class="info-box">לא נבחרו שלבים לפריט הידע זה.</div>')
@@ -1176,7 +1448,7 @@ function showDynamicDoc(docId){
   document.getElementById('article-content').appendChild(btnRow);
 
   showView('article');
-  document.querySelector('#view-article .article-back').setAttribute('onclick',"showView('library')");
+  nbSetBack('#view-article .article-back',doc);
 }
 
 // ── IMAGE LIGHTBOX ───────────────────────────────────────────────────────
@@ -1395,27 +1667,23 @@ function nbUpdateTrashBadge(){
 function nbConfirmDeleteDoc(docId,topicTitle){
   nbConfirmDelete(topicTitle,function(){
     var doc=window.dynamicDocs[docId];
-    var linkedTopics=TOPICS.filter(function(x){return x.dynId===docId;});
+    // The item keeps its own topic links (doc.topicIds); the topics stay in
+    // the library. Snapshots of the topics are kept in case they're gone by
+    // the time the item is restored.
+    var linkedTopics=doc?TOPICS.filter(function(x){return doc.topicIds.indexOf(x.id)!==-1;}):[];
     nbTrash.push({
       trashId:'trash-'+Date.now()+'-'+Math.floor(Math.random()*10000),
       type:'doc',
       docId:docId,
       doc:doc?JSON.parse(JSON.stringify(doc)):null,
-      topicSnapshot:linkedTopics.length?JSON.parse(JSON.stringify(linkedTopics[0])):null,
-      topicSnapshots:linkedTopics.length?JSON.parse(JSON.stringify(linkedTopics)):[],
-      wasPlaceholderTopic:false,
+      topicSnapshots:JSON.parse(JSON.stringify(linkedTopics)),
       title:topicTitle,
       deletedAt:Date.now()
     });
     delete window.dynamicDocs[docId];
-    // Deleting the form/content NEVER removes its card(s) from the library —
-    // it only turns the card(s) back into non-active placeholders. A single
-    // doc can be linked from more than one card (e.g. shared troubleshooting
-    // pages), so every linked card must be cleared, not just the first.
-    linkedTopics.forEach(function(t){ t.dynId=null; t.active=false; });
-    renderLibrary('all');
-    renderHomeWaves();
-    showView('library');
+    nbRenderSidebar();
+    renderLibrary(nbCurrentLibCat||'all');
+    if(linkedTopics.length) nbOpenTopic(linkedTopics[0].id); else showView('library');
     nbSaveLibrary('נמחק: '+topicTitle);
     nbUpdateTrashBadge();
   });
@@ -1427,7 +1695,13 @@ function nbConfirmDeleteDoc(docId,topicTitle){
 function nbConfirmDeleteTopic(topicId){
   var t=TOPICS.find(function(x){return x.id===topicId;});
   if(!t) return;
-  if(t.dynId){ nbConfirmDeleteDoc(t.dynId,t.title); return; }
+  var items=nbTopicItems(t.id);
+  if(items.length){
+    nbConfirmGeneric('לא ניתן למחוק את הנושא',
+      'בנושא <strong style="color:var(--navy)">'+t.title+'</strong> יש '+items.length+' פריטי ידע. כדי לא לאבד ידע, יש למחוק את הפריטים או לשייך אותם לנושא אחר לפני מחיקת הנושא.',
+      'פתח את הנושא','var(--navy)',function(){ nbOpenTopic(t.id); });
+    return;
+  }
   nbConfirmDelete(t.title,function(){
     nbTrash.push({
       trashId:'trash-'+Date.now()+'-'+Math.floor(Math.random()*10000),
@@ -1440,8 +1714,8 @@ function nbConfirmDeleteTopic(topicId){
     });
     var idx=TOPICS.indexOf(t);
     if(idx>-1) TOPICS.splice(idx,1);
-    renderLibrary('all');
-    renderHomeWaves();
+    nbRenderSidebar();
+    renderLibrary(nbCurrentLibCat||'all');
     nbSaveLibrary('נמחק: '+t.title);
     nbUpdateTrashBadge();
   });
@@ -1453,23 +1727,23 @@ function nbRestoreFromTrash(trashId){
   var entry=nbTrash[idx];
   if(entry.type==='doc'&&entry.doc){
     window.dynamicDocs=window.dynamicDocs||{};
-    window.dynamicDocs[entry.docId]=entry.doc;
+    var doc=entry.doc;
     var snapshots=(entry.topicSnapshots&&entry.topicSnapshots.length)?entry.topicSnapshots:(entry.topicSnapshot?[entry.topicSnapshot]:[]);
+    // Items deleted before the restructure have no topicIds of their own.
+    if(!doc.topicIds||!doc.topicIds.length) doc.topicIds=snapshots.map(function(s){return s.id;});
+    // Bring back any of its topics that were deleted in the meantime.
     snapshots.forEach(function(snap){
-      if(entry.wasPlaceholderTopic){
-        // Topic entry was fully removed — recreate it (only if not already re-added)
-        if(!TOPICS.some(function(x){return x.id===snap.id;})) TOPICS.push(snap);
-      } else {
-        var t=TOPICS.find(function(x){return x.id===snap.id;});
-        if(t){ t.dynId=entry.docId; t.active=true; }
-      }
+      if(!TOPICS.some(function(x){return x.id===snap.id;})) TOPICS.push(JSON.parse(JSON.stringify(snap)));
     });
+    window.dynamicDocs[entry.docId]=doc;
+    nbNormalizeModel();
   } else if(entry.type==='topic'&&entry.topicSnapshot){
     if(!TOPICS.some(function(x){return x.id===entry.topicSnapshot.id;})) TOPICS.push(entry.topicSnapshot);
+    nbNormalizeModel();
   }
   nbTrash.splice(idx,1);
-  renderLibrary('all');
-  renderHomeWaves();
+  nbRenderSidebar();
+  renderLibrary(nbCurrentLibCat||'all');
   nbSaveLibrary('שוחזר מסל מיחזור: '+entry.title);
   nbUpdateTrashBadge();
   nbOpenTrash();
@@ -1558,7 +1832,8 @@ function nbEditDocImpl(docId){
   nbStageOrder=['s1'];
 
   // Restore s1 data
-  nbState['s1'].s1data={topic:doc.topic,cat:doc.cat,wave:String(doc.wave),type:doc.docType};
+  nbState['s1'].s1data={topic:doc.topic,desc:doc.desc||'',kind:doc.kind,worlds:(doc.worlds||[]).slice(),
+    tags:(doc.tags||[]).join(', '),owner:doc.owner||'',topicId:doc.topicIds&&doc.topicIds.length?String(doc.topicIds[0]):'',cat:doc.cat};
   nbState['s1'].applied=true;
 
   // Restore stage selections (rebuilding any custom, user-created stages
@@ -1647,7 +1922,6 @@ function initObservers(){
     var btn=e.target.closest('[data-action="new"]');if(btn) showView('new');
   });
 
-  renderHotTopics();
   var obs=new IntersectionObserver(function(entries){
     entries.forEach(function(e){
       if(e.isIntersecting){
@@ -1660,7 +1934,7 @@ function initObservers(){
 }
 
 var NB_STAGES = [
-  {id:'s1',num:'1',req:true,title:'זיהוי ותיאור פריט הידע',sub:'נושא, סוג, קטגוריה, גל',type:'fields'},
+  {id:'s1',num:'1',req:true,title:'זיהוי ותיאור פריט הידע',sub:'שם, נושא, סוג, עולם תוכן, תגיות, אחראי',type:'fields'},
   {id:'s2',num:'2',req:true,title:'שאלות בירור ראשוניות',sub:'מהות, משך, מיקום',options:[
     {text:'מה בדיוק לא עובד?',hint:'→ מכווין למסלול הנכון'},
     {text:'מתי זה התחיל?',hint:'→ נקודתי vs מתמשך'},
@@ -1937,29 +2211,57 @@ function nbRenderStage(s){
   var bodyHtml='';
   if(s.type==='fields'){
     var d=st.s1data;
-    bodyHtml='<div style="background:var(--white);border:1.5px dashed var(--border-strong);border-radius:var(--r);padding:14px;margin-bottom:10px">'
-      +'<div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:9px">נושא פריט הידע</div>'
-      +'<textarea style="width:100%;border:1.5px solid var(--border);border-radius:var(--rs);padding:8px 11px;font-family:Rubik,sans-serif;font-size:13.5px;color:var(--text);background:var(--input-bg);outline:none;height:40px;resize:none;direction:rtl" id="nb-s1-topic" oninput="nbSyncS1(\'topic\',this.value)" placeholder="לדוגמה: הפעלת eSIM – קוד QR">'+(d.topic||'')+'</textarea></div>'
-      +'<div style="background:var(--white);border:1.5px dashed var(--border-strong);border-radius:var(--r);padding:14px;margin-bottom:10px">'
-      +'<div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:9px">תיאור</div>'
-      +'<textarea style="width:100%;border:1.5px solid var(--border);border-radius:var(--rs);padding:8px 11px;font-family:Rubik,sans-serif;font-size:13.5px;color:var(--text);background:var(--input-bg);outline:none;resize:vertical;min-height:70px;direction:rtl" id="nb-s1-desc" oninput="nbSyncS1(\'desc\',this.value)" placeholder="במה עוסק, מה פותר, מתי להשתמש…">'+(d.desc||'')+'</textarea></div>'
-      +'<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px">סוג</div>'
-      +'<div style="display:flex;flex-direction:column;gap:6px">'
-      +[['tech','טכני – דיבאג / תפעול','שלבי תפעול, הסתעפויות'],['service','שירות – שימור / מכירה','תסריטי שיחה, התנגדויות'],['mixed','משולב','שילוב טכני + שירותי']].map(function(r){
-        return '<label class="radio-item'+(d.type===r[0]?' sel':'')+'" data-field="type" data-val="'+r[0]+'" onclick="nbSelR(this)">'
-          +'<input type="radio" name="nb-dtype" '+(d.type===r[0]?'checked':'')+' style="flex-shrink:0;width:14px;height:14px;margin-top:3px;accent-color:var(--red)">'
-          +'<div><div style="font-size:13.5px;font-weight:500;color:var(--text)">'+r[1]+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+r[2]+'</div></div></label>';
-      }).join('')+'</div></div>'
-      +'<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px">קטגוריה</div>'
+    var topicOpts=TOPICS.slice().sort(function(a,b){return String(a.title).localeCompare(String(b.title),'he');}).map(function(t){
+      return '<option value="'+t.id+'"'+(String(d.topicId)===String(t.id)?' selected':'')+'>'+nbEsc(String(t.title).replace(/<[^>]*>/g,''))+'</option>';
+    }).join('');
+    var dWorlds=d.worlds||[];
+    bodyHtml='<div class="s1-box">'
+      +'<div class="s1-label">שם פריט הידע</div>'
+      +'<textarea class="s1-input" style="height:40px;resize:none" id="nb-s1-topic" oninput="nbSyncS1(\'topic\',this.value)" placeholder="לדוגמה: הפעלת eSIM – קוד QR">'+nbEsc(d.topic||'')+'</textarea></div>'
+      +'<div class="s1-box">'
+      +'<div class="s1-label">נושא</div>'
+      +'<div class="s1-help">הנושא שתחתיו יופיע הפריט. בנושא אחד יכולים להיות כמה פריטי ידע (אבחון, טיפול, תפעול…)</div>'
+      +'<select class="s1-input" id="nb-s1-topicsel" onchange="nbSyncS1(\'topicId\',this.value);nbRender();">'
+      +'<option value="">— בחר נושא —</option>'
+      +'<option value="new"'+(d.topicId==='new'?' selected':'')+'>➕ נושא חדש…</option>'
+      +topicOpts+'</select>'
+      +(d.topicId==='new'
+        ?'<input class="s1-input" style="margin-top:8px" id="nb-s1-newtopic" value="'+nbEsc(d.newTopic||'')+'" oninput="nbSyncS1(\'newTopic\',this.value)" placeholder="שם הנושא החדש">'
+          +'<div class="s1-sublabel">קטגוריה של הנושא החדש</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+          +[['sim',SIM_ICON+' SIM/eSIM'],['tech','🔧 תמיכה טכנית'],['billing','💳 חיובים'],['plans','📋 מסלולים'],['intl','✈️ חו"ל'],['ops','🎧 שיחה']].map(function(r){
+            return '<label class="radio-item'+(d.cat===r[0]?' sel':'')+'" data-field="cat" data-val="'+r[0]+'" onclick="nbSelR(this)">'
+              +'<input type="radio" name="nb-dcat" '+(d.cat===r[0]?'checked':'')+' style="flex-shrink:0;width:14px;height:14px;margin-top:2px;accent-color:var(--red)">'
+              +'<div style="font-size:13px;font-weight:500;color:var(--text)">'+r[1]+'</div></label>';
+          }).join('')+'</div>'
+        :'')
+      +'</div>'
+      +'<div class="s1-box">'
+      +'<div class="s1-label">סוג פריט הידע</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
-      +[['sim',SIM_ICON+' SIM/eSIM'],['tech2','🔧 תמיכה טכנית'],['billing','💳 חיובים'],['plans','📋 מסלולים'],['intl','✈️ חו"ל'],['ops','🎧 שיחה']].map(function(r){
-        return '<label class="radio-item'+(d.cat===r[0]?' sel':'')+'" data-field="cat" data-val="'+r[0]+'" onclick="nbSelR(this)">'
-          +'<input type="radio" name="nb-dcat" '+(d.cat===r[0]?'checked':'')+' style="flex-shrink:0;width:14px;height:14px;margin-top:2px;accent-color:var(--red)">'
-          +'<div style="font-size:13px;font-weight:500;color:var(--text)">'+r[1]+'</div></label>';
+      +NB_KIND_ORDER.map(function(k){
+        var kd=NB_KINDS[k];
+        return '<label class="radio-item kind-radio'+(d.kind===k?' sel':'')+'" data-field="kind" data-val="'+k+'" onclick="nbSelR(this)">'
+          +'<input type="radio" name="nb-dkind" '+(d.kind===k?'checked':'')+' style="flex-shrink:0;width:14px;height:14px;margin-top:3px;accent-color:var(--red)">'
+          +'<div><div style="font-size:13px;font-weight:600;color:var(--text)">'+nbKindBadge(k,true)+' '+kd.full+'</div><div style="font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45">'+kd.hint+'</div></div></label>';
       }).join('')+'</div></div>'
-      +'<div style="background:var(--white);border:1.5px dashed var(--border-strong);border-radius:var(--r);padding:14px;margin-bottom:14px">'
-      +'<div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:9px">תגיות לחיפוש</div>'
-      +'<textarea style="width:100%;border:1.5px solid var(--border);border-radius:var(--rs);padding:8px 11px;font-family:Rubik,sans-serif;font-size:13.5px;color:var(--text);background:var(--input-bg);outline:none;height:40px;resize:none;direction:rtl" id="nb-s1-tags" oninput="nbSyncS1(\'tags\',this.value)" placeholder="לדוגמה: eSIM, QR, הפעלה…">'+(d.tags||'')+'</textarea></div>'
+      +'<div class="s1-box">'
+      +'<div class="s1-label">עולמות תוכן</div>'
+      +'<div class="s1-help">אפשר לבחור יותר מאחד – הפריט יופיע בכל העולמות שנבחרו</div>'
+      +'<div class="world-pick">'+WORLDS.map(function(w){
+        var on=dWorlds.indexOf(w.id)!==-1;
+        return '<button type="button" class="world-toggle'+(on?' on':'')+'" data-world="'+nbEsc(w.id)+'" onclick="nbToggleWorld(this)">'+(on?'✓ ':'')+nbEsc(w.name)+'</button>';
+      }).join('')+'</div></div>'
+      +'<div class="s1-box">'
+      +'<div class="s1-label">תיאור קצר</div>'
+      +'<textarea class="s1-input" style="resize:vertical;min-height:64px" id="nb-s1-desc" oninput="nbSyncS1(\'desc\',this.value)" placeholder="במה עוסק, מה פותר, מתי להשתמש…">'+nbEsc(d.desc||'')+'</textarea></div>'
+      +'<div class="s1-box">'
+      +'<div class="s1-label">תגיות לחיפוש</div>'
+      +'<input class="s1-input" id="nb-s1-tags" value="'+nbEsc(d.tags||'')+'" oninput="nbSyncS1(\'tags\',this.value)" placeholder="מופרדות בפסיק, לדוגמה: eSIM, QR, הפעלה"></div>'
+      +'<div class="s1-box">'
+      +'<div class="s1-label">גורם מקצועי אחראי</div>'
+      +'<div class="s1-help">מי אחראי לוודא שהתוכן נכון, תקף ועדכני</div>'
+      +'<input class="s1-input" id="nb-s1-owner" value="'+nbEsc(d.owner||'')+'" oninput="nbSyncS1(\'owner\',this.value)" placeholder="שם או תפקיד, לדוגמה: מנהל תמיכה טכנית"></div>'
       +'<button onclick="nbApplyS1()" style="width:100%;height:38px;background:var(--red);color:#fff;border:none;border-radius:var(--rs);font-size:13.5px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif">✓ הוסף שלב 1 לפריט הידע</button>';
   } else {
     var optHtml=s.options.map(function(o,i){
@@ -2101,11 +2403,32 @@ function nbSyncS1(field,val){
   nbSaveDraft();
 }
 
+function nbToggleWorld(btn){
+  var d=nbState['s1'].s1data;
+  d.worlds=d.worlds||[];
+  var id=btn.getAttribute('data-world');
+  var i=d.worlds.indexOf(id);
+  if(i===-1) d.worlds.push(id); else d.worlds.splice(i,1);
+  var on=i===-1;
+  btn.classList.toggle('on',on);
+  btn.textContent=(on?'✓ ':'')+nbWorldName(id);
+  nbSaveDraft();
+}
+
 function nbApplyS1(){
   var d=nbState['s1'].s1data;
   d.topic=(document.getElementById('nb-s1-topic')||{}).value||'';
   d.desc=(document.getElementById('nb-s1-desc')||{}).value||'';
   d.tags=(document.getElementById('nb-s1-tags')||{}).value||'';
+  d.owner=(document.getElementById('nb-s1-owner')||{}).value||'';
+  var nt=document.getElementById('nb-s1-newtopic');
+  if(nt) d.newTopic=nt.value;
+  var missing=[];
+  if(!d.topic.trim()) missing.push('שם פריט הידע');
+  if(!d.topicId||(d.topicId==='new'&&!(d.newTopic||'').trim())) missing.push('נושא');
+  if(!d.kind) missing.push('סוג פריט הידע');
+  if(!d.worlds||!d.worlds.length) missing.push('עולם תוכן');
+  if(missing.length){ alert('יש להשלים: '+missing.join(', ')); return; }
   nbState['s1'].applied=true;
   nbRender();
   nbUpdateSummary();
@@ -2132,7 +2455,17 @@ function nbUpdateSummary(){
     var st=nbState[s.id];
     var def=s;
     var items=[];
-    if(s.id==='s1'){var d=st.s1data;if(d.topic)items.push('נושא: '+d.topic);if(d.type)items.push('סוג: '+d.type);if(d.cat)items.push('קטגוריה: '+d.cat);if(d.tags)items.push('תגיות: '+d.tags);}
+    if(s.id==='s1'){
+      var d=st.s1data;
+      if(d.topic)items.push('שם: '+nbEsc(d.topic));
+      var tp=d.topicId==='new'?(d.newTopic||'')+' (חדש)':((TOPICS.find(function(t){return String(t.id)===String(d.topicId);})||{}).title||'');
+      if(tp)items.push('נושא: '+tp);
+      if(d.kind&&NB_KINDS[d.kind])items.push('סוג: '+nbKindBadge(d.kind,true)+' '+NB_KINDS[d.kind].full);
+      if(d.worlds&&d.worlds.length)items.push('עולמות תוכן: '+d.worlds.map(nbWorldName).map(nbEsc).join(', '));
+      if(d.desc)items.push('תיאור: '+nbEsc(d.desc));
+      if(d.tags)items.push('תגיות: '+nbEsc(d.tags));
+      if(d.owner)items.push('גורם אחראי: '+nbEsc(d.owner));
+    }
     else{items=st.picked.map(function(i){
         var img=(st.images&&st.images[i])||null;
         return {text:def.options[i].text,img:img};
@@ -2158,10 +2491,17 @@ function nbCreateDoc(){
 }
 
 function nbCreateDocImpl(){
-  var topic=(nbState['s1'].s1data.topic||'').trim();
-  var cat=nbState['s1'].s1data.cat||'tech';
-  var wave=parseInt(nbState['s1'].s1data.wave||'2');
-  var docType=nbState['s1'].s1data.type||'tech';
+  var s1=nbState['s1'].s1data;
+  var topic=(s1.topic||'').trim();
+  var cat=s1.cat||'tech';
+  var docType=s1.kind||'R';
+  // Every item must live under a topic (spec §2).
+  if(topic&&!s1.topicId&&!window.nbEditingDocId){
+    alert('יש לבחור נושא לפריט הידע בשלב 1 (נושא קיים או נושא חדש).');
+    var elT=document.getElementById('nb-stage-s1');
+    if(elT){elT.classList.add('open');elT.scrollIntoView({behavior:'smooth'});}
+    return;
+  }
 
   // If editing existing doc — update it
   if(window.nbEditingDocId){
@@ -2181,12 +2521,18 @@ function nbCreateDocImpl(){
       if(st.images) Object.keys(st.images).forEach(function(k){if(isNaN(parseInt(k)))stageImgs2.push(st.images[k]);});
       if(items.length) stages.push({num:nbContentNum(sid),id:def.id,title:def.title,items:items,images:stageImgs2});
     });
-    window.dynamicDocs[docId].topic=topic;
-    window.dynamicDocs[docId].cat=cat;
-    window.dynamicDocs[docId].wave=wave;
-    window.dynamicDocs[docId].stages=stages;
-    // Update TOPICS entry (or entries — a doc can be linked from more than one card)
-    TOPICS.filter(function(x){return x.dynId===docId;}).forEach(function(t){t.title=topic;t.cat=cat;t.wave=wave;});
+    var edited=window.dynamicDocs[docId];
+    nbApplyS1Fields(edited,s1);
+    edited.stages=stages;
+    // The form edits the item's main topic; links to other topics are kept.
+    var mainTopic=nbResolveTopic(s1);
+    if(mainTopic!=null){
+      edited.topicIds=[mainTopic].concat((edited.topicIds||[]).slice(1).filter(function(x){return x!==mainTopic;}));
+      var mt=TOPICS.find(function(x){return x.id===mainTopic;});
+      if(mt) edited.cat=mt.cat;
+    }
+    nbRenderSidebar();
+    renderLibrary(nbCurrentLibCat||'all');
     nbSaveLibrary('עודכן: '+topic);
     showDynamicDoc(docId);
     nbShowSuccessModal(topic+' — עודכן!');
@@ -2210,7 +2556,6 @@ function nbCreateDocImpl(){
     nbState['s1'].applied = true;
     nbState['s1'].s1data.topic = topic;
     nbState['s1'].s1data.cat = cat;
-    nbState['s1'].s1data.wave = String(wave);
   }
   if(!topic){
     alert('יש למלא נושא תדריך בשלב 1 לפני יצירה.');
@@ -2236,12 +2581,13 @@ function nbCreateDocImpl(){
   });
 
   window.dynamicDocs=window.dynamicDocs||{};
-  window.dynamicDocs[docId]={id:docId,topic:topic,cat:cat,wave:wave,docType:docType,stages:stages};
-  // Pass linkTopicId directly — don't rely on window variable surviving
-  var linkTopicId=window.nbLinkToTopicId||null;
+  var newDoc={id:docId,cat:cat,docType:docType,stages:stages,createdAt:Date.now()};
+  nbApplyS1Fields(newDoc,s1);
+  window.dynamicDocs[docId]=newDoc;
   window.nbLinkToTopicId=null;
-  console.log('CREATE DOC: linkTopicId='+linkTopicId+' topic='+topic);
-  nbAddToLibrary(docId,topic,cat,wave,linkTopicId);
+  var topicId=nbResolveTopic(s1);
+  nbAddToLibrary(docId,topic,topicId);
+  nbCurrentTopicId=topicId;
   showDynamicDoc(docId);
   nbShowSuccessModal(topic);
 
@@ -2262,152 +2608,73 @@ NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s
 // ── PDF KNOWLEDGE ITEMS ─────────────────────────────────────────────────
 window.dynamicDocs = window.dynamicDocs || {};
 
+// Two built-in items with their own hand-designed views (#view-browsing, #view-churn).
+window.dynamicDocs['view-churn-doc'] = {id:'view-churn-doc',topic:'דיבאג נטישה',cat:'ops',docType:'churn',stages:[],_isViewDoc:'churn',desc:'זיהוי לקוח מאותת נטישה, 3 מסלולי טיפול, תסריטי שיחה והתנגדויות'};
+window.dynamicDocs['view-browsing-doc'] = {id:'view-browsing-doc',topic:'איטיות גלישה / חוסר גלישה',cat:'tech',docType:'browsing',stages:[],_isViewDoc:'browsing',desc:'אבחון, חבילה וקו, נתונים, APN, איפוס, הסלמה'};
+
 // ביטול חוסך נתונים
 window.dynamicDocs['pdf_001'] = {"id": "pdf_001", "topic": "ביטול חוסך נתונים", "cat": "tech", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "זיהוי הבעיה", "items": [{"text": "אם גלישה מוגבלת רק באפליקציות מסוימות (WhatsApp / דפדפן) — הבעיה בהגדרת מכשיר, לא ברשת", "img": null}]}, {"num": "2", "title": "Samsung", "items": [{"text": "הגדרות ← חיבורים ← שימוש בנתונים ← חוסך נתונים ← ביטול", "img": null}, {"text": "Settings → Connections → Data usage → Data saver → Off", "img": null}]}, {"num": "3", "title": "Xiaomi / Redmi / POCO", "items": [{"text": "הגדרות ← חיבורים ושיתוף ← שימוש בנתונים ← חוסך נתונים ← ביטול", "img": null}, {"text": "Settings → Connection & sharing → Data usage → Data saver → Off", "img": null}]}, {"num": "4", "title": "OnePlus / Oppo / Realme", "items": [{"text": "הגדרות ← שימוש בנתונים ← חוסך נתונים ← ביטול", "img": null}, {"text": "Settings → Data usage → Data saver → Off", "img": null}]}, {"num": "5", "title": "Google Pixel", "items": [{"text": "הגדרות ← רשת ואינטרנט ← חוסך נתונים ← ביטול", "img": null}, {"text": "Settings → Network & Internet → Data Saver → Off", "img": null}]}, {"num": "6", "title": "iPhone (iOS 13+)", "items": [{"text": "הגדרות ← סלולר ← אפשרויות נתונים סלולריים ← מצב נתונים מופחת ← ביטול", "img": null}, {"text": "Settings → Cellular → Cellular Data Options → Low Data Mode → Off", "img": null}]}, {"num": "7", "title": "אפליקציה ספציפית לא גולשת (אופציונלי)", "items": [{"text": "Android: הגדרות ← אפליקציות ← [בחר אפליקציה] ← שימוש בנתונים ← אפשר נתונים ברקע", "img": null}, {"text": "iPhone: הגדרות ← [בחר אפליקציה] ← אפשר נתונים סלולריים", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 12; });
-  if(t) { t.dynId = 'pdf_001'; t.active = true; }
-})();
 
 // בעיות קליטה בארץ – שיחות וגלישה
 window.dynamicDocs['pdf_002'] = {"id": "pdf_002", "topic": "בעיות קליטה בארץ – שיחות וגלישה", "cat": "tech", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "שלב מקדים לנציג", "items": [{"text": "לוודא VoLTE פעיל במנוי", "img": null}, {"text": "לוודא שמצב \"נא לא להפריע\" כבוי", "img": null}, {"text": "אם מכשיר iPhone ← לבצע איפוס הגדרות רשת", "img": null}]}, {"num": "2", "title": "שאלות חובה – שלב מברר", "items": [{"text": "האם התקלה מתרחשת בנסיעה או במקום קבוע?", "img": null}, {"text": "מתי התחילה הבעיה?", "img": null}, {"text": "שיחות מתנתקות, איכות קול מקוטעת, או קושי להוציא/לקבל שיחות?", "img": null}, {"text": "במקום קבוע — זה קורה בכל הבית/משרד, או רק במקום מסוים?", "img": null}, {"text": "יש עוד אנשים סביבך שחווים את אותה בעיה?", "img": null}]}, {"num": "3", "title": "תרחיש 1: בעיית קליטה בנסיעה", "items": [{"text": "מצב מתמשך (מעל שבועיים): תיאום ציפיות — \"ברשת סלולרית בזמן נסיעה יש מעבר בין אנטנות, זה טבעי ולא מצביע על תקלה נקודתית\"", "img": null}, {"text": "מצב חדש (עד שבועיים / הרעה): להעביר לבדיקה עם כתובת מדויקת ← הנדסה בלבד!", "img": null}, {"text": "שיחות מתנתקות בכל מקום ולא רק בנסיעה — להמליץ להחליף SIM / לבדוק מכשיר", "img": null}]}, {"num": "4", "title": "תרחיש 2: קליטה במקום קבוע — ירוק במפה", "items": [{"text": "לבדוק אם האתר מופיע כנפול עם צפי → תיאום ציפיות: \"האתר באזור מטופל, ייתכן שיפור בקרוב\"", "img": null}, {"text": "לא נפול — בכל הבית/משרד → פתוח קריאה להנדסה", "img": null}, {"text": "מקום ספציפי (חדר פנימי / חניון) → \"מיסוך במבנה — חלק מהאופי של רשת סלולרית\"", "img": null}]}, {"num": "5", "title": "תרחיש 2: קליטה במקום קבוע — אדום במפה", "items": [{"text": "תיאום ציפיות: \"רמת הקליטה מושפעת מגורמים סביבתיים — בנייה גבוהה, מבנים ממוגנים, זכוכית אנטי-סאן, מרתפים\"", "img": null}, {"text": "פתרון: הפעל Wi-Fi Calling אם המכשיר תומך", "img": null}, {"text": "ש: \"מתי זה ייפתר?\" ת: \"אין צפי מדויק, אנחנו פועלים באופן מתמשך לשיפור\"", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 14; });
-  if(t) { t.dynId = 'pdf_002'; t.active = true; }
-})();
 
 // הבדל בין VoLTE ל-Wi-Fi Calling
 window.dynamicDocs['pdf_003'] = {"id": "pdf_003", "topic": "הבדל בין VoLTE ל-Wi-Fi Calling", "cat": "tech", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "VoLTE — Voice over LTE", "items": [{"text": "דרך השידור: רשת סלולרית 4G LTE", "img": null}, {"text": "דורש קליטה סלולרית: כן", "img": null}, {"text": "מצב אידאלי: כשיש קליטת 4G מלאה", "img": null}, {"text": "הפעלה: גם בקו (CRM) וגם במכשיר", "img": null}, {"text": "מאפשר גלישה תוך כדי שיחה: כן", "img": null}]}, {"num": "2", "title": "Wi-Fi Calling", "items": [{"text": "דרך השידור: רשת Wi-Fi (אינטרנט ביתי/משרדי)", "img": null}, {"text": "לא דורש קליטה סלולרית — רק חיבור Wi-Fi", "img": null}, {"text": "מצב אידאלי: כשאין קליטה אבל יש Wi-Fi זמין", "img": null}, {"text": "רק במכשירים מסוימים שהספק תומך בהם", "img": null}, {"text": "הפעלה: גם בקו וגם במכשיר", "img": null}]}, {"num": "3", "title": "איך להסביר ללקוח", "items": [{"text": "VoLTE: מאפשר שיחה על גבי 4G, שומר על איכות שיחה וגם מאפשר לגלוש תוך כדי", "img": null}, {"text": "Wi-Fi Calling: שיחות דרך האינטרנט הביתי — כשאין קליטה מספיק טובה", "img": null}, {"text": "\"למשל במקלט, ממ\"ד או משרד עם קליטה חלשה — אם יש Wi-Fi, עדיין תוכל לדבר\"", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 17; });
-  if(t) { t.dynId = 'pdf_003'; t.active = true; }
-})();
 
 // לקוח לא מוצא רשת בחו"ל
 window.dynamicDocs['pdf_004'] = {"id": "pdf_004", "topic": "לקוח לא מוצא רשת בחו\"ל", "cat": "intl", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "בדיקת CRM", "items": [{"text": "בדוק האם למנוי שירות נדידה פעיל", "img": null}, {"text": "אם לא פעיל → הפעל ועדכן לקוח", "img": null}]}, {"num": "2", "title": "iPhone — פעולות מול הלקוח", "items": [{"text": "נדידת נתונים: הגדרות ← סלולרי ← אפשרויות נתונים ← נתונים בנדידה", "img": null}, {"text": "בחירת רשת אוטומטית: הגדרות ← סלולרי ← בחירת רשת ← אוטומטי", "img": null}, {"text": "בארה\"ב — ודא שהמכשיר נתמך. iPhone 11+ ללא חבילת גלישה לא יתחבר לרשת (מגבלת אפל)", "img": null}, {"text": "בחירת רשת ידנית מקובץ מפעילים בחו\"ל → לאחר רישום תקין, החזר לאוטומטי", "img": null}, {"text": "כיבוי והדלקה — המתן 2 דקות. לא תקין → מומחה טכני", "img": null}]}, {"num": "3", "title": "Samsung — פעולות מול הלקוח", "items": [{"text": "נדידת נתונים: הגדרות ← חיבורים ← רשתות תקשורת סלולרית ← נדידת נתונים", "img": null}, {"text": "בחירת רשת אוטומטית: הגדרות ← חיבורים ← מפעילי רשת ← בחר באופן אוטומטי", "img": null}, {"text": "בחירה ידנית מקובץ מפעילים → לאחר רישום, החזר לאוטומטי", "img": null}, {"text": "כיבוי והדלקה. לא תקין → מומחה טכני", "img": null}]}, {"num": "4", "title": "Xiaomi / Huawei / OnePlus / Google Pixel", "items": [{"text": "בחירת רשת ידנית: הגדרות ← רשת סלולרית ← נתונים ניידים ← ספק ← כבה אוטומטי ← בחר מהרשימה", "img": null}, {"text": "בארה\"ב: מומלץ להתביית על T-MOBILE", "img": null}, {"text": "מכשיר תומך דור 4 → העבר לדור 4 (הגדרות ← רשת סלולרית ← מצב רשת מועדף)", "img": null}, {"text": "כיבוי והדלקה. לא תקין → SIM במכשיר אחר → מומחה טכני", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 35; });
-  if(t) { t.dynId = 'pdf_004'; t.active = true; }
-})();
 
 // מדריך איפוס הגדרות רשת
 window.dynamicDocs['pdf_005'] = {"id": "pdf_005", "topic": "מדריך איפוס הגדרות רשת", "cat": "tech", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "השלכות האיפוס — להסביר ללקוח מראש", "items": [{"text": "\"הפעולה תמחק את כל רשתות ה-Wi-Fi שהמכשיר שמר — תצטרך להתחבר מחדש לרשת הביתית\"", "img": null}, {"text": "מחיקת התקני Bluetooth מחוברים (אוזניות, רמקול, שעון חכם, מערכת ברכב)", "img": null}, {"text": "עלול למחוק הגדרות APN → לבדוק גלישה מיד אחרי האיפוס. אם לא תקין → הגדר APN מחדש", "img": null}, {"text": "האיפוס לא מוחק קבצים אישיים או אפליקציות", "img": null}]}, {"num": "2", "title": "Samsung", "items": [{"text": "הגדרות ← ניהול כללי ← אפס ← אפס הגדרות רשת", "img": null}, {"text": "Settings → General Management → Reset → Reset Network Settings", "img": null}]}, {"num": "3", "title": "iPhone", "items": [{"text": "הגדרות ← כללי ← העברת תוכן או אפס ← אפס הגדרות רשת", "img": null}, {"text": "Settings → General → Transfer or Reset iPhone → Reset → Reset Network Settings", "img": null}]}, {"num": "4", "title": "Xiaomi (כולל Redmi ו-POCO)", "items": [{"text": "הגדרות ← חיבור ושיתוף ← איפוס Wi-Fi, נייד ו-Bluetooth", "img": null}, {"text": "Settings → Connection & Sharing → Reset Wi-Fi, mobile networks, and Bluetooth", "img": null}]}, {"num": "5", "title": "Huawei / OnePlus / Google Pixel / Oppo / Realme", "items": [{"text": "Huawei: הגדרות ← מערכת ← אפס ← אפס הגדרות רשת", "img": null}, {"text": "OnePlus: הגדרות ← מערכת ← אפשרויות איפוס ← אפס הגדרות רשת", "img": null}, {"text": "Google Pixel: הגדרות ← מערכת ← מתקדם ← אפשרויות איפוס ← אפס הגדרות רשת", "img": null}, {"text": "Oppo/Realme: הגדרות ← הגדרות נוספות ← גיבוי ואיפוס ← אפס הגדרות רשת", "img": null}]}, {"num": "6", "title": "חשוב לדעת", "items": [{"text": "Vivo / Nothing Phone (מיבוא אישי) — לוודא שה-APN נטען מחדש אחרי איפוס, ייתכן שיידרש הזנה ידנית", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 20; });
-  if(t) { t.dynId = 'pdf_005'; t.active = true; }
-})();
 
 // תסריטי שיחה למכירות
 window.dynamicDocs['pdf_006'] = {"id": "pdf_006", "topic": "תסריטי שיחה למכירות", "cat": "ops", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "התנגדות למחיר", "items": [{"text": "\"אני מבין אותך, זה לגמרי לגיטימי לבדוק מה אתה מקבל מול מה שאתה משלם. מה שאתה מקבל כאן שווה הרבה יותר: קליטה, מהירות, שירות אישי, ואחריות\"", "img": null}, {"text": "עוגן: \"יש זול — ויש חכם. מה שאתה מקבל פה זה גם שקט נפשי, לא רק סים\"", "img": null}, {"text": "עוגן: \"אני יכול להבטיח לך שבסוף החודש, לא תסתכל על המחיר — אלא על מה שקיבלת בתמורה\"", "img": null}]}, {"num": "2", "title": "תגובות לבעיות כיסוי / \"אין לי קליטה בכל מקום\"", "items": [{"text": "\"נכון שדור 5 תלוי בפריסת אנטנות. מה שאני יכול להגיד בוודאות — אנחנו בפריסה מתקדמת ומתרחבת כל הזמן\"", "img": null}, {"text": "עוגן: \"אתה לא מתחייב לדור 5 בלבד — אתה מקבל גם קליטה מלאה בדור 4, מכוסה מכל כיוון\"", "img": null}]}, {"num": "3", "title": "שיתוף אנטנות — \"אתם על האנטנות של החברה הסגולה?\"", "items": [{"text": "\"שיתוף הרשתות זה דווקא אחד היתרונות הגדולים — אתה מקבל תשתית של רשת גדולה, עם התנאים שאנחנו יודעים לתת\"", "img": null}, {"text": "עוגן: \"זה הכי טוב משני העולמות — תשתית חזקה, בלי לאבד את היחס האישי\"", "img": null}]}, {"num": "4", "title": "תסריט חבילת חו\"ל עם דמי חיבור חד-פעמיים", "items": [{"text": "פתיחה: \"בחרת תכנית מעולה — כוללת גם שימוש בחו\"ל וגם יתרונות דור חדש בארץ\"", "img": null}, {"text": "על דמי הרצינות: \"הם חד-פעמיים בלבד, מאפשרים לנו לשמור על מחירים תחרותיים למי שבאמת מתכוון להישאר\"", "img": null}, {"text": "עוגן: \"העלות הזו מחזירה את עצמה כבר בשימוש הראשון בחו\"ל\"", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 40; });
-  if(t) { t.dynId = 'pdf_006'; t.active = true; }
-})();
 
 // דיבאג תקלות שיחות נכנסות / יוצאות
 window.dynamicDocs['pdf_007'] = {"id": "pdf_007", "topic": "דיבאג תקלות שיחות נכנסות / יוצאות", "cat": "tech", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "שלב 1 — בירור ראשוני עם הלקוח", "items": [{"text": "האם התקלה בכל השיחות או רק מול מספרים מסוימים? (אם מסוים → דיבאג חסימת מספרים)", "img": null}, {"text": "האם בכל מקום או רק באזור מסוים? (אזור קבוע → דיבאג קליטה / הרעה ברשת)", "img": null}, {"text": "שיחות יוצאות / נכנסות / שתיהן? מתי התחילה התקלה?", "img": null}, {"text": "האם מכשיר עם eSIM? שימוש ב-Wi-Fi Calling?", "img": null}]}, {"num": "2", "title": "שלב 2 — בדיקות CRM (חובה לפני טיפול במכשיר)", "items": [{"text": "סטטוס קו — פעיל, לא מושהה או חסום", "img": null}, {"text": "חוב או חסימה כספית", "img": null}, {"text": "ניוד — האם הושלם", "img": null}, {"text": "חסימות שירות — שיחות יוצאות/נכנסות", "img": null}, {"text": "סוג SIM — פיזי/eSIM, האם הוחלף לאחרונה", "img": null}, {"text": "VoLTE — לוודא שמאופשר בקו", "img": null}, {"text": "תקלות אזוריות / שדרוגים שעלולים להשפיע", "img": null}]}, {"num": "3", "title": "שלב 3 — בדיקות במכשיר הלקוח", "items": [{"text": "מצב טיסה — לוודא כבוי. לבצע כיבוי והדלקה של מצב טיסה", "img": null}, {"text": "סוג רשת — מוגדר על 4G/5G (לא נעול על 2G/3G): Android: הגדרות ← חיבורים ← רשת סלולרית | iOS: הגדרות ← סלולר ← אפשרויות נתונים", "img": null}, {"text": "VoLTE במכשיר: Android: הגדרות ← חיבורים ← שיחות VoLTE | iOS: הגדרות ← סלולר ← VoLTE", "img": null}, {"text": "eSIM — הגדרות ← ניהול SIM — ודא פרופיל פעיל. חייג *#06# לבדיקת EID", "img": null}, {"text": "חסימות מקומיות — \"נא לא להפריע\", רשימת מספרים חסומים, Truecaller", "img": null}, {"text": "עדכון מערכת הפעלה. כיבוי והדלקה מלאה. לא נפתר → איפוס הגדרות רשת", "img": null}]}, {"num": "4", "title": "שלב 4 — מתי להסלים", "items": [{"text": "כל הבדיקות תקינות והתקלה ממשיכה → תמיכה בכירה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 15; });
-  if(t) { t.dynId = 'pdf_007'; t.active = true; }
-})();
 
 // קושי בקבלת שיחה ממספר מסוים
 window.dynamicDocs['pdf_008'] = {"id": "pdf_008", "topic": "קושי בקבלת שיחה ממספר מסוים", "cat": "tech", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מתי להפעיל את הדיבאג", "items": [{"text": "לקוח מתלונן על אי קבלת שיחות ממספר מסוים בלבד", "img": null}, {"text": "CRM תקין, קו פעיל, אין חסימות או תקלות אזוריות", "img": null}]}, {"num": "2", "title": "שלב 1 — בירור ראשוני", "items": [{"text": "מספר אחד בלבד או כמה מספרים?", "img": null}, {"text": "השיחה לא מתקבלת כלל, או מצלצל ויורד?", "img": null}, {"text": "קורה בכל מקום ובכל זמן? השיחה מופיעה ביומן שיחות?", "img": null}, {"text": "הלקוח מקבל שיחות ממספרים אחרים כרגיל?", "img": null}]}, {"num": "3", "title": "שלב 2 — בדיקות CRM", "items": [{"text": "קו פעיל, אין חסימת שיחות נכנסות", "img": null}, {"text": "אין הפניית שיחות כללית או למספר שגוי", "img": null}, {"text": "תקלות מערכתיות / אתר נפול באזור הלקוח", "img": null}]}, {"num": "4", "title": "שלב 3 — בדיקות במכשיר", "items": [{"text": "חסימה ידנית: הגדרות ← טלפון/שיחות ← מספרים חסומים ← הסר את המספר", "img": null}, {"text": "מצב DND (נא לא להפריע): הגדרות ← צלילים והתראות ← ודא שהמספר לא חסום ביוצאים מן הכלל", "img": null}, {"text": "חסימת מספרים לא מזוהים — לבטל זמנית לצורך בדיקה", "img": null}]}, {"num": "5", "title": "שלב 4 — אפליקציות צד ג'", "items": [{"text": "Truecaller / CallApp — לכבות זמנית ולבדוק", "img": null}, {"text": "אם נפתר — להגדיר מחדש או להחליף באחרת (תפעול עצמאי ע\"י הלקוח)", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 16; });
-  if(t) { t.dynId = 'pdf_008'; t.active = true; }
-})();
 
 // תקלה בשליחת / קבלת SMS
 window.dynamicDocs['pdf_009'] = {"id": "pdf_009", "topic": "תקלה בשליחת / קבלת SMS", "cat": "tech", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "בדיקות ראשוניות", "items": [{"text": "CRM — קו פעיל, אין חסימת הודעות, אין חוב", "img": null}, {"text": "בדיקת קליטה ושיחות — אם אין קליטה → מעבר לדיבאג קליטה / איתחול מכשיר / בדיקת SIM", "img": null}]}, {"num": "2", "title": "Android — בדיקת SMSC (iOS מוגדר אוטומטית)", "items": [{"text": "לבדוק אם מרכז שירות הודעות (SMSC) מוגדר", "img": null}, {"text": "אם ריק או לא תואם → לעדכן לערך ברירת המחדל של החברה", "img": null}, {"text": "לנסות לשלוח הודעת טקסט רגילה (לא MMS / קובץ מצורף)", "img": null}, {"text": "MMS לא יוצא → לבדוק חבילת גלישה / הגדרות APN", "img": null}]}, {"num": "3", "title": "כל המכשירים", "items": [{"text": "לבצע עם הלקוח איפוס הגדרות רשת", "img": null}, {"text": "בדיקה עם SIM חלופי / מכשיר חלופי", "img": null}, {"text": "עובד במכשיר אחר → תקלה במכשיר הלקוח", "img": null}, {"text": "לא עובד גם שם → הסלמה לאנליסט/הנדסה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 18; });
-  if(t) { t.dynId = 'pdf_009'; t.active = true; }
-})();
 
 // תקלת גלישה בחו"ל
 window.dynamicDocs['pdf_010'] = {"id": "pdf_010", "topic": "תקלת גלישה בחו\"ל", "cat": "intl", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "בדיקות מערכתיות — CRM + חבילות", "items": [{"text": "בדוק חסימת גלישה", "img": null}, {"text": "בדוק שהלקוח פתוח לנדידה ב-CRM", "img": null}, {"text": "ודא שחבילת חו\"ל תואמת ליעד ותאריכים", "img": null}, {"text": "ניצל חבילה → רכישת חבילה נוספת. חבילה לא תואמת → ברר יעד. בעיית תאריכים/חסימה → תקן ב-CRM", "img": null}]}, {"num": "2", "title": "בירור מול הלקוח — אם עדיין לא גולש", "items": [{"text": "שאל: \"באילו מקרים בדיוק לא מצליח לגלוש? וואטסאפ? יוטיוב? דפדפן?\"", "img": null}, {"text": "תקלה נקודתית (אפליקציה אחת) → \"הגלישה תקינה, הבעיה באפליקציה הספציפית — לא באחריות WECOM\"", "img": null}, {"text": "תקלה בכל האפליקציות → עבור לצ'ק ליסט מכשיר (Android/iPhone)", "img": null}]}, {"num": "3", "title": "Android בחו\"ל — צ'ק ליסט", "items": [{"text": "כבה Wi-Fi, הפעל נתונים ניידים: הגדרות ← חיבורים ← שימוש בנתונים ← נתונים ניידים", "img": null}, {"text": "הפעל נדידת נתונים: הגדרות ← חיבורים ← רשתות סלולריות ← נדידת נתונים", "img": null}, {"text": "ודא מצב רשת אוטומטי (דור 4/5): הגדרות ← חיבורים ← רשתות סלולריות ← מצב רשת", "img": null}, {"text": "אם יש 2 SIMים — השאר רק WECOM פעיל", "img": null}, {"text": "ניקוי APN: הגדרות ← חיבורים ← רשתות סלולריות ← שמות נקודות גישה ← 3 נקודות ← איפוס ברירת מחדל", "img": null}, {"text": "בחירת רשת ידנית מקובץ מפעילים → לאחר התחברות, החזר לאוטומט. עדיין לא עובד → מומחה טכני", "img": null}]}, {"num": "4", "title": "iPhone בחו\"ל — צ'ק ליסט", "items": [{"text": "כבה Wi-Fi, הפעל נתונים סלולריים: הגדרות ← סלולר ← נתונים סלולריים", "img": null}, {"text": "הפעל נדידה: הגדרות ← סלולר ← אפשרויות נתונים סלולריים ← נדידה בנתונים", "img": null}, {"text": "ודא Voice & Data: הגדרות ← סלולר ← אפשרויות נתונים ← קול ונתונים → 5G Auto או LTE", "img": null}, {"text": "Dual SIM/eSIM: ודא שרק WECOM פעיל לגלישה", "img": null}, {"text": "ניקוי APN: הגדרות ← כללי ← איפוס iPhone ← איפוס הגדרות רשת", "img": null}, {"text": "בחירת רשת ידנית מקובץ מפעילים → לאחר התחברות, החזר לאוטומטי. עדיין לא עובד → מומחה טכני", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 35; });
-  if(t) { t.dynId = 'pdf_010'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_011'] = {"id": "pdf_011", "topic": "אבחון מרכזי לתקלות ושירות בחו\"ל", "cat": "intl", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "מטרת המסמך", "items": [{"text": "לזהות במהירות מה התקלה של הלקוח ולהפנות למסלול הטיפול הנכון", "img": null}, {"text": "המסמך מלווה את הנציג בתחילת השיחה בלבד — ברגע שסוג התקלה ברור, עוברים למסלול הטיפול המתאים", "img": null}, {"text": "שאל: \"מה לא עובד כרגע — קליטה, גלישה, שיחות או הודעות?\"", "img": null}, {"text": "סמן את התיאור הראשוני, אך אל תעבור עדיין למסלול התקלה — תחילה ודא שהתנאים הבסיסיים לשירות בחו\"ל תקינים", "img": null}]}, {"num": "2", "title": "בדיקות בסיס במערכת", "items": [{"text": "האם הקו פתוח לשירותי חו\"ל / נדידה? לא → פתח את השירות לפי ההרשאות והתהליך הקיים, הנחה מצב טיסה או כיבוי־הדלקה, ובדוק שוב חיבור לרשת", "img": null}, {"text": "האם קיימת חבילת חו\"ל בתוקף? בדוק: החבילה פעילה, תאריכים תקינים, המדינה כלולה בחבילה, החבילה לא נוצלה במלואה", "img": null}, {"text": "נמצאה בעיה בחבילה → טפל בהתאם לממצא לפני המשך האבחון", "img": null}]}, {"num": "3", "title": "האם המכשיר מחובר לרשת בחו\"ל", "items": [{"text": "שאל: \"האם מופיע במכשיר שם של רשת סלולרית?\"", "img": null}, {"text": "לא מופיעה רשת / מופיע \"אין שירות\" → עצור את אבחון הגלישה/שיחות/הודעות ועבור למסלול R-01 — אין קליטה או רישום לרשת בחו\"ל", "img": null}, {"text": "רק לאחר שהמכשיר נרשם לרשת ניתן להמשיך לבדוק את השירות שאינו עובד", "img": null}, {"text": "מופיעה רשת סלולרית (המכשיר רשום) → המשך לזיהוי השירות שאינו עובד", "img": null}]}, {"num": "4", "title": "זיהוי השירות שאינו עובד — גלישה", "items": [{"text": "\"אני לא מצליח לגלוש\" — בדוק במכשיר: נתונים סלולריים פעילים, נדידת נתונים פעילה, ובמכשיר עם שני קווים — קו wecom נבחר לגלישה", "img": null}, {"text": "לא תקין → תקן בהתאם למסמך התפעול המתאים ובדוק שוב", "img": null}, {"text": "תקין ועדיין אין גלישה → שאל: \"הגלישה לא עובדת בכלל או שרק אפליקציה מסוימת לא עובדת?\"", "img": null}, {"text": "אין גלישה בכלל → מסלול R-02 (אין גלישה בחו\"ל). רק אפליקציה מסוימת → מסלול R-03 (תקלה באפליקציה מסוימת בחו\"ל)", "img": null}]}, {"num": "5", "title": "זיהוי השירות שאינו עובד — שיחות והודעות", "items": [{"text": "\"אני לא מצליח להוציא שיחות\" — ודא שהמכשיר רשום לרשת, שאל אם מקבל שיחות; כן → מסלול R-04 (שיחות יוצאות). לא → קיימת תקלה גם ביוצאות וגם בנכנסות, המשך לפי הממצאים", "img": null}, {"text": "\"אני לא מקבל שיחות\" — ודא שהמכשיר רשום לרשת, שאל אם מצליח להוציא שיחות; כן → מסלול R-04 (שיחות נכנסות). לא → תקלה בשני הכיוונים, המשך לפי הממצאים", "img": null}, {"text": "\"אני לא מקבל/שולח SMS\" — ודא שהמכשיר רשום לרשת, שאל אם הבעיה בשליחה, בקבלה או בשניהם → מסלול R-05 (הודעות בחו\"ל)", "img": null}]}, {"num": "6", "title": "לאחר כל שינוי במערכת", "items": [{"text": "אם בוצע שינוי בשירותי הקו — הנחה את הלקוח לבצע מצב טיסה והחזרה למצב רגיל, או כיבוי־הדלקה", "img": null}, {"text": "לאחר מכן בדוק שוב: האם המכשיר נרשם לרשת, והאם השירות שבגינו פנה הלקוח עובד", "img": null}]}, {"num": "7", "title": "כלל מנחה לנציג", "items": [{"text": "אין לבצע דיבאג של גלישה, שיחות או הודעות לפני שווידאת שהקו פתוח לשירות בחו\"ל ושהמכשיר רשום לרשת זרה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 42; });
-  if(t) { t.dynId = 'pdf_011'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_012'] = {"id": "pdf_012", "topic": "אין קליטה / רישום לרשת בחו\"ל", "cat": "intl", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "מתי משתמשים במסמך", "items": [{"text": "הלקוח נמצא בחו\"ל והמכשיר אינו מתחבר לרשת סלולרית מקומית — לדוגמה: אין שירות, לא מופיע שם מפעיל, המכשיר אינו נרשם לרשת", "img": null}]}, {"num": "2", "title": "שלב 1 — בדיקת שירות נדידה במערכת", "items": [{"text": "בדוק במערכת האם שירות נדידה פעיל למנוי", "img": null}, {"text": "לא פעיל → טפל בהפעלת השירות לפי התהליך הקיים, הנחה מצב טיסה/כיבוי־הדלקה, ובדוק שוב רישום לרשת", "img": null}, {"text": "פעיל → המשך לשלב הבא", "img": null}]}, {"num": "3", "title": "שלב 2 — בדיקת נדידת נתונים במכשיר", "items": [{"text": "ודא שנדידת נתונים פעילה במכשיר הלקוח (ראה מסמך O-02 — הפעלת נדידת נתונים)", "img": null}, {"text": "לא פעילה → הפעל לפי דגם המכשיר ובדוק שוב רישום לרשת", "img": null}, {"text": "המכשיר נרשם לרשת ופנה בגלל גלישה/שיחות/הודעות → חזור למסמך האבחון המרכזי (M-00) והמשך למסלול המתאים", "img": null}, {"text": "עדיין לא נרשם / נדידת נתונים כבר פעילה → המשך לשלב הבא", "img": null}]}, {"num": "4", "title": "שלב 3–4 — בחירת רשת", "items": [{"text": "ודא שבחירת הרשת מוגדרת למצב אוטומטי; אם התחבר — התקלה נפתרה, חזור למסלול המתאים אם נדרש", "img": null}, {"text": "עדיין לא מתחבר → בטל בחירה אוטומטית, המתן לרשימת מפעילים ובחר מפעיל מתוך רשימת המפעילים המאושרים בחו\"ל", "img": null}, {"text": "רישום הצליח → החזר לבחירה אוטומטית ובדוק שנשאר מחובר", "img": null}, {"text": "רישום נכשל → נסה מפעיל נוסף מהרשימה; אם לא מצליח לאף מפעיל — המשך לשלב הבא", "img": null}]}, {"num": "5", "title": "שלב 5 — הלקוח נמצא בארה\"ב", "items": [{"text": "אם כן — בדוק התאמת דגם המכשיר לרשתות בארה\"ב לפי מסמך \"תאימות מכשירים ורשתות בארה\"ב\"", "img": null}, {"text": "אם לא — המשך לבדיקות לפי סוג המכשיר", "img": null}]}, {"num": "6", "title": "שלב 6 — בדיקות לפי סוג מכשיר", "items": [{"text": "iPhone: ודא בחירת רשת אוטומטית → אם לא נרשם, בצע בחירה ידנית ממפעיל מאושר → לאחר רישום החזר לאוטומטי → בצע כיבוי־הדלקה והמתן דקות", "img": null}, {"text": "Samsung: אותו תהליך דרך \"בחר באופן אוטומטי\" בהגדרות מפעילי הרשת", "img": null}, {"text": "Xiaomi / Huawei / OnePlus / Google Pixel: בחירת רשת ידנית ממפעיל מאושר; אם תומך דור 4 — ודא מצב רשת מתאים; כיבוי־הדלקה; אם עדיין לא נרשם — נסה את ה-SIM במכשיר אחר", "img": null}, {"text": "Oppo / Realme: בחירת רשת ידנית; מכשירי דור 5 — המסמך המקורי מנחה להעביר לדור 4; נסה את ה-SIM במכשיר אחר", "img": null}]}, {"num": "7", "title": "שלב 7 — עדיין אין רישום לרשת", "items": [{"text": "אם בוצעו כל הבדיקות הרלוונטיות והמכשיר עדיין אינו נרשם — העבר למומחה טכני לפי מסמך E-01 (העברה למומחה בתקלת חו\"ל)", "img": null}]}, {"num": "8", "title": "סיום טיפול", "items": [{"text": "לאחר שהמכשיר נרשם לרשת — בדוק עם הלקוח האם השירות שבגינו פנה עובד", "img": null}, {"text": "אם לא — חזור למסמך האבחון המרכזי (M-00) והמשך למסלול גלישה/שיחות/הודעות בהתאם לתקלה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 43; });
-  if(t) { t.dynId = 'pdf_012'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_013'] = {"id": "pdf_013", "topic": "אין גלישה בחו\"ל", "cat": "intl", "wave": 1, "docType": "pdf", "stages": [{"num": "1", "title": "מתי משתמשים במסמך", "items": [{"text": "הלקוח נמצא בחו\"ל, המכשיר מחובר לרשת סלולרית, אך אינו מצליח לגלוש", "img": null}, {"text": "אם המכשיר אינו מחובר לרשת זרה — עבור למסלול R-01 (אין קליטה או רישום לרשת בחו\"ל)", "img": null}]}, {"num": "2", "title": "שלב 1 — תיחום התקלה", "items": [{"text": "שאל: \"הגלישה לא עובדת בכלל או שרק אפליקציה מסוימת לא עובדת?\"", "img": null}, {"text": "רק אפליקציה מסוימת → עבור למסלול R-03 (תקלה באפליקציה מסוימת בחו\"ל)", "img": null}, {"text": "אין גלישה בכלל → המשך לשלב הבא", "img": null}]}, {"num": "3", "title": "שלב 2 — בדיקות מערכת (wecom)", "items": [{"text": "ודא: שירותי נדידה פעילים בקו, אין חסימת גלישה בחו\"ל, קיימת חבילת חו\"ל בתוקף, תאריכים תקינים, המדינה כלולה בחבילה, החבילה לא נוצלה במלואה", "img": null}, {"text": "נמצאה בעיה → טפל בהתאם לממצא, הנחה מצב טיסה והחזרה למצב רגיל, ובדוק שוב גלישה", "img": null}, {"text": "הכול תקין → המשך לשלב הבא", "img": null}]}, {"num": "4", "title": "שלב 3 — בדיקות בסיס במכשיר", "items": [{"text": "כבה זמנית Wi-Fi, ודא שנתונים סלולריים פעילים, ולאחר מכן ודא שנדידת נתונים פעילה (מסמך O-02)", "img": null}, {"text": "אם קיימים שני קווים — ודא שקו wecom נבחר לגלישה", "img": null}, {"text": "לאחר תיקון בדוק שוב גלישה — אם עדיין לא עובד, המשך לשלב הבא", "img": null}]}, {"num": "5", "title": "שלב 4–5 — APN וזהות רשת", "items": [{"text": "בדוק שהגדרת נקודת הגישה (APN) תקינה — לפי מסמך O-03 (הגדרת APN בחו\"ל); הערך הנדרש: UINTERNET PARTNER", "img": null}, {"text": "בדוק האם קיימת במכשיר זהות פרטנר כנדרשת לשירות בחו\"ל — אם תקינה, אין לבצע שינוי דרך תפריט STK; אם נדרש שינוי — מסמך O-04", "img": null}, {"text": "אם בוצע שינוי ידני בזהות הרשת, יש להנחות את הלקוח להחזיר למצב אוטומטי עם החזרה לארץ", "img": null}]}, {"num": "6", "title": "שלב 6–7 — בחירת רשת ורענון מכשיר", "items": [{"text": "ייתכן שהמכשיר רשום לרשת אך שירותי הנתונים אינם עובדים ברשת שאליה התחבר — בצע בחירת רשת ידנית לפי מסמך O-05, בחר מפעיל מאושר, ובדוק שוב גלישה", "img": null}, {"text": "הגלישה עובדת → החזר את בחירת הרשת למצב אוטומטי, הטיפול הסתיים", "img": null}, {"text": "עדיין אין גלישה → מצב טיסה למספר שניות ואז חזרה למצב רגיל; אם עדיין לא תקין — כיבוי והדלקה", "img": null}]}, {"num": "7", "title": "שלב 8–9 — ריענון SIM ואיפוס רשת", "items": [{"text": "אם עדיין אין גלישה: בצע ריענון SIM במערכת דרך כפתור ריענון ה-SIM החדש בלבד (אין להשתמש בכפתורים הישנים), ואז מצב טיסה/כיבוי-הדלקה ובדיקה חוזרת", "img": null}, {"text": "אם כל הבדיקות בוצעו ועדיין אין גלישה — ניתן לבצע איפוס הגדרות רשת במכשיר (הסבר ללקוח שההגדרות השמורות עלולות להימחק)", "img": null}, {"text": "לאחר האיפוס: ודא נתונים סלולריים ונדידת נתונים פעילים, ודא רישום לרשת, ובדוק שוב גלישה", "img": null}]}, {"num": "8", "title": "שלב 10 — התקלה לא נפתרה", "items": [{"text": "אם בוצעו כל השלבים ועדיין אין גלישה — עבור למסמך E-01 (העברה למומחה בתקלת חו\"ל)", "img": null}, {"text": "יש להעביר למומחה את תוצאות הבדיקות שכבר בוצעו כדי למנוע חזרה מיותרת על אותו תהליך מול הלקוח", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 44; });
-  if(t) { t.dynId = 'pdf_013'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_014'] = {"id": "pdf_014", "topic": "תקלה באפליקציה מסוימת בחו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מתי משתמשים במסמך", "items": [{"text": "הלקוח נמצא בחו\"ל, מחובר לרשת ומצליח לגלוש, אך אפליקציה מסוימת אינה עובדת (לדוגמה: וואטסאפ אינו מתחבר, ניווט לא נטען, ושאר האפליקציות והדפדפן פועלים)", "img": null}]}, {"num": "2", "title": "שלב 1 — ודא שהתקלה נקודתית", "items": [{"text": "שאל: \"האם אתה מצליח לגלוש בדפדפן או להשתמש באפליקציות אחרות?\"", "img": null}, {"text": "לא → התקלה אינה באפליקציה בלבד, חזור למסלול R-02 (אין גלישה בחו\"ל)", "img": null}, {"text": "כן → הגלישה הסלולרית פעילה, המשך לשלב הבא", "img": null}]}, {"num": "3", "title": "שלב 2 — סגירה ופתיחה מחדש", "items": [{"text": "הנחה את הלקוח לסגור את האפליקציה לחלוטין ולפתוח אותה מחדש, ובדוק שוב", "img": null}]}, {"num": "4", "title": "שלב 3–4 — הרשאות ומגבלות נתונים", "items": [{"text": "ודא שהאפליקציה מורשית להשתמש בנתונים סלולריים (iPhone: הגדרות ← סלולר ← מציאת האפליקציה; אנדרואיד: הגדרות האפליקציה, לפי יצרן)", "img": null}, {"text": "נמצאה חסימה → הפעל שימוש בנתונים, פתח מחדש ובדוק", "img": null}, {"text": "באנדרואיד בדוק גם \"חוסך נתונים\" או הגבלת נתונים ייעודית לאפליקציה — בטל זמנית ובדוק שוב", "img": null}]}, {"num": "5", "title": "שלב 5–6 — אבחון סופי", "items": [{"text": "אם הדפדפן גולש, אפליקציות אחרות עובדות, המכשיר מחובר לרשת ונתונים סלולריים פעילים — אין לבצע שינויי רשת נוספים", "img": null}, {"text": "נסה: סגירה ופתיחה נוספת, בדיקת עדכון לאפליקציה, כיבוי־הדלקה", "img": null}, {"text": "עדיין לא עובד → הסבר ללקוח שהחיבור הסלולרי תקין ושאר האפליקציות עובדות, והתקלה ממוקדת באפליקציה הספציפית — מומלץ לבדוק את הגדרות האפליקציה או לפנות לתמיכה של ספק האפליקציה", "img": null}, {"text": "אין להעביר למומחה תקשורת רק בשל תקלה באפליקציה אחת כאשר יתר שירותי הגלישה פועלים", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 45; });
-  if(t) { t.dynId = 'pdf_014'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_015'] = {"id": "pdf_015", "topic": "תקלות שיחות בחו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מתי משתמשים במסמך", "items": [{"text": "הלקוח נמצא בחו\"ל, המכשיר רשום לרשת, אך קיימת תקלה בשיחות — יוצאות בלבד, נכנסות בלבד, או שני הכיוונים", "img": null}, {"text": "אם המכשיר אינו רשום לרשת זרה — עבור למסלול R-01 (אין קליטה או רישום לרשת בחו\"ל)", "img": null}]}, {"num": "2", "title": "שלב 1–2 — תיחום ובדיקות משותפות", "items": [{"text": "שאל: \"הבעיה היא בהוצאת שיחות, בקבלת שיחות או בשניהם?\"", "img": null}, {"text": "לפני טיפול ודא: שירותי נדידה פעילים, המכשיר רשום לרשת, הלקוח מחובר למפעיל מאושר, ולאחר שינוי במערכת בוצע רענון (מצב טיסה או כיבוי־הדלקה)", "img": null}]}, {"num": "3", "title": "מסלול א' — לא ניתן להוציא שיחות", "items": [{"text": "ברר יעד החיוג — לחיוג לישראל: ברשת התומכת ב-VoLTE (דור 4) אין צורך בקידומת מדינה; ברשת דור 3 יש לחייג עם קידומת (למשל +972)", "img": null}, {"text": "אם עדיין לא ניתן להוציא שיחה — בדוק שהרשת המארחת תומכת בשירותי שיחות; במידת הצורך בצע בחירת רשת ידנית (מסמך O-05) ונסה מפעיל מאושר נוסף", "img": null}, {"text": "בארה\"ב — בדוק תאימות מכשיר לפי מסמך \"תאימות מכשירים ורשתות בארצות הברית\"", "img": null}, {"text": "אם המכשיר רשום, החיוג תקין, הרשת מתאימה והמכשיר תואם והתקלה נמשכת — עבור למסמך E-01 (העברה למומחה)", "img": null}]}, {"num": "4", "title": "מסלול ב' — לא מתקבלות שיחות", "items": [{"text": "שאל אם שיחות יוצאות עובדות; אם לא — בצע גם את מסלול א'", "img": null}, {"text": "ודא שהפרופיל הנדרש קיים ומעודכן במערכת (CSP19)", "img": null}, {"text": "אם בוצע שינוי במערכת — הנחה מצב טיסה/כיבוי־הדלקה ובצע שיחת בדיקה נכנסת", "img": null}, {"text": "אם המכשיר רשום, שיחות יוצאות תקינות, הפרופיל תקין ובוצע רענון והתקלה נמשכת — עבור למסמך E-01", "img": null}]}, {"num": "5", "title": "מסלול ג' — אין שיחות יוצאות וגם אין נכנסות", "items": [{"text": "ודא שהמכשיר רשום לרשת ובדוק שירותי נדידה", "img": null}, {"text": "בצע את מסלול א' (יוצאות) ואת מסלול ב' (נכנסות)", "img": null}, {"text": "אם שני הכיוונים עדיין אינם עובדים — העבר למומחה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 46; });
-  if(t) { t.dynId = 'pdf_015'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_016'] = {"id": "pdf_016", "topic": "תקלות הודעות בחו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מתי משתמשים במסמך", "items": [{"text": "הלקוח נמצא בחו\"ל, המכשיר רשום לרשת, אך קיימת תקלה בשליחה/קבלה של הודעות — כולל מצב שבו לא מתקבל קוד אימות", "img": null}, {"text": "אם המכשיר אינו רשום לרשת זרה — עבור למסלול R-01 (אין קליטה או רישום לרשת בחו\"ל)", "img": null}]}, {"num": "2", "title": "שלב 1–3 — תיחום ובדיקות בסיס", "items": [{"text": "שאל: \"הבעיה בשליחה, בקבלה או בשניהם?\"", "img": null}, {"text": "ודא: שירותי נדידה פעילים, המכשיר רשום לרשת, מחובר למפעיל מאושר, ולאחר שינוי במערכת בוצע רענון (מצב טיסה או כיבוי־הדלקה)", "img": null}, {"text": "שאל האם שיחות עובדות — אם לא, ייתכן שהתקלה אינה מוגבלת להודעות; עבור למסלול R-04 (תקלות שיחות)", "img": null}]}, {"num": "3", "title": "מסלול א' — לא ניתן לשלוח הודעות", "items": [{"text": "ברר האם הבעיה בכל הודעה או רק ליעד מסוים — אם רק ליעד מסוים, נסה לשלוח למספר נוסף; אם עובד ליעדים אחרים, התקלה אינה כללית", "img": null}, {"text": "בדוק את הרשת המארחת — אם קיים חשד שאינה מתאימה, עבור למסמך O-05 (בחירת רשת ידנית) ונסה מפעיל מאושר נוסף", "img": null}, {"text": "בצע מצב טיסה והחזרה למצב רגיל; אם עדיין לא תקין — כיבוי והדלקה; נסה לשלוח הודעה נוספת", "img": null}]}, {"num": "4", "title": "מסלול ב' — לא מתקבלות הודעות", "items": [{"text": "ברר האם הבעיה בכל SMS או רק בקוד אימות — אם רק קוד אימות, נסה תחילה לקבל SMS רגיל ממספר אחר; אם מתקבל, השירות תקין וההמשך לפי מסמך קודי אימות הייעודי", "img": null}, {"text": "אם גם הודעה רגילה אינה מתקבלת — בדוק את הרשת וזהות הרשת שאליה המכשיר רשום; במידת הצורך עבור למסמך O-05 ונסה מפעיל אחר", "img": null}, {"text": "בצע מצב טיסה והחזרה למצב רגיל; אם עדיין לא תקין — כיבוי והדלקה; נסה לקבל הודעה נוספת", "img": null}]}, {"num": "5", "title": "מסלול ג' — לא ניתן לשלוח וגם לא לקבל", "items": [{"text": "ודא שהמכשיר רשום לרשת ושירותי נדידה פעילים", "img": null}, {"text": "בדוק האם שיחות עובדות, נסה מול מפעיל מאושר נוסף, בצע רענון למכשיר, ובדוק שוב שליחה וקבלה", "img": null}, {"text": "אם התקלה נמשכת — עבור למסמך E-01 (העברה למומחה בתקלת חו\"ל)", "img": null}]}, {"num": "6", "title": "סיום טיפול", "items": [{"text": "לאחר שהודעות נשלחות ומתקבלות — ודא מול הלקוח שהשירות שבגינו פנה חזר לפעול", "img": null}, {"text": "אם קיימת עדיין תקלה בשירות אחר — חזור למסמך האבחון המרכזי (M-00)", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 47; });
-  if(t) { t.dynId = 'pdf_016'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_017'] = {"id": "pdf_017", "topic": "הפעלת נדידת נתונים במכשיר", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מטרת המסמך ולפני שמתחילים", "items": [{"text": "לוודא שנדידת נתונים פעילה במכשיר הלקוח כאשר הוא בחו\"ל — בנוסף לבדיקת שירותי הנדידה בקו במערכות wecom", "img": null}, {"text": "ודא שהלקוח בחר את קו wecom לשימוש בנתונים סלולריים; אם קיימים שני קווים — יש לבצע את הבדיקה על קו wecom", "img": null}]}, {"num": "2", "title": "אייפון", "items": [{"text": "ודא שנתונים סלולריים פעילים: הגדרות ← סלולרי ← נתונים סלולריים", "img": null}, {"text": "הפעל נדידת נתונים: הגדרות ← סלולרי ← אפשרויות נתונים סלולריים ← נדידת נתונים", "img": null}, {"text": "בשני קווים: הגדרות ← סלולרי ← בחר קו wecom ← אפשרויות נתונים סלולריים ← הפעל נדידת נתונים", "img": null}]}, {"num": "3", "title": "סמסונג", "items": [{"text": "ודא שנתונים סלולריים/נתונים ניידים פעילים", "img": null}, {"text": "הגדרות ← חיבורים ← רשתות תקשורת סלולרית ← הפעל \"נדידת נתונים\"", "img": null}, {"text": "אם האפשרות אפורה — ודא תחילה שנתונים סלולריים פעילים (הגדרות ← חיבורים ← שימוש בנתונים) ואז חזור להפעיל נדידת נתונים", "img": null}]}, {"num": "4", "title": "שיאומי / רדמי / פוקו", "items": [{"text": "בגרסאות חדשות: הגדרות ← רשתות סלולריות ← נדידת נתונים ← נדידה בינלאומית — בחר אפשרות המאפשרת נדידה", "img": null}, {"text": "בחלק מהגרסאות: הגדרות ← כרטיסי SIM ורשתות סלולריות ← נדידת נתונים", "img": null}, {"text": "הנתיב משתנה בין גרסאות — אם לא נמצא, חפש בהגדרות את המונח \"נדידת נתונים\"", "img": null}]}, {"num": "5", "title": "וואווי / גוגל פיקסל / מוטורולה / רילמי / אופו / וואן פלוס", "items": [{"text": "וואווי: הגדרות ← רשת סלולרית ← נתונים סלולריים ← בחר SIM של wecom ← הפעל נדידת נתונים", "img": null}, {"text": "גוגל פיקסל: הגדרות ← רשת ואינטרנט ← כרטיסי SIM ← בחר קו wecom ← הפעל נתונים סלולריים ← נדידה (או: אינטרנט ← הגדרות הקו ← נדידה)", "img": null}, {"text": "מוטורולה: הגדרות ← רשת ואינטרנט ← כרטיסי SIM ורשת סלולרית ← בחר קו wecom ← הפעל נתונים סלולריים ← נדידה", "img": null}, {"text": "רילמי: הגדרות ← רשת סלולרית ← בחר SIM של wecom ← הפעל נדידת נתונים", "img": null}, {"text": "אופו / וואן פלוס: הגדרות ← רשת סלולרית ← בחר SIM של wecom ← נדידת נתונים; אם לא מופיע, חפש \"נדידת נתונים\" בהגדרות", "img": null}]}, {"num": "6", "title": "מכשיר אחר / לאחר ההפעלה", "items": [{"text": "מכשיר אנדרואיד שאינו מופיע: פתח הגדרות, חפש \"נדידת נתונים\" ואם לא נמצא חפש \"נדידה\", וודא שההגדרה מופעלת עבור SIM של wecom", "img": null}, {"text": "לאחר ההפעלה בדוק שוב גלישה — תקין: הטיפול הסתיים. עדיין לא — חזור למסלול R-02 (אין גלישה בחו\"ל) והמשך לבדיקה הבאה", "img": null}]}, {"num": "7", "title": "חשוב לנציג", "items": [{"text": "נדידת נתונים מאפשרת גלישה סלולרית בזמן חיבור לרשת זרה, אך אינה מחליפה את בדיקת שירותי הנדידה בקו במערכות wecom", "img": null}, {"text": "סדר הבדיקה: שירותי נדידה בקו ← המכשיר רשום לרשת זרה ← נתונים סלולריים פעילים ← נדידת נתונים פעילה ← בדיקת גלישה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 48; });
-  if(t) { t.dynId = 'pdf_017'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_018'] = {"id": "pdf_018", "topic": "בדיקה והגדרת APN בחו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מטרת המסמך ולפני שמתחילים", "items": [{"text": "לוודא שהגדרת נקודת הגישה (APN) במכשיר תקינה כאשר הלקוח בחו\"ל ואינו מצליח לגלוש", "img": null}, {"text": "יש להשתמש במסמך רק לאחר שווידאת: המכשיר רשום לרשת זרה, נתונים סלולריים פעילים, נדידת נתונים פעילה, וקו wecom נבחר לגלישה", "img": null}, {"text": "ערך ה-APN הנדרש: UINTERNET PARTNER", "img": null}]}, {"num": "2", "title": "אייפון", "items": [{"text": "בדוק: הגדרות ← סלולרי ← רשת נתונים סלולרית ← שדה APN", "img": null}, {"text": "אם הערך אינו תקין וניתן לעריכה — עדכן ושמור, ואז מצב טיסה והחזרה למצב רגיל, ובדוק שוב גלישה", "img": null}, {"text": "אם לא ניתן לערוך (מנוהל אוטומטית ע\"י המפעיל) — אין לבצע שינוי ידני, חזור למסלול הטיפול והמשך לבדיקה הבאה", "img": null}]}, {"num": "3", "title": "סמסונג", "items": [{"text": "הגדרות ← חיבורים ← רשתות תקשורת סלולרית ← שמות נקודות גישה — בדוק איזו נקודת גישה מסומנת כפעילה", "img": null}, {"text": "קיימת נקודת גישה תקינה התואמת לערך הנדרש → המשך לבדיקת גלישה", "img": null}, {"text": "הערך אינו תקין: אם קיימת נקודת גישה מתאימה ברשימה — בחר אותה; אם לא — בצע איפוס לברירת מחדל (תפריט ← איפוס לברירת מחדל) ובדוק שוב", "img": null}]}, {"num": "4", "title": "שיאומי / וואווי / גוגל פיקסל", "items": [{"text": "שיאומי: הגדרות ← כרטיסי SIM ורשתות סלולריות ← בחר קו wecom ← שמות נקודות גישה (או: הגדרות ← רשתות סלולריות ← קו wecom ← APN)", "img": null}, {"text": "וואווי: הגדרות ← רשת סלולרית ← נתונים סלולריים ← שמות נקודות גישה ← בחר קו wecom", "img": null}, {"text": "גוגל פיקסל: הגדרות ← רשת ואינטרנט ← SIM ← בחר קו wecom ← שמות נקודות גישה", "img": null}, {"text": "בכל המקרים: אם ההגדרה אינה תקינה — בצע איפוס לברירת מחדל, ודא שנקודת הגישה המתאימה הופיעה, בחר אותה, ובדוק שוב גלישה", "img": null}]}, {"num": "5", "title": "אופו / רילמי / וואן פלוס / מכשיר אנדרואיד אחר", "items": [{"text": "הגדרות ← רשת סלולרית ← בחר קו wecom ← שמות נקודות גישה (בחלק מהגרסאות שמות התפריטים שונים — חפש \"APN\" או \"שמות נקודות גישה\")", "img": null}, {"text": "מכשיר שאינו מופיע: פתח הגדרות, חפש \"APN\" (או \"שמות נקודות גישה\"), בחר קו wecom, ודא נקודת גישה תקינה, ובצע איפוס לברירת מחדל אם נדרש", "img": null}]}, {"num": "6", "title": "לאחר שינוי APN וחשוב לנציג", "items": [{"text": "בצע מצב טיסה והחזרה למצב רגיל; אם עדיין לא תקין — כיבוי והדלקה של המכשיר, ואז בדוק שוב גלישה", "img": null}, {"text": "הגלישה עובדת → חזור למסלול R-02 וסיים טיפול. עדיין אין גלישה → חזור למסלול R-02 והמשך לבדיקה הבאה", "img": null}, {"text": "אין לשנות ערכי APN שאינם מופיעים במקור המאושר של wecom; אם ההגדרה מנוהלת אוטומטית ואינה ניתנת לעריכה — אין לבצע שינוי ידני", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 13; });
-  if(t) { t.dynId = 'pdf_018'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_019'] = {"id": "pdf_019", "topic": "תפעול STK ושינוי זהות רשת בחו\"ל", "cat": "intl", "wave": 3, "docType": "pdf", "stages": [{"num": "1", "title": "מטרת המסמך ומתי משתמשים בו", "items": [{"text": "להנחות את הנציג מתי נדרש לבצע שינוי זהות רשת באמצעות תפריט ה-SIM (STK) ומתי אין לבצע פעולה זו", "img": null}, {"text": "משתמשים במסמך רק כאשר במהלך טיפול בתקלה בחו\"ל נדרש שינוי זהות רשת", "img": null}]}, {"num": "2", "title": "בדיקה לפני שימוש ב-STK", "items": [{"text": "לפני שימוש בתפריט STK יש לבדוק האם קיימת כבר זהות פרטנר במכשיר", "img": null}, {"text": "קיימת זהות פרטנר → אין לנווט את הלקוח לתפריט STK; חזור למסלול התקלה והמשך לבדיקה הבאה", "img": null}, {"text": "לא קיימת זהות פרטנר / נדרש שינוי זהות → המשך לתפעול STK", "img": null}]}, {"num": "3", "title": "⚠ מסמך חלקי — ממתין להשלמה", "items": [{"text": "המסמך המקורי מסתיים כאן ומסומן על ידי הצוות כטעון השלמה (\"לבקש משחר להשלים\")", "img": null}, {"text": "שלבי תפעול ה-STK בפועל (הניווט בתפריט, בחירת הזהות, אישור) עדיין אינם מתועדים — יש להשלים מול הצוות המקצועי לפני הסתמכות מלאה על מסמך זה בשיחה", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 50; });
-  if(t) { t.dynId = 'pdf_019'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_020'] = {"id": "pdf_020", "topic": "בחירת רשת ידנית בחו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מטרת המסמך ולפני שמתחילים", "items": [{"text": "לחבר את המכשיר ידנית לרשת סלולרית זמינה כאשר הוא אינו מתביית אוטומטית, או כאשר נדרש לעבור לרשת מארחת אחרת", "img": null}, {"text": "ודא: שירותי נדידה פעילים בקו, נדידת נתונים פעילה במכשיר, המכשיר באזור עם קליטה, וקיימת רשימת מפעילים מאושרים למדינה", "img": null}]}, {"num": "2", "title": "אייפון וסמסונג", "items": [{"text": "אייפון: הגדרות ← סלולרי ← בחירת רשת ← כבה \"אוטומטי\" ← המתן לרשימת רשתות ← בחר מפעיל מרשימת המפעילים המאושרים בחו\"ל", "img": null}, {"text": "סמסונג: הגדרות ← חיבורים ← רשתות תקשורת סלולרית ← מפעילי רשת ← כבה \"בחר באופן אוטומטי\" ← בחר מפעיל מהרשימה המאושרת", "img": null}, {"text": "בשני המקרים: לאחר רישום תקין החזר את בחירת הרשת למצב אוטומטי ובדוק את השירות; אם הרישום נכשל — נסה מפעיל מאושר נוסף", "img": null}]}, {"num": "3", "title": "שיאומי / וואווי / וואן פלוס / גוגל פיקסל / אופו / רילמי", "items": [{"text": "הנתיב עשוי להשתנות בין דגמים — חפש בהגדרות \"רשת סלולרית\", \"מפעיל\" או \"בחירת רשת\"", "img": null}, {"text": "בטל בחירת רשת אוטומטית, המתן להופעת הרשתות הזמינות, ובחר מפעיל מהרשימה המאושרת", "img": null}, {"text": "לאחר רישום תקין החזר את הבחירה למצב אוטומטי", "img": null}]}, {"num": "4", "title": "אם אף מפעיל אינו מאפשר רישום", "items": [{"text": "ודא שנוסו כל המפעילים המאושרים במדינה", "img": null}, {"text": "בצע מצב טיסה והחזרה למצב רגיל; אם עדיין אין רישום — בצע כיבוי והדלקה ונסה שוב בחירת רשת ידנית", "img": null}, {"text": "אם המכשיר עדיין אינו מצליח להירשם — חזור למסלול R-01 (אין קליטה או רישום לרשת בחו\"ל)", "img": null}]}, {"num": "5", "title": "הלקוח נמצא בארצות הברית", "items": [{"text": "אין לבחור מפעיל באופן אקראי — עבור למסמך \"תאימות מכשירים ורשתות בארצות הברית\" ובדוק התאמה בין דגם המכשיר, דור הרשת הנתמך והמפעיל המארח", "img": null}]}, {"num": "6", "title": "סיום הטיפול וחשוב לנציג", "items": [{"text": "המכשיר התחבר והשירות עובד → הטיפול הסתיים", "img": null}, {"text": "המכשיר התחבר אך השירות עדיין לא עובד → חזור למסלול שממנו הופנית (גלישה / שיחות / הודעות)", "img": null}, {"text": "המכשיר אינו מצליח להירשם לאף רשת → חזור למסלול R-01 והמשך לפי שלבי ההסלמה", "img": null}, {"text": "לאחר שהרישום הושלם בהצלחה יש להחזיר את המכשיר לבחירת רשת אוטומטית, אלא אם קיימת הנחיה מקצועית אחרת במסלול הספציפי", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 51; });
-  if(t) { t.dynId = 'pdf_020'; t.active = true; }
-})();
 
 window.dynamicDocs['pdf_021'] = {"id": "pdf_021", "topic": "העברה למומחה בתקלת חו\"ל", "cat": "intl", "wave": 2, "docType": "pdf", "stages": [{"num": "1", "title": "מתי מעבירים למומחה", "items": [{"text": "העבר למומחה רק לאחר שבוצעו כל הבדיקות הרלוונטיות למסלול התקלה והשירות עדיין אינו עובד", "img": null}, {"text": "אין להעביר למומחה לפני השלמת שלבי האבחון והתפעול הרלוונטיים — העברה למומחה אינה שלב אבחון", "img": null}]}, {"num": "2", "title": "לפני ההעברה ודא", "items": [{"text": "שירותי הנדידה פעילים במערכת", "img": null}, {"text": "החבילה מתאימה למדינה ובתוקף (אם נדרשת חבילה לשירות)", "img": null}, {"text": "המכשיר רשום לרשת זרה", "img": null}, {"text": "בוצעו בדיקות המכשיר הרלוונטיות ובחירת רשת ידנית אם המסלול דרש זאת", "img": null}, {"text": "בוצע רענון מכשיר לאחר שינוי במערכת, ואם נדרש — ריענון SIM במערכת באמצעות הכפתור החדש בלבד", "img": null}]}, {"num": "3", "title": "מה מתעדים לפני ההעברה", "items": [{"text": "המדינה שבה נמצא הלקוח, וסוג התקלה", "img": null}, {"text": "האם המכשיר רשום לרשת, ושם הרשת שאליה הוא מחובר", "img": null}, {"text": "דגם המכשיר, הבדיקות שכבר בוצעו ופעולות שבוצעו במערכת", "img": null}, {"text": "רשתות שנוסו ידנית ותוצאת כל פעולה", "img": null}, {"text": "המטרה: שהמומחה לא יחזור עם הלקוח על כל התהליך מההתחלה", "img": null}]}, {"num": "4", "title": "מקרים שמחייבים המשך טיפול מקצועי", "items": [{"text": "אין רישום לרשת — הלקוח אינו מצליח להירשם לאף רשת מאושרת לאחר השלמת מסלול R-01", "img": null}, {"text": "אין גלישה — המכשיר רשום לרשת וכל שלבי R-02 בוצעו, אך עדיין אין גלישה", "img": null}, {"text": "תקלה בשיחות — בוצעו הבדיקות במסלול R-04 והשיחות עדיין אינן פועלות", "img": null}, {"text": "תקלה בהודעות — בוצעו הבדיקות במסלול R-05 וההודעות עדיין אינן נשלחות/מתקבלות", "img": null}]}, {"num": "5", "title": "⚠ מה קורה לאחר ההעברה — חסר מידע להשלמה", "items": [{"text": "לאיזה תור / גורם מועברת הפנייה", "img": null}, {"text": "אילו שדות חובה יש למלא", "img": null}, {"text": "זמן הטיפול הצפוי", "img": null}, {"text": "מי אחראי לחזור ללקוח", "img": null}]}, {"num": "6", "title": "כלל מנחה לנציג", "items": [{"text": "העברה למומחה אינה שלב אבחון — לפני ההעברה ודא שהמסלול הרלוונטי הושלם ושכל המידע שכבר נאסף מתועד", "img": null}]}]};
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 52; });
-  if(t) { t.dynId = 'pdf_021'; t.active = true; }
-})();
 
 // ── LOCAL PERSISTENCE ────────────────────────────────────────────────────
 // Keeps created knowledge items and the in-progress "פריט ידע חדש" form
 // draft across page refreshes by mirroring them into localStorage.
-var NB_STORAGE_KEYS={docs:'wecom_kb_docs_v1',topics:'wecom_kb_topics_v1',draft:'wecom_kb_draft_v1',trash:'wecom_kb_trash_v1',seedVersion:'wecom_kb_seed_version_v1',history:'wecom_kb_history_v1'};
+var NB_STORAGE_KEYS={docs:'wecom_kb_docs_v1',topics:'wecom_kb_topics_v1',worlds:'wecom_kb_worlds_v1',draft:'wecom_kb_draft_v1',trash:'wecom_kb_trash_v1',seedVersion:'wecom_kb_seed_version_v1',history:'wecom_kb_history_v1'};
 var NB_HISTORY_MAX=25;
 
 function nbSaveLibrary(historyLabel){
   try{
     localStorage.setItem(NB_STORAGE_KEYS.docs, JSON.stringify(window.dynamicDocs||{}));
     localStorage.setItem(NB_STORAGE_KEYS.topics, JSON.stringify(TOPICS||[]));
+    localStorage.setItem(NB_STORAGE_KEYS.worlds, JSON.stringify(WORLDS||[]));
     localStorage.setItem(NB_STORAGE_KEYS.trash, JSON.stringify(nbTrash||[]));
     localStorage.setItem(NB_STORAGE_KEYS.seedVersion, String(NB_SEED_VERSION));
   }catch(e){ /* localStorage unavailable — fail silently */ }
@@ -2428,7 +2695,8 @@ function nbSnapshotHistory(label){
       ts:Date.now(),
       label:label||'עדכון בספרייה',
       topics:JSON.parse(JSON.stringify(TOPICS||[])),
-      docs:JSON.parse(JSON.stringify(window.dynamicDocs||{}))
+      docs:JSON.parse(JSON.stringify(window.dynamicDocs||{})),
+      worlds:JSON.parse(JSON.stringify(WORLDS||[]))
     });
     if(history.length>NB_HISTORY_MAX) history=history.slice(history.length-NB_HISTORY_MAX);
     localStorage.setItem(NB_STORAGE_KEYS.history, JSON.stringify(history));
@@ -2463,6 +2731,10 @@ function nbRestoreHistorySnapshot(histId){
     function(){
       TOPICS=JSON.parse(JSON.stringify(snap.topics));
       window.dynamicDocs=JSON.parse(JSON.stringify(snap.docs));
+      if(snap.worlds) WORLDS=JSON.parse(JSON.stringify(snap.worlds));
+      nbNormalizeModel(); // snapshots taken before the restructure use the old format
+      nbRenderSidebar();
+      nbRenderLibFilters();
       renderLibrary('all');
       renderHomeWaves();
       showView('library');
@@ -2528,12 +2800,31 @@ function nbLoadLibrary(){
 
     var docsRaw=localStorage.getItem(NB_STORAGE_KEYS.docs);
     if(docsRaw){
+      // The saved library is the source of truth, so built-in documents that
+      // were deleted stay deleted. When the built-in content in the code has
+      // changed (seed version bumped), refresh the content of the built-in
+      // documents that still exist, keep their links and fields, and add
+      // built-in documents that are new in this version.
       var savedDocs=JSON.parse(docsRaw);
-      window.dynamicDocs=window.dynamicDocs||{};
-      Object.keys(savedDocs).forEach(function(k){
-        var isSeedDoc=(k.indexOf('pdf_')===0||k==='view-churn-doc');
-        if(seedMatches||!isSeedDoc) window.dynamicDocs[k]=savedDocs[k];
-      });
+      var seedDocs=window.dynamicDocs||{};
+      if(!seedMatches){
+        var trashed={};
+        try{(JSON.parse(localStorage.getItem(NB_STORAGE_KEYS.trash))||[]).forEach(function(e){if(e.docId)trashed[e.docId]=true;});}catch(e){}
+        Object.keys(seedDocs).forEach(function(k){
+          if(savedDocs[k]){
+            savedDocs[k].stages=seedDocs[k].stages;
+            savedDocs[k].topic=seedDocs[k].topic;
+          } else if(!trashed[k]){
+            savedDocs[k]=seedDocs[k];
+          }
+        });
+      }
+      window.dynamicDocs=savedDocs;
+    }
+    var worldsRaw=localStorage.getItem(NB_STORAGE_KEYS.worlds);
+    if(worldsRaw){
+      var savedWorlds=JSON.parse(worldsRaw);
+      if(Array.isArray(savedWorlds)&&savedWorlds.length) WORLDS=savedWorlds;
     }
     var topicsRaw=localStorage.getItem(NB_STORAGE_KEYS.topics);
     if(topicsRaw){
@@ -2596,56 +2887,13 @@ document.addEventListener("DOMContentLoaded", function(){
   nbUpdateHistoryBadge();
   initObservers();
   nbRender();
-  // Initialize all PDF docs
-  window.dynamicDocs = window.dynamicDocs || {};
-  window.dynamicDocs['view-churn-doc'] = {id:'view-churn-doc',topic:'דיבאג נטישה',cat:'ops',wave:1,docType:'churn',stages:[],_isViewDoc:'churn'};
-  window.dynamicDocs['view-browsing-doc'] = {id:'view-browsing-doc',topic:'איטיות גלישה / חוסר גלישה',cat:'tech',wave:1,docType:'browsing',stages:[],_isViewDoc:'browsing'};
-  (function(){
-    var t = TOPICS.find(function(x){ return x.id === 11; });
-    if(t && !t.dynId) { t.dynId = 'view-browsing-doc'; t.active = true; }
-  })();
-
-// ── LINK PDF DOCS TO TOPICS ─────────────────────────────────────────────
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 12; });
-  if(t && !t.dynId) { t.dynId = 'pdf_001'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 14; });
-  if(t && !t.dynId) { t.dynId = 'pdf_002'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 17; });
-  if(t && !t.dynId) { t.dynId = 'pdf_003'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 35; });
-  if(t && !t.dynId) { t.dynId = 'pdf_004'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 20; });
-  if(t && !t.dynId) { t.dynId = 'pdf_005'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 40; });
-  if(t && !t.dynId) { t.dynId = 'pdf_006'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 15; });
-  if(t && !t.dynId) { t.dynId = 'pdf_007'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 16; });
-  if(t && !t.dynId) { t.dynId = 'pdf_008'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 18; });
-  if(t && !t.dynId) { t.dynId = 'pdf_009'; t.active = true; }
-})();
-(function(){
-  var t = TOPICS.find(function(x){ return x.id === 35; });
-  if(t && !t.dynId) { t.dynId = 'pdf_010'; t.active = true; }
-})();
+  // Bring saved data from older versions to the worlds → topics → items
+  // model, and store the converted library once.
+  var before=JSON.stringify({t:TOPICS,d:window.dynamicDocs});
+  nbNormalizeModel();
+  if(JSON.stringify({t:TOPICS,d:window.dynamicDocs})!==before) nbSaveLibrary('עדכון מבנה הספרייה: עולמות תוכן, נושאים וסוגי פריטים');
+  nbRenderSidebar();
+  nbRenderLibFilters();
   renderLibrary('all');
 });
 
@@ -2750,26 +2998,19 @@ document.addEventListener('change', function(e){
 <nav class="sidebar-nav">
   <div class="snav-section">
     <div class="snav-title">ראשי</div>
-    <div class="snav-item active" id="snav-library" onclick="showView('library')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span> ספריית ידע <span class="snav-badge">51</span></div>
+    <div class="snav-item active" id="snav-library" onclick="nbCurrentWorld='all';nbRenderLibFilters();nbRenderSidebar();showView('library')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span> ספריית ידע <span class="snav-badge">51</span></div>
     <div class="snav-item" id="snav-new" onclick="showView('new')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span> פריט ידע חדש</div>
     <div class="snav-item" id="snav-trash" onclick="nbOpenTrash()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span> סל מיחזור <span class="snav-badge" id="nb-trash-count-nav" style="display:none"></span></div>
     <div class="snav-item" id="snav-history" onclick="nbOpenHistory()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg></span> היסטוריית גרסאות <span class="snav-badge" id="nb-history-count-nav" style="display:none"></span></div>
   </div>
-  <div class="snav-section">
-    <div class="snav-title">קטגוריות</div>
-    <div class="snav-item" onclick="filterCategory('sim')"><span class="snav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg></span> SIM / eSIM <span class="snav-badge">10</span></div>
-    <div class="snav-item" onclick="filterCategory('tech')"><span class="snav-icon">🔧</span> תמיכה טכנית <span class="snav-badge">9</span></div>
-    <div class="snav-item" onclick="filterCategory('billing')"><span class="snav-icon">💳</span> חיובים <span class="snav-badge">6</span></div>
-    <div class="snav-item" onclick="filterCategory('plans')"><span class="snav-icon">📋</span> מסלולים <span class="snav-badge">7</span></div>
-    <div class="snav-item" onclick="filterCategory('intl')"><span class="snav-icon">✈️</span> חו"ל ונדידה <span class="snav-badge">14</span></div>
-    <div class="snav-item" onclick="filterCategory('ops')"><span class="snav-icon">🎧</span> טיפול בשיחה <span class="snav-badge">5</span></div>
-  </div>
+  <div id="snav-dynamic"></div>
 </nav>
 <main class="content">
 
 <!-- LIBRARY -->
 <div id="view-library" class="view active">
-  <div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>ספריית ידע – 51 נושאים</div><div class="page-sub">מסודר לפי גלי כתיבה ושכיחות | לחץ על נושא לפתיחת תדריך</div></div>
+  <div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>ספריית ידע – <span id="lib-count">51</span> נושאים</div><div class="page-sub">עולם תוכן ← נושא ← פריטי ידע | לחצו על נושא כדי לראות את כל פריטי הידע שבו</div></div>
+  <div class="lib-filter-row" id="lib-worlds"></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="lib-filters">
     <button class="filter-btn active" onclick="filterLibrary('all',this)">הכל</button>
     <button class="filter-btn" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
@@ -2782,6 +3023,12 @@ document.addEventListener('change', function(e){
   <div id="library-content"></div>
 </div>
 
+<!-- TOPIC -->
+<div id="view-topic" class="view">
+  <div class="article-back" onclick="showView('library')">← חזרה לספרייה</div>
+  <div id="topic-content"></div>
+</div>
+
 <!-- ARTICLE -->
 <div id="view-article" class="view">
   <div class="article-back" onclick="showView('library')">← חזרה לספרייה</div>
@@ -2792,6 +3039,7 @@ document.addEventListener('change', function(e){
 <div id="view-browsing" class="view">
   <div style="max-width:960px;margin:0 auto;padding:16px 8px 80px">
     <div class="article-back" onclick="showView('library')" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;transition:color .15s">← חזרה לספרייה</div>
+    <div id="special-strip-browsing"></div>
     <div id="panel-tech" class="doc-panel-inner">
       <div class="article-header">
         <div class="doc-meta">
@@ -3119,6 +3367,7 @@ document.addEventListener('change', function(e){
 <div id="view-churn" class="view">
   <div style="max-width:960px;margin:0 auto;padding:16px 8px 80px">
     <div class="article-back" onclick="showView('library')" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;transition:color .15s">← חזרה לספרייה</div>
+    <div id="special-strip-churn"></div>
     <div style="display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start">
     <div id="panel-retain" class="doc-panel-inner">
       <div class="article-header">
