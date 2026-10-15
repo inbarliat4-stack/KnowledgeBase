@@ -1006,6 +1006,13 @@ select.s1-input{height:40px;cursor:pointer}
 .result-card mark,.rc-snippet mark{background:#FFE58F;color:inherit;border-radius:3px;padding:0 1px}
 .search-count{display:inline-block}
 
+/* ── Links between items, and gaps still to be filled ── */
+.kb-link{color:#1D45B4;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
+.kb-link:hover{color:var(--red)}
+.kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
+li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
+.o-steps>li.kb-missing::before{background:var(--warn)}
+
 /* ── DEMO ROLE GATE ── */
 body.gate-open{overflow:hidden}
 #nb-gate{position:fixed;inset:0;z-index:10000;background:var(--navy);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;direction:rtl}

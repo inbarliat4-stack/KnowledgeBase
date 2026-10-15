@@ -115,21 +115,12 @@
 
     var seedMatches = saved.seedVersion === NB_SEED_VERSION;
 
+    if (!Array.isArray(saved.trash)) saved.trash = [];
     if (saved.docs) {
       var savedDocs = saved.docs;
-      var seedDocs = window.dynamicDocs || {};
-      if (!seedMatches) {
-        var trashed = {};
-        (saved.trash || []).forEach(function (e) { if (e.docId) trashed[e.docId] = true; });
-        Object.keys(seedDocs).forEach(function (k) {
-          if (savedDocs[k]) {
-            savedDocs[k].stages = seedDocs[k].stages;
-            savedDocs[k].topic = seedDocs[k].topic;
-          } else if (!trashed[k]) {
-            savedDocs[k] = seedDocs[k];
-          }
-        });
-      }
+      // Same rules as the browser version (nbReconcileSeed in app.js):
+      // refresh built-in content, add new built-in items, retire replaced ones.
+      if (!seedMatches) nbReconcileSeed(savedDocs, window.dynamicDocs || {}, saved.trash);
       window.dynamicDocs = savedDocs;
     }
 
