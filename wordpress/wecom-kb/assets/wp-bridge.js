@@ -130,7 +130,7 @@
       if (seedMatches) {
         TOPICS = saved.topics;
       } else {
-        saved.topics.filter(function (t) { return t.id > NB_SEED_MAX_TOPIC_ID; }).forEach(function (t) {
+        saved.topics.filter(function (t) { return nbIsUserTopicId(t.id); }).forEach(function (t) {
           if (!TOPICS.some(function (x) { return x.id === t.id; })) TOPICS.push(t);
         });
       }
