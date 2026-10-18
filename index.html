@@ -1494,11 +1494,52 @@ function nbSearch(query){
 function nbClearSearch(){ nbSearch(''); }
 function nbSearchTag(tag){ nbSearch('#'+tag); window.scrollTo(0,0); }
 
-// Lower-case, unify Hebrew quote marks, drop niqqud and markup.
-function nbNorm(s){
-  return nbPlain(s).toLowerCase()
-    .replace(/[״“”]/g,'"').replace(/[׳‘’`]/g,"'")
-    .replace(/[֑-ׇ]/g,'').replace(/\s+/g,' ');
+// ── Search vocabulary ──
+// Words in the same group find each other (written in any case; quote marks
+// inside Hebrew words are ignored anyway, so חו"ל = חו״ל = חול). Add a group
+// here to teach search another equivalent spelling.
+var NB_SEARCH_SYNONYMS=[
+  ['esim','איסים','אי-סים','e-sim'],
+  ['sim','סים']
+];
+var NB_HEB_PREFIXES='הובלמשכ';
+
+// Normalized text for matching, plus a map from each normalized character
+// back to its position in the plain text (used for excerpts):
+// lower-case, unified quote marks, no niqqud, single spaces, and no quote
+// marks inside Hebrew words (gershayim / geresh: חו"ל → חול, ארה״ב → ארהב).
+function nbNormMap(s){
+  var src=nbPlain(s), out='', map=[], prevSpace=false;
+  for(var i=0;i<src.length;i++){
+    var c=src.charAt(i);
+    if(/[֑-ׇ]/.test(c)) continue;
+    if(/[״“”]/.test(c)) c='"'; else if(/[׳‘’`]/.test(c)) c="'";
+    if((c==='"'||c==="'")&&/[א-ת]/.test(out.charAt(out.length-1))&&/[א-ת]/.test(src.charAt(i+1))) continue;
+    if(/\s/.test(c)){ if(prevSpace) continue; c=' '; prevSpace=true; } else prevSpace=false;
+    out+=c.toLowerCase(); map.push(i);
+  }
+  return {norm:out,map:map,src:src};
+}
+function nbNorm(s){ return nbNormMap(s).norm; }
+
+// All spellings that count as this word (itself, or its synonym group).
+function nbVariants(tok){
+  for(var i=0;i<NB_SEARCH_SYNONYMS.length;i++){
+    var g=NB_SEARCH_SYNONYMS[i].map(nbNorm);
+    if(g.indexOf(tok)!==-1) return g;
+  }
+  return [tok];
+}
+function nbReEsc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+// Position of a word in normalized text, or -1. Short words (up to 3
+// characters) must start a word, optionally after a one-letter Hebrew
+// prefix — so "סים" finds "לסים" but not "כרטיסים", and "זרה" not "חזרה".
+var nbWordReCache={};
+function nbWordIndex(text,v){
+  if(v.length>3) return text.indexOf(v);
+  var re=nbWordReCache[v]||(nbWordReCache[v]=new RegExp('(^|[^a-z0-9א-ת])(['+NB_HEB_PREFIXES+'])?'+nbReEsc(v)));
+  var m=re.exec(text);
+  return m?m.index+m[1].length+(m[2]?1:0):-1;
 }
 
 // All searchable text of an item's content, whatever its type.
@@ -1521,11 +1562,13 @@ function nbContentText(d){
   return parts.filter(Boolean).map(nbPlain).join(' · ');
 }
 
-// Finds a query word in a text. Hebrew one-letter prefixes (ה ו ב ל מ ש כ)
-// are tolerated, so "הגלישה" also finds "גלישה". Returns the matched form.
+// Finds a query word in normalized text, with its synonyms. A one-letter
+// Hebrew prefix on the query word is tolerated too ("הגלישה" finds "גלישה",
+// "לאיסים" finds "eSIM"). Returns the form that matched, or null.
 function nbFindToken(text,tok){
-  if(text.indexOf(tok)!==-1) return tok;
-  if(tok.length>3&&'הובלמשכ'.indexOf(tok.charAt(0))!==-1&&text.indexOf(tok.slice(1))!==-1) return tok.slice(1);
+  var cands=nbVariants(tok);
+  if(tok.length>3&&NB_HEB_PREFIXES.indexOf(tok.charAt(0))!==-1) cands=cands.concat(nbVariants(tok.slice(1)));
+  for(var i=0;i<cands.length;i++){ if(nbWordIndex(text,cands[i])!==-1) return cands[i]; }
   return null;
 }
 
@@ -1542,7 +1585,8 @@ function nbSearchItems(query){
     if(nbCurrentLibCat!=='all'&&!topics.some(function(t){return nbCatMatches(nbCurrentLibCat,t.cat);})) return;
     var tags=d.tags.map(nbNorm);
     if(tagMode){
-      if(!tags.some(function(t){return t===tokens[0]||t.indexOf(tokens[0])!==-1;})) return;
+      var tagVariants=nbVariants(tokens[0]);
+      if(!tags.some(function(t){return tagVariants.some(function(v){return t===v||t.indexOf(v)!==-1;});})) return;
       results.push({d:d,topics:topics,score:10,where:['תגית'],matched:[]});
       return;
     }
@@ -1585,21 +1629,28 @@ function nbSearchTopicsList(query){
   });
 }
 
-// Escapes text and wraps the matched words in <mark>.
+// Escapes text and wraps the matched words in <mark>. Matched words are in
+// normalized form, so quote marks may sit between their letters in the text
+// (חול highlights חו"ל), and short words only at the start of a word.
 function nbHighlight(text,words){
   var safe=nbEsc(nbPlain(text));
-  var ws=(words||[]).filter(function(w){return w&&w.length>1;}).map(function(w){return nbEsc(w).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');});
+  var Q='(?:&quot;|&#39;|״|׳)?';
+  var ws=(words||[]).filter(function(w){return w&&w.length>1;}).map(function(w){
+    var pat=w.split('').map(nbReEsc).join(Q);
+    return w.length>3?pat:'(?<![a-z0-9א-ת])['+NB_HEB_PREFIXES+']?'+pat;
+  });
   if(!ws.length) return safe;
-  return safe.replace(new RegExp('('+ws.join('|')+')','gi'),'<mark>$1</mark>');
+  try{ return safe.replace(new RegExp('('+ws.join('|')+')','gi'),'<mark>$1</mark>'); }
+  catch(e){ return safe; } // very old browsers without look-behind: no highlight
 }
 // A short excerpt of the content around the first matched word.
 function nbSnippet(d,words){
-  var text=nbPlain(nbContentText(d)).replace(/\s+/g,' ');
-  var low=nbNorm(text), pos=-1;
-  (words||[]).some(function(w){var i=low.indexOf(w);if(i!==-1){pos=i;return true;}return false;});
+  var nm=nbNormMap(nbContentText(d)), pos=-1;
+  (words||[]).some(function(w){var i=nbWordIndex(nm.norm,w);if(i!==-1){pos=nm.map[i];return true;}return false;});
   if(pos===-1) return '';
+  var text=nm.src;
   var start=Math.max(0,pos-60), end=Math.min(text.length,pos+110);
-  return (start>0?'…':'')+nbHighlight(text.slice(start,end),words)+(end<text.length?'…':'');
+  return (start>0?'…':'')+nbHighlight(text.slice(start,end).replace(/\s+/g,' '),words)+(end<text.length?'…':'');
 }
 
 function nbRenderSearch(){
