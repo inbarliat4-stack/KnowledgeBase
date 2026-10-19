@@ -367,10 +367,11 @@ function searchTopics(query){ nbSearch(query); }
 // Search typed before the library finished loading waits until it is ready.
 var nbLibraryReady=false, nbPendingSearch=null;
 function nbSearch(query){
-  if(!nbLibraryReady){ nbPendingSearch=query||''; return; }
-  nbSearchQuery=(query||'').trim();
+  var rawQuery=query||'';
+  if(!nbLibraryReady){ nbPendingSearch=rawQuery; return; }
+  nbSearchQuery=rawQuery.trim();
   var inp=document.getElementById('nb-search');
-  if(inp&&inp.value!==nbSearchQuery) inp.value=nbSearchQuery;
+  if(inp&&inp.value!==rawQuery&&document.activeElement!==inp) inp.value=nbSearchQuery;
   var lib=document.getElementById('view-library');
   if(nbSearchQuery&&lib&&!lib.classList.contains('active')) showView('library');
   else renderLibrary(nbCurrentLibCat||'all');
