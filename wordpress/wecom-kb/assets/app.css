@@ -1099,7 +1099,7 @@ select.s1-input{height:40px;cursor:pointer}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .o-steps>li.kb-missing{padding:4px 46px 4px 14px}
-.o-steps>li.kb-missing::before{top:0;background:var(--warn)}
+.o-steps>li.kb-missing::before{top:50%;transform:translateY(-50%);background:var(--warn)}
 
 /* ── DEMO ROLE GATE ── */
 body.gate-open{overflow:hidden}

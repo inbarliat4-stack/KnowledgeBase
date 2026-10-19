@@ -682,14 +682,25 @@ function nbItemCardHTML(d){
 }
 
 function nbNewItemForTopic(topicId){
+  nbResetNewForm(topicId);
+  showView('new');
+  nbRender();
+}
+
+function nbResetNewForm(topicId){
   NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};}); nbState._bodies={};
   nbCustomStages=[];
   nbStageOrder=[];
   window.nbEditingDocId=null;
-  window.nbLinkToTopicId=topicId;
-  nbState['s1'].s1data={topicId:String(topicId),kind:'R',worlds:[]};
+  window.nbLinkToTopicId=topicId==null?null:topicId;
+  if(topicId!=null) nbState['s1'].s1data={topicId:String(topicId),kind:'R',worlds:[]};
+}
+
+function nbNewItem(){
+  nbResetNewForm();
   showView('new');
   nbRender();
+  window.scrollTo(0,0);
 }
 
 // Kept for older links/calls: a topic always opens its topic view now.
@@ -1712,12 +1723,12 @@ function nbInit(){
   nbRender();
 }
 
-function nbGoNew(){ showView('new'); }
+function nbGoNew(){ nbNewItem(); }
 
 function initObservers(){
   // event delegation for dynamically created buttons
   document.addEventListener('click', function(e){
-    var btn=e.target.closest('[data-action="new"]');if(btn) showView('new');
+    var btn=e.target.closest('[data-action="new"]');if(btn) nbNewItem();
   });
 
   var obs=new IntersectionObserver(function(entries){

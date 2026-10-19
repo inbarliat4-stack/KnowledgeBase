@@ -1110,7 +1110,7 @@ select.s1-input{height:40px;cursor:pointer}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .o-steps>li.kb-missing{padding:4px 46px 4px 14px}
-.o-steps>li.kb-missing::before{top:0;background:var(--warn)}
+.o-steps>li.kb-missing::before{top:50%;transform:translateY(-50%);background:var(--warn)}
 
 /* ── DEMO ROLE GATE ── */
 body.gate-open{overflow:hidden}
@@ -1830,14 +1830,25 @@ function nbItemCardHTML(d){
 }
 
 function nbNewItemForTopic(topicId){
+  nbResetNewForm(topicId);
+  showView('new');
+  nbRender();
+}
+
+function nbResetNewForm(topicId){
   NB_STAGES.forEach(function(s){nbState[s.id]={picked:[],custom:[],applied:false,s1data:{},images:{}};}); nbState._bodies={};
   nbCustomStages=[];
   nbStageOrder=[];
   window.nbEditingDocId=null;
-  window.nbLinkToTopicId=topicId;
-  nbState['s1'].s1data={topicId:String(topicId),kind:'R',worlds:[]};
+  window.nbLinkToTopicId=topicId==null?null:topicId;
+  if(topicId!=null) nbState['s1'].s1data={topicId:String(topicId),kind:'R',worlds:[]};
+}
+
+function nbNewItem(){
+  nbResetNewForm();
   showView('new');
   nbRender();
+  window.scrollTo(0,0);
 }
 
 // Kept for older links/calls: a topic always opens its topic view now.
@@ -2860,12 +2871,12 @@ function nbInit(){
   nbRender();
 }
 
-function nbGoNew(){ showView('new'); }
+function nbGoNew(){ nbNewItem(); }
 
 function initObservers(){
   // event delegation for dynamically created buttons
   document.addEventListener('click', function(e){
-    var btn=e.target.closest('[data-action="new"]');if(btn) showView('new');
+    var btn=e.target.closest('[data-action="new"]');if(btn) nbNewItem();
   });
 
   var obs=new IntersectionObserver(function(entries){
@@ -4697,7 +4708,7 @@ document.addEventListener('change', function(e){
   <div class="snav-section">
     <div class="snav-title">ראשי</div>
     <div class="snav-item active" id="snav-library" onclick="nbCurrentWorld='all';nbCurrentKind='all';nbSearchQuery='';var si=document.getElementById('nb-search');if(si)si.value='';nbRenderLibFilters();nbRenderSidebar();showView('library')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span> ספריית ידע <span class="snav-badge">51</span></div>
-    <div class="snav-item" id="snav-new" onclick="showView('new')"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span> פריט ידע חדש</div>
+    <div class="snav-item" id="snav-new" onclick="nbNewItem()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span> פריט ידע חדש</div>
     <div class="snav-item" id="snav-trash" onclick="nbOpenTrash()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span> סל מיחזור <span class="snav-badge" id="nb-trash-count-nav" style="display:none"></span></div>
     <div class="snav-item nb-edit-only" id="snav-tracking" onclick="nbOpenTracking()"><span class="snav-icon">📋</span> מעקב מסמכים</div>
     <div class="snav-item" id="snav-history" onclick="nbOpenHistory()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg></span> היסטוריית גרסאות <span class="snav-badge" id="nb-history-count-nav" style="display:none"></span></div>
@@ -5354,7 +5365,7 @@ document.addEventListener('change', function(e){
 
 </main>
 </div>
-<nav class="mob-nav"><div class="mob-nav-inner"><button class="mob-btn active" id="mob-library" onclick="showView('library')"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span>ספרייה</span></button><button class="mob-btn" id="mob-new" onclick="showView('new')"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span>חדש</span></button><button class="mob-btn" id="mob-trash" onclick="nbOpenTrash()"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span><span>מיחזור</span></button><button class="mob-btn nb-edit-only" id="mob-tracking" onclick="nbOpenTracking()"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg></span><span>מעקב</span></button></div></nav>
+<nav class="mob-nav"><div class="mob-nav-inner"><button class="mob-btn active" id="mob-library" onclick="showView('library')"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><span>ספרייה</span></button><button class="mob-btn" id="mob-new" onclick="nbNewItem()"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><span>חדש</span></button><button class="mob-btn" id="mob-trash" onclick="nbOpenTrash()"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span><span>מיחזור</span></button><button class="mob-btn nb-edit-only" id="mob-tracking" onclick="nbOpenTracking()"><span class="mob-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg></span><span>מעקב</span></button></div></nav>
 </div>
 
 </body>
