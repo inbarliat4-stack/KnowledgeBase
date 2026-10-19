@@ -2079,11 +2079,11 @@ function nbRenderImportBox(){
   if(window.nbEditingDocId){ el.innerHTML=issues+src; return; }
   var body;
   if(typeof window.nbImportSourceDoc!=='function'){
-    body='<div class="import-note">זמין באתר ה-WordPress: העלאת מסמך מקור (PDF / Word) והמרה אוטומטית לטיוטה. בגרסת ההדגמה הזו אין שרת שמבצע את ההמרה.</div>';
+    body='<div class="import-note">זמין באתר ה-WordPress: העלאת מסמך מקור (PDF / PNG / Word) והמרה אוטומטית לטיוטה. בגרסת ההדגמה הזו אין שרת שמבצע את ההמרה.</div>';
   } else if(!window.NB_CAN_IMPORT){
     body='<div class="import-note">המרת מסמכים לא הוגדרה עדיין. מנהל המערכת צריך להזין מפתח API בהגדרות התוסף (כלים ← wecom מאגר ידע).</div>';
   } else {
-    body='<div class="import-row"><input type="file" id="nb-import-file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">'
+    body='<div class="import-row"><input type="file" id="nb-import-file" accept=".pdf,.png,.docx,.txt,application/pdf,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">'
       +'<select id="nb-import-kind" class="s1-input"><option value="">סוג: זיהוי אוטומטי</option>'
       +NB_KIND_ORDER.map(function(k){return '<option value="'+k+'">'+k+' · '+NB_KINDS[k].full+'</option>';}).join('')+'</select>'
       +'<button type="button" class="nb-btn" onclick="nbStartImport()">המר לטיוטה</button></div>'
@@ -2121,7 +2121,7 @@ function nbStartSourceUpdate(docId){
   var d=window.dynamicDocs[docId];
   if(!d) return;
   var inp=document.createElement('input');
-  inp.type='file'; inp.accept='.pdf,.docx,.txt';
+  inp.type='file'; inp.accept='.pdf,.png,.docx,.txt,application/pdf,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain';
   inp.onchange=function(){
     var file=inp.files&&inp.files[0];
     if(!file) return;
@@ -2374,19 +2374,27 @@ function showDynamicDoc(docId){
   // Add "עדכן מסמך" button
   var btnRow=document.createElement('div');
   btnRow.className='nb-edit-only'; // hidden for read-only users in the WordPress version
-  btnRow.style.cssText='display:flex;gap:10px;margin:16px 0 0;max-width:680px';
+  btnRow.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 0;max-width:680px';
 
   var updateBtn=document.createElement('button');
-  updateBtn.style.cssText='flex:1;height:40px;padding:0 22px;background:var(--navy);color:#fff;border:none;border-radius:var(--rs);font-size:13.5px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif';
+  updateBtn.style.cssText='flex:1 1 170px;height:40px;padding:0 22px;background:var(--navy);color:#fff;border:none;border-radius:var(--rs);font-size:13.5px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif';
   updateBtn.textContent='✏️ עדכן פריט ידע';
   updateBtn.addEventListener('click',function(){ nbEditDoc(docId); });
 
   var deleteBtn=document.createElement('button');
-  deleteBtn.style.cssText='flex:1;height:40px;padding:0 22px;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:var(--rs);font-size:13.5px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif';
+  deleteBtn.style.cssText='flex:1 1 170px;height:40px;padding:0 22px;background:#fff;color:var(--red);border:2px solid var(--red);border-radius:var(--rs);font-size:13.5px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif';
   deleteBtn.textContent='🗑 מחק פריט ידע';
   deleteBtn.addEventListener('click',function(){ nbConfirmDeleteDoc(docId,doc.topic); });
 
   btnRow.appendChild(updateBtn);
+  if(typeof window.nbImportSourceDoc==='function'&&window.NB_CAN_IMPORT){
+    var uploadBtn=document.createElement('button');
+    uploadBtn.style.cssText='flex:1 1 170px;height:40px;padding:0 14px;background:#fff;color:var(--navy);border:1.5px solid var(--border-strong);border-radius:var(--rs);font-size:13.5px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif';
+    uploadBtn.textContent='📄 העלה טיוטה';
+    uploadBtn.title='העלאת Word, PNG או PDF כגרסה מוצעת לבדיקה';
+    uploadBtn.addEventListener('click',function(){ nbStartSourceUpdate(docId); });
+    btnRow.appendChild(uploadBtn);
+  }
   btnRow.appendChild(deleteBtn);
   document.getElementById('article-content').appendChild(btnRow);
 

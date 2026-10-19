@@ -1,7 +1,7 @@
 <?php
 /**
  * Source-document import (spec §8): an editor uploads the source document
- * (PDF, Word or text) and Claude converts it into a draft knowledge item in
+ * (PDF, PNG, Word or text) and Claude converts it into a draft knowledge item in
  * the app's structure. The draft is never published automatically — the
  * editor reviews it in the app and approves it.
  *
@@ -60,13 +60,26 @@ class Wecom_KB_Importer {
 		}
 
 		$ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
-		if ( ! in_array( $ext, array( 'pdf', 'docx', 'txt' ), true ) ) {
-			return new WP_Error( 'wecom_kb_type', 'אפשר להעלות PDF, Word (docx) או קובץ טקסט.', array( 'status' => 400 ) );
+		if ( ! in_array( $ext, array( 'pdf', 'png', 'docx', 'txt' ), true ) ) {
+			return new WP_Error( 'wecom_kb_type', 'אפשר להעלות PDF, PNG, Word (docx) או קובץ טקסט.', array( 'status' => 400 ) );
 		}
 
 		// The document content block for the API.
 		$bytes = file_get_contents( $file['tmp_name'] );
-		if ( 'pdf' === $ext ) {
+		if ( 'png' === $ext ) {
+			$image = getimagesize( $file['tmp_name'] );
+			if ( ! is_array( $image ) || 'image/png' !== $image['mime'] ) {
+				return new WP_Error( 'wecom_kb_type', 'הקובץ אינו תמונת PNG תקינה.', array( 'status' => 400 ) );
+			}
+			$doc_block = array(
+				'type'   => 'image',
+				'source' => array(
+					'type'       => 'base64',
+					'media_type' => 'image/png',
+					'data'       => base64_encode( $bytes ),
+				),
+			);
+		} elseif ( 'pdf' === $ext ) {
 			if ( 0 !== strpos( $bytes, '%PDF' ) ) {
 				return new WP_Error( 'wecom_kb_type', 'הקובץ אינו PDF תקין.', array( 'status' => 400 ) );
 			}
@@ -207,6 +220,7 @@ class Wecom_KB_Importer {
 				'test_form' => false,
 				'mimes'     => array(
 					'pdf'  => 'application/pdf',
+					'png'  => 'image/png',
 					'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 					'txt'  => 'text/plain',
 				),
