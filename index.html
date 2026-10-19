@@ -1394,14 +1394,27 @@ function nbTopicMatchesFilters(t){
 }
 function nbCatMatches(cat,c){ return cat==='all'||c===cat||(cat==='tech'&&c==='tech2'); }
 
+function nbCurrentLibraryTopicCount(){
+  if(nbSearchQuery) return nbSearchTopicsList(nbSearchQuery).length;
+  var cat=nbCurrentLibCat||'all';
+  return TOPICS.filter(function(t){
+    return nbCatMatches(cat,t.cat)&&nbTopicMatchesFilters(t);
+  }).length;
+}
+function nbUpdateLibraryTopicCount(count){
+  var title=document.getElementById('lib-count');
+  if(title) title.textContent=count;
+  var badge=document.querySelector('#snav-library .snav-badge');
+  if(badge) badge.textContent=count;
+}
+
 function renderLibrary(cat){
   nbCurrentLibCat=cat;
   if(nbSearchQuery){ nbRenderSearch(); return; }
   var f=TOPICS.filter(function(t){
     return nbCatMatches(cat,t.cat)&&nbTopicMatchesFilters(t);
   });
-  var title=document.getElementById('lib-count');
-  if(title) title.textContent=f.length;
+  nbUpdateLibraryTopicCount(f.length);
   document.getElementById('library-content').innerHTML=f.length
     ?'<div class="topic-grid">'+f.map(cardHTML).join('')+'</div>'
     :'<div class="empty-state">אין נושאים בסינון הזה</div>';
@@ -1450,6 +1463,7 @@ function nbRenderLibFilters(){
 function nbRenderSidebar(){
   var el=document.getElementById('snav-dynamic');
   if(!el) return;
+  nbUpdateLibraryTopicCount(nbCurrentLibraryTopicCount());
   var cats=[['sim',SIM_ICON,'SIM / eSIM'],['tech','🔧','תמיכה טכנית'],['billing','💳','חיובים'],['plans','📋','מסלולים'],['intl','✈️','חו"ל ונדידה'],['ops','🎧','טיפול בשיחה']];
   var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
     +WORLDS.map(function(w){
@@ -1702,8 +1716,7 @@ function nbRenderSearch(){
   if(!el) return;
   var q=nbSearchQuery;
   var items=nbSearchItems(q), topics=nbSearchTopicsList(q);
-  var count=document.getElementById('lib-count');
-  if(count) count.textContent=topics.length;
+  nbUpdateLibraryTopicCount(topics.length);
   var filtersOn=nbCurrentWorld!=='all'||nbCurrentKind!=='all'||nbCurrentLibCat!=='all';
   var html='<div class="search-head"><div><span class="search-q">'+(q.charAt(0)==='#'?'תגית ':'')+'<bdi>"'+nbEsc(q.charAt(0)==='#'?q.slice(1):q)+'"</bdi></span>'
     +'<span class="search-count">'+items.length+' פריטי ידע'+(topics.length?' · '+topics.length+' נושאים':'')+(filtersOn?' · לפי הסינון שנבחר':'')+'</span></div>'
