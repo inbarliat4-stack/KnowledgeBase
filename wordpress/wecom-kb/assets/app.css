@@ -1098,6 +1098,7 @@ select.s1-input{height:40px;cursor:pointer}
 .kb-link:hover{color:var(--red)}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
+.o-steps>li.kb-missing{padding:4px 46px 4px 14px}
 .o-steps>li.kb-missing::before{background:var(--warn)}
 
 /* ── DEMO ROLE GATE ── */
