@@ -461,46 +461,60 @@ function nbSearchItems(query){
   var tagMode=query.charAt(0)==='#';
   var tokens=tagMode?[nbNorm(query.slice(1)).trim()]:nbNorm(query).split(' ').filter(function(t){return t.length>1||/\d/.test(t);});
   if(!tokens.length||!tokens[0]) return [];
-  var results=[];
-  Object.keys(docs).forEach(function(k){
-    var d=docs[k];
-    if(!d||!nbVisible(d)||!nbItemPassesFilters(d)) return;
-    // Items not normalized yet (search typed while the page is still loading) have no topicIds/tags.
-    var topics=TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;});
-    if(nbCurrentLibCat!=='all'&&!topics.some(function(t){return nbCatMatches(nbCurrentLibCat,t.cat);})) return;
-    var tags=(d.tags||[]).map(nbNorm);
-    if(tagMode){
-      var tagVariants=nbVariants(tokens[0]);
-      if(!tags.some(function(t){return tagVariants.some(function(v){return t===v||t.indexOf(v)!==-1;});})) return;
-      results.push({d:d,topics:topics,score:10,where:['תגית'],matched:[]});
-      return;
-    }
-    var f={title:nbNorm(d.topic),tags:tags.join(' '),desc:nbNorm(d.desc),owner:nbNorm(d.owner),
-      topics:topics.map(function(t){return nbNorm(t.title);}).join(' '),content:null};
-    var score=0, where={}, matched=[];
-    for(var i=0;i<tokens.length;i++){
-      var tok=tokens[i], hit=false;
-      if(nbFindToken(f.title,tok)){score+=10;where['שם']=1;hit=true;}
-      if(nbFindToken(f.tags,tok)){score+=8;where['תגיות']=1;hit=true;}
-      if(nbFindToken(f.desc,tok)){score+=5;where['תיאור']=1;hit=true;}
-      if(nbFindToken(f.topics,tok)){score+=4;where['נושא']=1;hit=true;}
-      if(nbFindToken(f.owner,tok)){score+=2;where['אחראי']=1;hit=true;}
-      if(f.content===null) f.content=nbNorm(nbContentText(d));
-      var cm=nbFindToken(f.content,tok);
-      if(cm){score+=1+Math.min(f.content.split(cm).length-1,5);where['תוכן']=1;hit=true;}
-      if(!hit) return; // every word must appear somewhere
-      matched.push(nbFindToken(f.title,tok)||cm||tok);
-    }
-    // The exact phrase ranks far above the words scattered around (or
-    // found inside longer words, e.g. "זרה" inside "חזרה").
-    if(tokens.length>1){
-      var phrase=tokens.join(' ');
-      if(f.title.indexOf(phrase)!==-1) score+=25;
-      else if((f.desc+' '+f.tags+' '+f.content).indexOf(phrase)!==-1){ score+=15; matched.unshift(phrase); }
-    }
-    results.push({d:d,topics:topics,score:score,where:Object.keys(where),matched:matched});
-  });
-  return results.sort(function(a,b){return b.score-a.score;});
+  function findResults(requireEveryToken){
+    var results=[];
+    Object.keys(docs).forEach(function(k){
+      var d=docs[k];
+      if(!d||!nbVisible(d)||!nbItemPassesFilters(d)) return;
+      // Items not normalized yet (search typed while the page is still loading) have no topicIds/tags.
+      var topics=TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;});
+      if(nbCurrentLibCat!=='all'&&!topics.some(function(t){return nbCatMatches(nbCurrentLibCat,t.cat);})) return;
+      var tags=(d.tags||[]).map(nbNorm);
+      if(tagMode){
+        var tagVariants=nbVariants(tokens[0]);
+        if(!tags.some(function(t){return tagVariants.some(function(v){return t===v||t.indexOf(v)!==-1;});})) return;
+        results.push({d:d,topics:topics,score:10,where:['תגית'],matched:[]});
+        return;
+      }
+      var f={title:nbNorm(d.topic),tags:tags.join(' '),desc:nbNorm(d.desc),owner:nbNorm(d.owner),
+        topics:topics.map(function(t){return nbNorm(t.title);}).join(' '),content:null};
+      var score=0, where={}, matched=[], matchedCount=0;
+      for(var i=0;i<tokens.length;i++){
+        var tok=tokens[i], hit=false;
+        if(nbFindToken(f.title,tok)){score+=10;where['שם']=1;hit=true;}
+        if(nbFindToken(f.tags,tok)){score+=8;where['תגיות']=1;hit=true;}
+        if(nbFindToken(f.desc,tok)){score+=5;where['תיאור']=1;hit=true;}
+        if(nbFindToken(f.topics,tok)){score+=4;where['נושא']=1;hit=true;}
+        if(nbFindToken(f.owner,tok)){score+=2;where['אחראי']=1;hit=true;}
+        if(f.content===null) f.content=nbNorm(nbContentText(d));
+        var cm=nbFindToken(f.content,tok);
+        if(cm){score+=1+Math.min(f.content.split(cm).length-1,5);where['תוכן']=1;hit=true;}
+        if(!hit){
+          if(requireEveryToken) return;
+          continue;
+        }
+        matchedCount++;
+        matched.push(nbFindToken(f.title,tok)||cm||tok);
+      }
+      if(!matchedCount) return;
+      // The exact phrase ranks far above the words scattered around (or
+      // found inside longer words, e.g. "זרה" inside "חזרה").
+      if(tokens.length>1&&matchedCount===tokens.length){
+        var phrase=tokens.join(' ');
+        if(f.title.indexOf(phrase)!==-1) score+=25;
+        else if((f.desc+' '+f.tags+' '+f.content).indexOf(phrase)!==-1){ score+=15; matched.unshift(phrase); }
+      }
+      results.push({d:d,topics:topics,score:score,where:Object.keys(where),matched:matched,matchedCount:matchedCount});
+    });
+    return results.sort(function(a,b){return b.score-a.score;});
+  }
+  var results=findResults(true);
+  // Keep all-terms matches precise; if none exist, show useful partial matches
+  // instead of making a multiword search look as if only one word is supported.
+  if(!results.length&&tokens.length>1){
+    results=findResults(false).sort(function(a,b){return b.matchedCount-a.matchedCount||b.score-a.score;});
+  }
+  return results;
 }
 
 function nbSearchTopicsList(query){
