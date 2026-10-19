@@ -374,11 +374,13 @@ html{overflow-x:hidden}body{font-family:"Rubik",sans-serif;background:var(--bg);
 
   .step-content {
     flex: 1;
+    min-width: 0;
     background: var(--gray-light);
     border: 1px solid var(--gray-border);
     border-radius: var(--radius);
     padding: 14px 16px;
     margin-top: 4px;
+    overflow-wrap: anywhere;
   }
   .step-content.branch {
     border-color: transparent;
@@ -410,6 +412,7 @@ html{overflow-x:hidden}body{font-family:"Rubik",sans-serif;background:var(--bg);
     display: flex;
     align-items: flex-start;
     gap: 8px;
+    overflow-wrap: anywhere;
     font-size: 13.5px;
     color: var(--text);
     background: var(--white);

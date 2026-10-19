@@ -188,11 +188,13 @@ body {
 
 .step-content {
   flex: 1;
+  min-width: 0;
   background: var(--gray-light);
   border: 1px solid var(--gray-border);
   border-radius: var(--radius);
   padding: 14px 16px;
   margin-top: 4px;
+  overflow-wrap: anywhere;
 }
 .step-content.alert-bg { background: #FFF8F5; border-color: #FFB596; }
 .step-title { font-weight: 600; font-size: 14.5px; color: var(--navy); margin-bottom: 6px; }
@@ -205,6 +207,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  overflow-wrap: anywhere;
   font-size: 13.5px;
   color: var(--text);
   background: var(--white);
