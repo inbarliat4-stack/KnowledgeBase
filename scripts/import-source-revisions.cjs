@@ -49,7 +49,6 @@ const newSourceItems = {
     tags: ['eSIM', 'QR'], reviewNotes: []
   }
 };
-const draftDocRoot = 'https://github.com/inbarliat4-stack/KnowledgeBase/raw/refs/heads/main/drafts/new-app-items/';
 const applyChanges = process.argv.includes('--write');
 const sourceDirArg = process.argv.find((arg, index) => index > 1 && !arg.startsWith('--'));
 
@@ -134,6 +133,7 @@ function cleanHeading(value) {
 
 function isHeading(paragraph, kind) {
   const text = cleanHeading(paragraph.text);
+  if (kind === 'O' && /(?:תת דגם|החל מגרסה|גרסת מפעיל|גרסת תוכנה)/i.test(text)) return false;
   if (/^(כן|לא|אולי|אחר)$/i.test(text)) return false;
   if (/^(?:heading|title|subtitle|[123]|a[123])$/i.test(paragraph.style)) return true;
   if (/^שלב\s*\d+\b/i.test(text)) return true;
@@ -141,6 +141,7 @@ function isHeading(paragraph, kind) {
     return true;
   }
   if (/^(?:iPhone|Android|Samsung|Google Pixel|Xiaomi|Redmi|POCO|OnePlus|Oppo|Realme|HyperOS)(?:\b|\s|\/)/i.test(text)) return true;
+  if (kind === 'O' && /^(?:מכשירי Apple|יתר המכשירים)$/i.test(text)) return true;
   if (kind === 'M' && /^(?:בחירת מסלול|מפת הפניות|לא ברור מה|אין שירות|יש רשת|הבעיה בשליחה|הלקוח אומר|סדר העבודה)/i.test(text)) return true;
   if (kind === 'E' && /^(?:מקרים שמחייבים|מה חובה לתעד|מה קורה לאחר ההעברה|לאחר ההעברה)/i.test(text)) return true;
   return paragraph.bold && text.length <= 90 && !/[.!?]$/.test(text);
@@ -181,6 +182,19 @@ function sourceUrl(sourceDir, filePath, code) {
   return `https://marathon051-my.sharepoint.com/my?id=${encodeURIComponent(fullPath)}&ga=1`;
 }
 
+function sharePointDraftUrl(code) {
+  const pathSegments = [
+    'Documents',
+    'שולחן העבודה',
+    'Kira',
+    'KnowledgeBase',
+    'drafts',
+    'new-app-items',
+    `${code}.docx`
+  ];
+  return `https://marathon051-my.sharepoint.com/personal/liat_i_we-com_co_il/${pathSegments.map(encodeURIComponent).join('/')}?web=1`;
+}
+
 function buildItem(target, code, paragraphs, images) {
   const content = paragraphs.slice(1);
   const item = {
@@ -205,6 +219,7 @@ function buildItem(target, code, paragraphs, images) {
   if (target.kind === 'O') {
     item.body = { groups: makeSections(content, target.kind).map(section => ({
       title: section.title,
+      ordered: /^שלב\s*\d+/i.test(section.title),
       steps: section.lines.map(text => ({ text, img: null }))
     })) };
   } else if (target.kind === 'R' || target.kind === 'S') {
@@ -332,8 +347,8 @@ function main() {
     const code = normalizeCode(file.name);
     const target = code && appItems.get(code);
     const newItemDefinition = code && newSourceItems[code];
-    if (target && newItemDefinition && target.id === newItemDefinition.id) continue;
-    if (!target && !newItemDefinition) {
+    const isExistingRevisionTarget = target && (!newItemDefinition || target.id !== newItemDefinition.id);
+    if (!isExistingRevisionTarget && !newItemDefinition) {
       unmatched.push({ name: file.name, code });
       continue;
     }
@@ -355,12 +370,12 @@ function main() {
     const entry = {
       ...file,
       code,
-      target: target || newItemDefinition,
+      target: isExistingRevisionTarget ? target : newItemDefinition,
       paragraphs,
       imageCount,
       score: paragraphs.reduce((sum, p) => sum + p.text.length, 0)
     };
-    const collection = target ? candidates : newItemCandidates;
+    const collection = isExistingRevisionTarget ? candidates : newItemCandidates;
     if (!collection.has(code)) collection.set(code, []);
     collection.get(code).push(entry);
   }
@@ -432,7 +447,7 @@ function main() {
     item.source = source;
     item.draftDoc = {
       name: `${code} – טיוטת Word לעורך`,
-      url: `${draftDocRoot}${code}.docx`
+      url: sharePointDraftUrl(code)
     };
     item.reviewNotes = reviewNotes;
     item.track = {
@@ -461,8 +476,10 @@ function main() {
   ];
   const generatedBlock = lines.join('\n');
   const oldBlockMatch = index.match(new RegExp(`${markerStart}[\\s\\S]*?${markerEnd}`));
+  let revisionsChanged = !oldBlockMatch;
   let nextIndex = index;
   if (oldBlockMatch) {
+    revisionsChanged = oldBlockMatch[0] !== generatedBlock;
     nextIndex = nextIndex.replace(oldBlockMatch[0], generatedBlock);
   } else {
     const assignments = [...nextIndex.matchAll(/^window\.dynamicDocs\[[^\n]+\]\s*=\s*.*;$/gm)];
@@ -471,6 +488,7 @@ function main() {
     nextIndex = `${nextIndex.slice(0, insertAt)}\n\n${generatedBlock}${nextIndex.slice(insertAt)}`;
   }
   const oldNewItemsBlockMatch = nextIndex.match(new RegExp(`${newItemsMarkerStart}[\\s\\S]*?${newItemsMarkerEnd}`));
+  let newItemsChanged = newItems.length > 0 && !oldNewItemsBlockMatch;
   if (newItems.length) {
     const newItemLines = [
       newItemsMarkerStart,
@@ -481,6 +499,7 @@ function main() {
     ];
     const generatedNewItemsBlock = newItemLines.join('\n');
     if (oldNewItemsBlockMatch) {
+      newItemsChanged = oldNewItemsBlockMatch[0] !== generatedNewItemsBlock;
       nextIndex = nextIndex.replace(oldNewItemsBlockMatch[0], generatedNewItemsBlock);
     } else {
       const revisionEnd = nextIndex.indexOf(markerEnd);
@@ -493,8 +512,7 @@ function main() {
   const versionMatch = nextIndex.match(/var NB_SEED_VERSION = (\d+);/);
   if (!versionMatch) throw new Error('Could not find NB_SEED_VERSION in index.html.');
   const changed = nextIndex !== index;
-  const addingSeedItems = newItems.length > 0 && !oldNewItemsBlockMatch;
-  const nextSeedVersion = Number(versionMatch[1]) + (!oldBlockMatch || addingSeedItems ? 1 : 0);
+  const nextSeedVersion = Number(versionMatch[1]) + (revisionsChanged || newItemsChanged ? 1 : 0);
   if (changed) {
     nextIndex = nextIndex.replace(
       /var NB_SEED_VERSION = \d+;[^\r\n]*/,
@@ -513,7 +531,7 @@ function main() {
     .filter(([code, definition]) => appItems.get(code)?.id === definition.id).length;
   console.log(`Source DOCX files: ${files.length} (${files.length - skippedEmpty.length} non-empty; ${skippedEmpty.length} empty skipped).`);
   console.log(`Proposed revisions: ${generated.length} existing app items.`);
-  console.log(`New app items: ${newItems.length} to add; ${existingNewItems} already in the seed.`);
+  console.log(`New app items: ${newItems.length} prepared; ${existingNewItems} already in the seed.`);
   console.log(`Unmatched source documents: ${unmatched.length}.`);
   console.log(`Duplicate codes: ${JSON.stringify(duplicates)}.`);
   console.log(`Image-bearing sources: ${generated.filter(entry => entry.revision.issues.some(issue => issue.includes('תמונה'))).map(entry => entry.code).join(', ') || 'none'}.`);

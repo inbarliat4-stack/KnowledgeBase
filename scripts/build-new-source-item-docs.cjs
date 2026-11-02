@@ -77,12 +77,12 @@ function makeProposedContent(item, sourceName) {
   if (item.kind === 'O') {
     for (const group of item.body.groups) {
       if (group.title) out.push(paragraph(group.title, 'Heading2'));
-      for (const step of group.steps) out.push(paragraph(step.text, 'ListParagraph'));
+      for (const step of group.steps) out.push(paragraph(`• ${step.text}`, 'Normal'));
     }
   } else {
     for (const stage of item.stages) {
       out.push(paragraph(stage.title, 'Heading2'));
-      for (const step of stage.items || []) out.push(paragraph(step.text, 'ListParagraph'));
+      for (const step of stage.items || []) out.push(paragraph(`• ${step.text}`, 'Normal'));
     }
   }
 
@@ -122,7 +122,7 @@ function main() {
     const source = sources.get(code);
     if (!item) throw new Error(`Could not find app item ${id} in index.html.`);
     if (!source) throw new Error(`Could not find a non-empty source document for ${code}.`);
-    if (!item.draftDoc || !item.draftDoc.url.endsWith(`/drafts/new-app-items/${code}.docx`)) {
+    if (!item.draftDoc || !item.draftDoc.url.includes(`/drafts/new-app-items/${code}.docx?web=1`)) {
       throw new Error(`The app item ${code} does not contain its Word draft link.`);
     }
 

@@ -142,8 +142,20 @@ function paragraph(text, style = 'Normal') {
   const templateStyles = ['Title', 'Heading1', 'Heading2', 'ListParagraph', 'Script'];
   const styleMarkup = templateStyles.includes(style) ? `<w:pStyle w:val="${style}"/>` : '';
   const keepNext = /^Heading/.test(style) ? '<w:keepNext/>' : '';
-  const emphasis = style === 'Notice' ? '<w:highlight w:val="yellow"/><w:b/>' : style === 'Branch' ? '<w:b/>' : style === 'Subtitle' ? '<w:i/>' : '';
-  return `<w:p><w:pPr>${styleMarkup}<w:bidi/><w:jc w:val="right"/>${keepNext}</w:pPr><w:r><w:rPr><w:rtl/>${emphasis}</w:rPr><w:t xml:space="preserve">${safe}</w:t></w:r></w:p>`;
+  const paragraphFormat = {
+    Title: '<w:spacing w:before="120" w:after="100"/>',
+    Heading1: '<w:spacing w:before="300" w:after="120"/>',
+    Heading2: '<w:spacing w:before="220" w:after="80"/><w:ind w:right="120"/><w:shd w:val="clear" w:color="auto" w:fill="EAF2F8"/>'
+  }[style] || '';
+  const runFormat = {
+    Title: '<w:b/><w:color w:val="1F1F1F"/><w:sz w:val="36"/><w:szCs w:val="36"/>',
+    Subtitle: '<w:i/><w:color w:val="666666"/>',
+    Heading1: '<w:b/><w:color w:val="1F4E79"/><w:sz w:val="32"/><w:szCs w:val="32"/>',
+    Heading2: '<w:b/><w:color w:val="2F5597"/><w:sz w:val="26"/><w:szCs w:val="26"/>',
+    Notice: '<w:highlight w:val="yellow"/><w:b/>',
+    Branch: '<w:b/>'
+  }[style] || '';
+  return `<w:p><w:pPr>${styleMarkup}<w:bidi/><w:jc w:val="right"/>${paragraphFormat}${keepNext}</w:pPr><w:r><w:rPr><w:rtl/>${runFormat}</w:rPr><w:t xml:space="preserve">${safe}</w:t></w:r></w:p>`;
 }
 
 function tableCell(text, width, header) {
