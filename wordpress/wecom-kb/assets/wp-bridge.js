@@ -120,7 +120,7 @@
       var savedDocs = saved.docs;
       // Same rules as the browser version (nbReconcileSeed in app.js):
       // refresh built-in content, add new built-in items, retire replaced ones.
-      if (!seedMatches) nbReconcileSeed(savedDocs, window.dynamicDocs || {}, saved.trash);
+      if (!seedMatches) nbReconcileSeed(savedDocs, window.dynamicDocs || {}, saved.trash, Number(saved.seedVersion) || 0);
       window.dynamicDocs = savedDocs;
     }
 
