@@ -31,6 +31,18 @@
 
 קובץ המקור של ממשק הפלטפורמה הוא `index.html`. לאחר שינוי בו מריצים `node wordpress/build.cjs` כדי לעדכן את קובצי הממשק שבתוסף. תיקיית התוסף היא `wordpress/wecom-kb/`; מתקינים אותה באתר WordPress באמצעות ZIP ששמו `wecom-kb.zip`.
 
+### הצעת עדכונים ממסמכי מקור בגרסת GitHub
+
+בגרסת GitHub, הסקריפט `scripts/import-source-revisions.cjs` קורא קובצי DOCX מתיקייה מקומית מסונכרנת ומוסיף גרסאות מוצעות לפריטי האפליקציה בעלי קוד תואם. קודים חדשים שמוגדרים בסקריפט מתווספים כטיוטות ממתינות לאישור, עם קישור למקור ולטיוטת Word נפרדת. ברירת המחדל היא תצוגה מקדימה בלבד:
+
+```powershell
+node scripts/import-source-revisions.cjs "מסמכי DOCx מוכנים לפרסום"
+node scripts/import-source-revisions.cjs "מסמכי DOCx מוכנים לפרסום" --write
+node scripts/build-new-source-item-docs.cjs "מסמכי DOCx מוכנים לפרסום"
+```
+
+מסמכי Word החדשים נוצרים תחת `drafts/new-app-items/`; הם כוללים את הצעת המבנה ואת מסמך המקור המלא לצורך השוואה. קובצי המקור אינם משתנים. לאחר שינוי `index.html`, יש להריץ `node wordpress/build.cjs` כדי לסנכרן את נכסי ממשק התוסף. פעולה זו אינה אורזת את התוסף ואינה מעדכנת את `wordpress/wecom-kb.zip`.
+
 ## 📁 מבנה הפרויקט
 
 ```
