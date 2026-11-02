@@ -2041,7 +2041,7 @@ function nbItemMetaHTML(doc){
     +doc.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
     +'</div>'
     // Until it is published, editors get a direct link to the source document.
-    +(doc.source&&!doc.draftDoc?'<div class="draft-src nb-edit-only">📄 '+(doc.status==='published'?'מסמך Word (מקור): ':'מסמך המקור לבדיקה לפני פרסום: ')+nbSourceLink(doc.source)+'</div>':'')
+    +(doc.source&&(doc.status==='published'||!doc.draftDoc)?'<div class="draft-src nb-edit-only">📄 '+(doc.status==='published'?'מסמך Word (מקור): ':'מסמך המקור לבדיקה לפני פרסום: ')+nbSourceLink(doc.source)+'</div>':'')
     +(doc.draftDoc&&doc.status!=='published'?'<div class="draft-src nb-edit-only">📝 טיוטת Word לעריכה: '+nbSourceLink(doc.draftDoc)+'</div>':'')
     +(doc.reviewNotes&&doc.reviewNotes.length&&doc.status!=='published'?'<div class="import-issues nb-edit-only"><div class="ii-title">⚠ הערות לפני אישור</div><ul>'+doc.reviewNotes.map(function(note){return '<li>'+nbEsc(note)+'</li>';}).join('')+'</ul></div>':'');
 }
@@ -2066,7 +2066,7 @@ function nbTrackPanelHTML(doc){
   if(doc.publishedAt) cells.push('<div><span>פורסם</span><b>'+nbFmtDate(doc.publishedAt)+'</b></div>');
   if(t.source) cells.push('<div class="wide"><span>מקור ידע</span><b>'+nbEsc(t.source)+'</b></div>');
   if(t.gap) cells.push('<div class="wide gap"><span>פער / פעולה נדרשת</span><b>'+nbEsc(t.gap)+'</b></div>');
-  if(doc.source&&!doc.draftDoc) cells.push('<div class="wide"><span>מסמך מקור</span><b>'+nbSourceLink(doc.source)+'</b></div>');
+  if(doc.source&&(doc.status==='published'||!doc.draftDoc)) cells.push('<div class="wide"><span>מסמך מקור</span><b>'+nbSourceLink(doc.source)+'</b></div>');
   var canImport=typeof window.nbImportSourceDoc==='function'&&window.NB_CAN_IMPORT;
   var actions=(doc.revision?'<button type="button" class="tp-btn warn" onclick="nbOpenReview(\''+nbEsc(doc.id)+'\')">🔎 גרסה מוצעת ממתינה — השווה ואשר</button>':'')
     +(canImport?'<button type="button" class="tp-btn" onclick="nbStartSourceUpdate(\''+nbEsc(doc.id)+'\')">📄 עדכון ממסמך מקור</button>':'');
