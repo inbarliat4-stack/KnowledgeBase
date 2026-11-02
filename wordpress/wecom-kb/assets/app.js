@@ -223,6 +223,7 @@ function showView(id){
   ['library','new','tracking'].forEach(function(t){var b=document.getElementById('mob-'+t);if(b)b.classList.toggle('active',t===id||(t==='library'&&['browsing','churn','article','topic'].indexOf(id)!==-1)||(t==='tracking'&&id==='review'))});
   if(id==='library'){var sl=document.getElementById('snav-library');if(sl)sl.classList.toggle('active',nbCurrentWorld==='all');}
   if(id==='library'){
+    nbMostViewedFilter=false;
     renderLibrary('all');
     var fb=document.querySelectorAll('#lib-filters .filter-btn');
     fb.forEach(function(b,i){b.classList.toggle('active',i===0);});
@@ -257,14 +258,21 @@ function nbTopicMatchesFilters(t){
 }
 function nbCatMatches(cat,c){ return cat==='all'||c===cat||(cat==='tech'&&c==='tech2'); }
 
-function nbCurrentLibraryTopicCount(){
-  if(nbSearchQuery) return nbSearchTopicsList(nbSearchQuery).length;
-  var cat=nbCurrentLibCat||'all';
-  return TOPICS.filter(function(t){
-    return nbCatMatches(cat,t.cat)&&nbTopicMatchesFilters(t);
-  }).length;
+function nbCurrentLibraryItemCount(){
+  var cat=nbCurrentLibCat||'all', docs=window.dynamicDocs||{}, count=0, seen=[];
+  Object.keys(docs).forEach(function(key){
+    var d=docs[key];
+    if(!d||!nbVisible(d)||!nbItemPassesFilters(d)) return;
+    var matchesTopic=(d.topicIds||[]).some(function(topicId){
+      var topic=TOPICS.find(function(t){return t.id===topicId;});
+      return topic&&nbCatMatches(cat,topic.cat);
+    });
+    var id=d.id||key;
+    if(matchesTopic&&seen.indexOf(id)===-1){seen.push(id);count++;}
+  });
+  return count;
 }
-function nbUpdateLibraryTopicCount(count){
+function nbUpdateLibraryItemCount(count){
   var title=document.getElementById('lib-count');
   if(title) title.textContent=count;
   var badge=document.querySelector('#snav-library .snav-badge');
@@ -273,11 +281,12 @@ function nbUpdateLibraryTopicCount(count){
 
 function renderLibrary(cat){
   nbCurrentLibCat=cat;
+  if(nbMostViewedFilter){ nbRenderMostViewed(); return; }
   if(nbSearchQuery){ nbRenderSearch(); return; }
   var f=TOPICS.filter(function(t){
     return nbCatMatches(cat,t.cat)&&nbTopicMatchesFilters(t);
   });
-  nbUpdateLibraryTopicCount(f.length);
+  nbUpdateLibraryItemCount(nbCurrentLibraryItemCount());
   document.getElementById('library-content').innerHTML=f.length
     ?'<div class="topic-grid">'+f.map(cardHTML).join('')+'</div>'
     :'<div class="empty-state">אין נושאים בסינון הזה</div>';
@@ -287,21 +296,38 @@ function renderLibrary(cat){
 var nbCurrentLibCat='all';
 var nbCurrentWorld='all';
 var nbCurrentKind='all';
+var nbMostViewedFilter=false;
 function filterKind(kind){
+  nbMostViewedFilter=false;
   nbCurrentKind=kind;
   nbRenderLibFilters();
   renderLibrary(nbCurrentLibCat);
 }
 function filterLibrary(cat,btn){
+  nbMostViewedFilter=false;
   document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.remove('active')});
   if(btn) btn.classList.add('active');
   renderLibrary(cat);
 }
 function filterWorld(world){
+  nbMostViewedFilter=false;
   nbCurrentWorld=world;
   nbRenderLibFilters();
   nbRenderSidebar();
   renderLibrary(nbCurrentLibCat);
+}
+function filterMostViewed(btn){
+  nbMostViewedFilter=true;
+  nbCurrentLibCat='all';
+  nbCurrentWorld='all';
+  nbCurrentKind='all';
+  nbSearchQuery='';
+  var input=document.getElementById('nb-search');
+  if(input) input.value='';
+  document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.remove('active')});
+  if(btn) btn.classList.add('active');
+  nbRenderLibFilters();
+  renderLibrary('all');
 }
 
 // World filter row above the category filters (worlds are editable data).
@@ -326,7 +352,7 @@ function nbRenderLibFilters(){
 function nbRenderSidebar(){
   var el=document.getElementById('snav-dynamic');
   if(!el) return;
-  nbUpdateLibraryTopicCount(nbCurrentLibraryTopicCount());
+  nbUpdateLibraryItemCount(nbCurrentLibraryItemCount());
   var cats=[['sim',SIM_ICON,'SIM / eSIM'],['tech','🔧','תמיכה טכנית'],['billing','💳','חיובים'],['plans','📋','מסלולים'],['intl','✈️','חו"ל ונדידה'],['ops','🎧','טיפול בשיחה']];
   var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
     +WORLDS.map(function(w){
@@ -391,6 +417,12 @@ function nbSearch(query){
   var rawQuery=query||'';
   if(!nbLibraryReady){ nbPendingSearch=rawQuery; return; }
   nbSearchQuery=rawQuery.trim();
+  if(nbSearchQuery){
+    nbMostViewedFilter=false;
+    document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.remove('active')});
+    var allFilter=document.querySelector('#lib-filters .filter-btn');
+    if(allFilter) allFilter.classList.add('active');
+  }
   var inp=document.getElementById('nb-search');
   if(inp&&inp.value!==rawQuery&&document.activeElement!==inp) inp.value=nbSearchQuery;
   var lib=document.getElementById('view-library');
@@ -579,7 +611,7 @@ function nbRenderSearch(){
   if(!el) return;
   var q=nbSearchQuery;
   var items=nbSearchItems(q), topics=nbSearchTopicsList(q);
-  nbUpdateLibraryTopicCount(topics.length);
+  nbUpdateLibraryItemCount(items.length);
   var filtersOn=nbCurrentWorld!=='all'||nbCurrentKind!=='all'||nbCurrentLibCat!=='all';
   var html='<div class="search-head"><div><span class="search-q">'+(q.charAt(0)==='#'?'תגית ':'')+'<bdi>"'+nbEsc(q.charAt(0)==='#'?q.slice(1):q)+'"</bdi></span>'
     +'<span class="search-count">'+items.length+' פריטי ידע'+(topics.length?' · '+topics.length+' נושאים':'')+(filtersOn?' · לפי הסינון שנבחר':'')+'</span></div>'
@@ -606,6 +638,50 @@ function nbRenderSearch(){
     html+='<div class="search-section">נושאים</div><div class="topic-grid">'+topics.map(cardHTML).join('')+'</div>';
   }
   el.innerHTML=html;
+  setTimeout(function(){document.querySelectorAll('#library-content .fade-in:not(.visible)').forEach(function(e2,i){setTimeout(function(){e2.classList.add('visible')},i*30)})},30);
+}
+
+function nbGetRecentItems(){
+  try{
+    var entries=JSON.parse(localStorage.getItem(NB_STORAGE_KEYS.recent)||'[]');
+    return Array.isArray(entries)?entries.filter(function(entry){
+      return entry&&typeof entry.id==='string'&&Number.isFinite(entry.viewedAt);
+    }).slice(0,10):[];
+  }catch(e){
+    console.warn('Could not read recently viewed knowledge items.',e);
+    return [];
+  }
+}
+function nbRecordRecentItem(docId){
+  var recent=nbGetRecentItems().filter(function(entry){return entry.id!==docId;});
+  recent.unshift({id:docId,viewedAt:Date.now()});
+  try{localStorage.setItem(NB_STORAGE_KEYS.recent,JSON.stringify(recent.slice(0,10)));}
+  catch(e){console.warn('Could not save recently viewed knowledge items.',e);}
+}
+function nbRenderMostViewed(){
+  var el=document.getElementById('library-content');
+  if(!el) return;
+  var docs=window.dynamicDocs||{};
+  var recent=nbGetRecentItems().map(function(entry){
+    return {entry:entry,doc:docs[entry.id]};
+  }).filter(function(row){
+    return row.doc&&nbVisible(row.doc);
+  });
+  nbUpdateLibraryItemCount(recent.length);
+  el.innerHTML='<div class="search-head"><div><span class="search-q">הנצפות ביותר</span>'
+    +'<span class="search-count">עד 10 פריטי הידע האחרונים שנפתחו בדפדפן זה</span></div></div>'
+    +(recent.length?'<div class="result-list">'+recent.map(function(row){
+      var d=row.doc, topics=TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;});
+      var viewedAt=new Date(row.entry.viewedAt);
+      var time=viewedAt.toLocaleDateString('he-IL')+' '+viewedAt.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="result-card fade-in" style="--kind:'+(NB_KINDS[d.kind]||NB_KINDS.R).color+'" onclick="nbOpenResult(\''+nbEsc(d.id)+'\')">'
+        +'<div class="rc-top">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'<span class="rc-title">'+nbEsc(nbPlain(d.topic))+'</span></div>'
+        +'<div class="rc-path">'+(topics.length?topics.map(function(t){return nbEsc(nbPlain(t.title));}).join(' · '):'ללא נושא')
+        +(d.worlds&&d.worlds.length?' · '+d.worlds.map(function(w){return nbEsc(nbWorldName(w));}).join(', '):'')+'</div>'
+        +(d.desc?'<div class="rc-desc">'+nbEsc(d.desc)+'</div>':'')
+        +'<div class="rc-foot"><span class="rc-where">נפתח לאחרונה: '+nbEsc(time)+'</span></div>'
+        +'</div>';
+    }).join('')+'</div>':'<div class="empty-state">עדיין לא נפתחו פריטי ידע בדפדפן זה</div>');
   setTimeout(function(){document.querySelectorAll('#library-content .fade-in:not(.visible)').forEach(function(e2,i){setTimeout(function(){e2.classList.add('visible')},i*30)})},30);
 }
 
@@ -1183,6 +1259,7 @@ function nbSetBack(sel,doc){
 function showDynamicDoc(docId){
   var doc=window.dynamicDocs[docId];
   if(!doc||!nbVisible(doc)) return;
+  nbRecordRecentItem(docId);
   if(doc._isViewDoc){
     // Hand-designed documents: keep their own page, add the shared header strip.
     var strip=document.getElementById('special-strip-'+doc._isViewDoc);
@@ -3196,7 +3273,7 @@ function nbBodySummaryHTML(k){
 // ── LOCAL PERSISTENCE ────────────────────────────────────────────────────
 // Keeps created knowledge items and the in-progress "פריט ידע חדש" form
 // draft across page refreshes by mirroring them into localStorage.
-var NB_STORAGE_KEYS={docs:'wecom_kb_docs_v1',topics:'wecom_kb_topics_v1',worlds:'wecom_kb_worlds_v1',draft:'wecom_kb_draft_v1',trash:'wecom_kb_trash_v1',seedVersion:'wecom_kb_seed_version_v1',history:'wecom_kb_history_v1'};
+var NB_STORAGE_KEYS={docs:'wecom_kb_docs_v1',topics:'wecom_kb_topics_v1',worlds:'wecom_kb_worlds_v1',draft:'wecom_kb_draft_v1',trash:'wecom_kb_trash_v1',seedVersion:'wecom_kb_seed_version_v1',history:'wecom_kb_history_v1',recent:'wecom_kb_recent_items_v1'};
 var NB_HISTORY_MAX=25;
 
 function nbSaveLibrary(historyLabel){
