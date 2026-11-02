@@ -2041,7 +2041,7 @@ function nbItemMetaHTML(doc){
     +doc.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
     +'</div>'
     // Until it is published, editors get a direct link to the source document.
-    +(doc.source&&!doc.draftDoc&&doc.status!=='published'?'<div class="draft-src nb-edit-only">📄 מסמך המקור לבדיקה לפני פרסום: '+nbSourceLink(doc.source)+'</div>':'')
+    +(doc.source&&!doc.draftDoc?'<div class="draft-src nb-edit-only">📄 '+(doc.status==='published'?'מסמך Word (מקור): ':'מסמך המקור לבדיקה לפני פרסום: ')+nbSourceLink(doc.source)+'</div>':'')
     +(doc.draftDoc&&doc.status!=='published'?'<div class="draft-src nb-edit-only">📝 טיוטת Word לעריכה: '+nbSourceLink(doc.draftDoc)+'</div>':'')
     +(doc.reviewNotes&&doc.reviewNotes.length&&doc.status!=='published'?'<div class="import-issues nb-edit-only"><div class="ii-title">⚠ הערות לפני אישור</div><ul>'+doc.reviewNotes.map(function(note){return '<li>'+nbEsc(note)+'</li>';}).join('')+'</ul></div>':'');
 }
