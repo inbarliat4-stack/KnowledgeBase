@@ -41,9 +41,10 @@
 node scripts/import-source-revisions.cjs "מסמכי DOCx מוכנים לפרסום"
 node scripts/import-source-revisions.cjs "מסמכי DOCx מוכנים לפרסום" --write
 node scripts/build-new-source-item-docs.cjs "מסמכי DOCx מוכנים לפרסום"
+node scripts/build-new-source-item-docs.cjs "מסמכי DOCx מוכנים לפרסום" --only=O-36
 ```
 
-מסמכי Word החדשים נוצרים תחת `drafts/new-app-items/`; הם כוללים את הצעת המבנה עם כותרות וסעיפים, ללא סגנון רשימה ממוספרת לכל פסקה, ואת מסמך המקור המלא לצורך השוואה. קובצי המקור אינם משתנים. לאחר שינוי `index.html`, יש להריץ `node wordpress/build.cjs` כדי לסנכרן את נכסי ממשק התוסף. פעולה זו אינה אורזת את התוסף ואינה מעדכנת את `wordpress/wecom-kb.zip`.
+מסמכי Word החדשים נוצרים תחת `drafts/new-app-items/`; הם כוללים את הצעת המבנה עם כותרות וסעיפים, ללא סגנון רשימה ממוספרת לכל פסקה, ואת מסמך המקור המלא לצורך השוואה. אפשר להשתמש ב-`--only=O-36` כדי ליצור מחדש טיוטה אחת בלבד. קובצי המקור אינם משתנים. לאחר שינוי `index.html`, יש להריץ `node wordpress/build.cjs` כדי לסנכרן את נכסי ממשק התוסף. פעולה זו אינה אורזת את התוסף ואינה מעדכנת את `wordpress/wecom-kb.zip`.
 
 ## 📁 מבנה הפרויקט
 
