@@ -77,7 +77,7 @@ var NB_USER_TOPIC_START = 2000;
 function nbIsUserTopicId(id){ return (id>52&&id<1000)||id>=NB_USER_TOPIC_START; }
 // Bump this whenever the hardcoded TOPICS/dynamicDocs seed content changes in
 // the code, so a browser with older saved data doesn't keep masking it.
-var NB_SEED_VERSION = 50; // restore links to formatted documents from "טיוטות פריטי ידע"
+var NB_SEED_VERSION = 51; // move saved items with corrupted (????) titles to the trash
 // ── KNOWLEDGE ARCHITECTURE (spec §2–3) ──────────────────────────────────
 // עולם תוכן → נושא → פריטי ידע. A knowledge item (window.dynamicDocs entry)
 // belongs to one or more topics (item.topicIds) and one or more content
@@ -3456,6 +3456,16 @@ function nbReconcileSeed(savedDocs,seedDocs,trash,previousVersion){
     trash.push({trashId:'trash-'+Date.now()+'-'+k,type:'doc',docId:k,doc:d,
       topicSnapshots:TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;}),
       title:nbPlain(d.topic)+' ('+NB_SEED_RETIRED[k]+')',deletedAt:Date.now()});
+    delete savedDocs[k];
+  });
+  // Items that are not built-in and whose title was saved with broken Hebrew
+  // ("????", from an import with the wrong text encoding) go to the trash.
+  Object.keys(savedDocs).forEach(function(k){
+    var d=savedDocs[k];
+    if(!d||seedDocs[k]||!/\?{4,}/.test(nbPlain(d.topic||''))) return;
+    trash.push({trashId:'trash-'+Date.now()+'-'+k,type:'doc',docId:k,doc:d,
+      topicSnapshots:TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;}),
+      title:nbPlain(d.topic)+' (טקסט פגום)',deletedAt:Date.now()});
     delete savedDocs[k];
   });
 }
