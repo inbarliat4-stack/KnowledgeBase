@@ -1,4 +1,4 @@
-/* GENERATED from index.html by wordpress/build.cjs ? do not edit by hand. */
+/* GENERATED from index.html by wordpress/build.cjs — do not edit by hand. */
 var TOPICS=[
   {id:1,cat:'sim',title:'הפעלת SIM פיזי חדש',desc:'שלבי הפעלה, זיהוי לקוח, בדיקת סטטוס קו, מה לומר ללקוח'},
   {id:2,cat:'sim',title:'הפעלת eSIM – קוד QR',desc:'דרישות מקדימות, שליחת QR, סריקה, טעויות נפוצות, אימות'},
