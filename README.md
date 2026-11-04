@@ -1,10 +1,12 @@
-# How the wecom Knowledge Base works
+# wecom Knowledge Base
 
-The platform is an internal knowledge base for customer-service agents. Editors create and maintain structured פריטי ידע; agents use the published content to find guidance while helping customers.
+An internal knowledge base for wecom customer-service agents. Editors create and maintain structured פריטי ידע; agents use the published items to find guidance while helping customers.
+
+Live development version: https://inbarliat4-stack.github.io/KnowledgeBase/
 
 ## What users see
 
-Knowledge is organized as content worlds → topics → knowledge items. Items use formats suited to different purposes:
+Knowledge is organized as content worlds (שירות, טכני, הנדסה) → topics → knowledge items. Each item has a code (for example `M-10` or `O-51`) and a format suited to its purpose:
 
 - **M** — guided diagnosis and routing
 - **R / S** — handling and specialist procedures
@@ -13,24 +15,59 @@ Knowledge is organized as content worlds → topics → knowledge items. Items u
 - **T** — call scripts
 - **I** — reference information
 
-Agents can search and read published items. Editors can also create, edit, delete, review, and manage them.
+Agents search and read published items. Editors can also create, edit, delete, review and manage items, and administrators can also manage content worlds. The entry screen lets you pick a role (מנהל מערכת, עורך תוכן, נציג שירות) to see each view; in this version that is a demo and does not restrict access.
 
-The **הנצפות ביותר** filter shows up to ten items most recently opened in the current browser.
+Each item has a status: draft, pending approval, published, expired or archived. Agents see only published items. The **הנצפות ביותר** filter shows up to ten items most recently opened in the current browser.
 
-## Editing and publishing
+## How app items are updated
 
-Editors can create an item manually or upload a source document. The app saves content as a draft for the editor to check. Drafts and proposed revisions do not replace published content until an editor reviews and approves them.
+App items are built from source documents in three stages:
 
-For an existing item, **העלה טיוטה** uploads a Word (.docx), PDF, or PNG file. The conversion proposes a revision alongside the current item; the editor can compare, edit, approve, or reject it. The original upload is stored in WordPress's Media Library.
+1. **Origin documents.** The original documents sit in the SharePoint folder "מסמכי DOCx מוכנים לפרסום". They are read-only and are never linked from the app.
+2. **Formatted source docx.** AI formats each origin into one unified Word document per item, in `formatted-source/` (for example `M-10.docx`). Every formatted document follows the same template: a details table (code, type, topic, content world, owner, status, origin file), numbered steps, editor callouts, a "לבדיקת העורך/ת – פערים והערות" section and a "מקורות" section. Missing information is highlighted in yellow, and the origin's state (מוכן לפרסום, טיוטה – בבדיקה, להשלים) appears in the status field. The formatted documents are editable and open in Word for the web, without downloading.
+3. **App items.** Each item links only to its formatted source docx, shown to editors as "מסמך מקור מעוצב". A proposed new version of an item is built from its formatted docx only when requested. It appears alongside the current item, and the editor can compare, edit, approve or reject it. It replaces the published item only after approval.
 
-## AI document conversion
+**העלה טיוטה**, on an existing item, relates to updating its origin document.
 
-The WordPress plugin sends uploaded documents to Anthropic's API and converts them into the appropriate item structure. Word files are converted to text on the server; PDFs and PNGs are sent as documents or images. The editor selects the item's topic and content world for a new item, and checks the generated content and any conversion notes.
+In this development version there is no API: Claude Code performs the AI steps locally in this repository, using `scripts/build-formatted-source.cjs`:
 
-This feature requires an administrator to configure an Anthropic API key in **Tools → wecom מאגר ידע**. It also requires editor permissions and WordPress's `upload_files` capability. Document content is sent to Anthropic, so the company's data policy should allow that.
+```powershell
+# All origins: lays out each origin in the template (existing documents are kept)
+node scripts/build-formatted-source.cjs "מסמכי DOCx מוכנים לפרסום"
+# One item
+node scripts/build-formatted-source.cjs "מסמכי DOCx מוכנים לפרסום" --only=O-40
+# One item, with content Claude Code formatted from the origin (JSON)
+node scripts/build-formatted-source.cjs "מסמכי DOCx מוכנים לפרסום" --only=O-40 --content=O-40.json --force
+```
 
-## Storage, permissions, and history
+Without `--content`, the script places every line of the origin in the template, highlights missing information, and checks that no origin text was lost. With `--content`, it renders content Claude Code formatted, which can restructure the text into steps, tables and callouts. It then lists the origin lines that were rephrased or left out, so they can be checked. Existing formatted documents are never replaced without `--force`, because editors may have edited them. Empty origin documents are skipped. Origin documents are only read.
 
-In the WordPress plugin, the shared library is stored in the WordPress database. Each save creates a version-history entry, and the app detects conflicting edits so an editor can choose whether to keep their work or reload the latest version. Agents have read-only access; editors can edit; administrators can configure the plugin and manage imports.
+## Where things are stored
 
-The repository's standalone `index.html` is the front-end source. The WordPress plugin assets are generated from it with `build.cjs`. GitHub holds the source; the WordPress site runs the plugin. The latest plugin workflow is documented in the [WordPress plugin README](wordpress/wecom-kb/README.md).
+- **The app's built-in content** is in `index.html`, one `window.dynamicDocs[…]` entry per item. When built-in content changes, `NB_SEED_VERSION` is increased by one, so browsers that already saved a copy pick up the change.
+- **Changes made in the app** are saved in the browser (`localStorage`), including the trash and version history. They are not shared between browsers.
+- **Documents are not on GitHub.** The formatted source docx, the drafts and the origin files are kept in the shared OneDrive folder and excluded from git (see `.gitignore`), because this repository and the site are public. Only people with access to that folder can open the document links.
+
+## Project structure
+
+```
+KnowledgeBase/
+├── index.html          ← the whole app: design, code and built-in content
+├── docs/               ← two original pages, linked from two early items
+├── shared.css          ← styles for the pages in docs/
+├── scripts/
+│   └── build-formatted-source.cjs  ← builds formatted source docx from origins
+├── wordpress/          ← WordPress plugin version of the app
+│   ├── build.cjs       ← copies index.html into the plugin's assets
+│   └── wecom-kb/       ← the plugin (see its README)
+└── .gitignore          ← keeps the document folders off GitHub
+
+Not in git (shared OneDrive folder only):
+├── formatted-source/              ← one formatted source docx per item code
+├── drafts/                        ← earlier drafts
+└── מסמכי DOCx מוכנים לפרסום/      ← local copy of the read-only origin documents
+```
+
+## WordPress plugin
+
+`wordpress/wecom-kb/` packages the same app as a WordPress plugin, with a shared library in the WordPress database and AI conversion through Anthropic's API. Its assets are generated from `index.html` with `node wordpress/build.cjs`, which does not zip the plugin. Adapting the plugin to the source-document workflow above is a separate, later task. See the [plugin README](wordpress/wecom-kb/README.md).
