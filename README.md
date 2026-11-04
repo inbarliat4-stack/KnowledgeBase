@@ -1,49 +1,36 @@
-# wecom. מאגר ידע פנימי
+# How the wecom Knowledge Base works
 
-פלטפורמת ידע פנימית לנציגי שירות לקוחות. עורכים יוצרים ומתחזקים פריטי ידע מובנים; נציגים משתמשים בתוכן שפורסם כדי למצוא הנחיות בזמן הטיפול בלקוח.
+The platform is an internal knowledge base for customer-service agents. Editors create and maintain structured פריטי ידע; agents use the published content to find guidance while helping customers.
 
-## מה המשתמשים רואים
+## What users see
 
-הידע מאורגן לפי **עולמות תוכן → נושאים → פריטי ידע**. כל פריט משתמש במבנה המתאים למטרתו:
+Knowledge is organized as content worlds → topics → knowledge items. Items use formats suited to different purposes:
 
-- **M** – אבחון והכוונה למסלול טיפול
-- **R / S** – הוראות טיפול ומסלולים מקצועיים
-- **O** – הוראות מערכת או תהליך
-- **E** – הנחיות להסלמה
-- **T** – תסריטי שיחה
-- **I** – מידע לעיון
+- **M** — guided diagnosis and routing
+- **R / S** — handling and specialist procedures
+- **O** — system or process instructions
+- **E** — escalation guidance
+- **T** — call scripts
+- **I** — reference information
 
-נציגים יכולים לחפש ולקרוא פריטים שפורסמו. עורכים יכולים גם ליצור, לערוך, למחוק, לבדוק ולנהל אותם. מנהלי מערכת יכולים בנוסף להגדיר את התוסף ולנהל ייבוא.
+Agents can search and read published items. Editors can also create, edit, delete, review, and manage them.
 
-מונה ספריית הידע מציג את מספר פריטי הידע הזמינים לפי הסינון שנבחר. המסנן **הנצפות ביותר** מציג עד עשרה פריטים שנפתחו לאחרונה בדפדפן הנוכחי.
+The **הנצפות ביותר** filter shows up to ten items most recently opened in the current browser.
 
-## עריכה ופרסום
+## Editing and publishing
 
-עורך יכול ליצור פריט ידנית או להעלות מסמך מקור. האפליקציה שומרת את התוכן כטיוטה לבדיקת העורך. טיוטות וגרסאות מוצעות אינן מחליפות את התוכן שפורסם עד שעורך בודק ומאשר אותן.
+Editors can create an item manually or upload a source document. The app saves content as a draft for the editor to check. Drafts and proposed revisions do not replace published content until an editor reviews and approves them.
 
-בפריט קיים, **העלה טיוטה** מעלה קובץ Word (`.docx`), PDF או PNG. ההמרה מציעה גרסה מעודכנת לצד הפריט הנוכחי, והעורך יכול להשוות, לערוך, לאשר או לדחות אותה. הקובץ המקורי נשמר בספריית המדיה של WordPress.
+For an existing item, **העלה טיוטה** uploads a Word (.docx), PDF, or PNG file. The conversion proposes a revision alongside the current item; the editor can compare, edit, approve, or reject it. The original upload is stored in WordPress's Media Library.
 
-## המרת מסמכים באמצעות AI
+## AI document conversion
 
-תוסף ה-WordPress שולח מסמכים שהועלו ל-API של Anthropic וממיר אותם למבנה הפריט המתאים. קובצי Word מומרים לטקסט בשרת; קובצי PDF ו-PNG נשלחים כמסמכים או כתמונות. בפריט חדש העורך בוחר את הנושא ואת עולם התוכן, ובודק את התוכן שנוצר ואת הערות ההמרה.
+The WordPress plugin sends uploaded documents to Anthropic's API and converts them into the appropriate item structure. Word files are converted to text on the server; PDFs and PNGs are sent as documents or images. The editor selects the item's topic and content world for a new item, and checks the generated content and any conversion notes.
 
-התכונה דורשת שמנהל מערכת יגדיר מפתח API של Anthropic תחת **כלים → wecom מאגר ידע**. היא דורשת גם הרשאות עורך ואת הרשאת `upload_files` של WordPress. תוכן המסמך נשלח ל-Anthropic, ולכן מדיניות המידע של החברה צריכה לאפשר זאת.
+This feature requires an administrator to configure an Anthropic API key in **Tools → wecom מאגר ידע**. It also requires editor permissions and WordPress's `upload_files` capability. Document content is sent to Anthropic, so the company's data policy should allow that.
 
-## שמירה, הרשאות והיסטוריה
+## Storage, permissions, and history
 
-בתוסף ה-WordPress, הספרייה המשותפת נשמרת במסד הנתונים של WordPress. כל שמירה יוצרת רשומה בהיסטוריית הגרסאות. האפליקציה מזהה עריכות מתנגשות, והעורך יכול לבחור אם לשמור את עבודתו או לטעון את הגרסה העדכנית. לנציגים יש גישת קריאה בלבד, עורכים יכולים לערוך, ומנהלי מערכת יכולים להגדיר את התוסף ולנהל ייבוא.
+In the WordPress plugin, the shared library is stored in the WordPress database. Each save creates a version-history entry, and the app detects conflicting edits so an editor can choose whether to keep their work or reload the latest version. Agents have read-only access; editors can edit; administrators can configure the plugin and manage imports.
 
-קובץ `index.html` שבמאגר הוא קוד המקור של הממשק. קובצי תוסף ה-WordPress נוצרים ממנו באמצעות `node wordpress/build.cjs`. GitHub מחזיק את קוד המקור, ואתר ה-WordPress מריץ את התוסף. תהליך העבודה העדכני של התוסף מתועד ב-[README של התוסף](wordpress/wecom-kb/README.md).
-
-## הצעת עדכונים ממסמכי מקור בגרסת GitHub
-
-בגרסת GitHub, הסקריפט `scripts/import-source-revisions.cjs` קורא קובצי DOCX מתיקייה מקומית מסונכרנת ומוסיף גרסאות מוצעות לפריטי האפליקציה בעלי קוד תואם. קודים חדשים שמוגדרים בסקריפט מתווספים כטיוטות ממתינות לאישור, עם קישור לטיוטת Word שנפתחת ב-Word for the web מתיקיית הפרויקט המסונכרנת. קובצי המקור מצורפים לטיוטה לצורך השוואה, והקישור אליהם אינו מוצג כקישור הראשי בפריט.
-
-```powershell
-node scripts/import-source-revisions.cjs "מסמכי DOCx מוכנים לפרסום"
-node scripts/import-source-revisions.cjs "מסמכי DOCx מוכנים לפרסום" --write
-node scripts/build-new-source-item-docs.cjs "מסמכי DOCx מוכנים לפרסום"
-node scripts/build-new-source-item-docs.cjs "מסמכי DOCx מוכנים לפרסום" --only=O-36
-```
-
-מסמכי Word החדשים נוצרים תחת `drafts/new-app-items/`; הם כוללים את הצעת המבנה עם כותרות וסעיפים, ללא סגנון רשימה ממוספרת לכל פסקה, ואת מסמך המקור המלא לצורך השוואה. אפשר להשתמש ב-`--only=O-36` כדי ליצור מחדש טיוטה אחת בלבד. קובצי המקור אינם משתנים. לאחר שינוי `index.html`, יש להריץ `node wordpress/build.cjs` כדי לסנכרן את נכסי ממשק התוסף. פעולה זו אינה אורזת את התוסף ואינה מעדכנת את `wordpress/wecom-kb.zip`.
+The repository's standalone `index.html` is the front-end source. The WordPress plugin assets are generated from it with `build.cjs`. GitHub holds the source; the WordPress site runs the plugin. The latest plugin workflow is documented in the [WordPress plugin README](wordpress/wecom-kb/README.md).
