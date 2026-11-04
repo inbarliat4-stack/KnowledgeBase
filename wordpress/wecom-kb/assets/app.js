@@ -77,7 +77,7 @@ var NB_USER_TOPIC_START = 2000;
 function nbIsUserTopicId(id){ return (id>52&&id<1000)||id>=NB_USER_TOPIC_START; }
 // Bump this whenever the hardcoded TOPICS/dynamicDocs seed content changes in
 // the code, so a browser with older saved data doesn't keep masking it.
-var NB_SEED_VERSION = 51; // move saved items with corrupted (????) titles to the trash
+var NB_SEED_VERSION = 52; // keep one copy of O-06, O-36, O-37, R-14, R-45, R-50, R-51 (the 2.11 version)
 // ── KNOWLEDGE ARCHITECTURE (spec §2–3) ──────────────────────────────────
 // עולם תוכן → נושא → פריטי ידע. A knowledge item (window.dynamicDocs entry)
 // belongs to one or more topics (item.topicIds) and one or more content
@@ -3405,6 +3405,8 @@ var NB_SEED_PUBLICATION_MIGRATIONS={
 };
 // Official content fields of built-in documents: refreshed from the code when
 // the content version changes. Links, worlds and owner stay as people set them.
+// Codes that must exist only once: the built-in item published on 2.11.
+var NB_SEED_SINGLE_COPY=['O-06','O-36','O-37','R-14','R-45','R-50','R-51'];
 var NB_SEED_CONTENT_FIELDS=['topic','stages','body','kind','desc','tags','revision','draftDoc','reviewNotes'];
 
 // Brings a saved library up to the built-in content of this version.
@@ -3466,6 +3468,23 @@ function nbReconcileSeed(savedDocs,seedDocs,trash,previousVersion){
     trash.push({trashId:'trash-'+Date.now()+'-'+k,type:'doc',docId:k,doc:d,
       topicSnapshots:TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;}),
       title:nbPlain(d.topic)+' (טקסט פגום)',deletedAt:Date.now()});
+    delete savedDocs[k];
+  });
+  // Some browsers also hold an earlier import of these items under another id.
+  // Keep only the built-in version (published 2.11) and move the copy to the trash.
+  var builtInByCode={};
+  Object.keys(seedDocs).forEach(function(k){
+    var c=(/^\s*([A-Z]-\d{2,3})(?!\d)/.exec(nbPlain(seedDocs[k].topic||''))||[])[1];
+    if(c&&NB_SEED_SINGLE_COPY.indexOf(c)!==-1) builtInByCode[c]=k;
+  });
+  Object.keys(savedDocs).forEach(function(k){
+    var d=savedDocs[k];
+    if(!d||seedDocs[k]) return;
+    var c=(/^\s*([A-Z]-\d{2,3})(?!\d)/.exec(nbPlain(d.topic||''))||[])[1];
+    if(!c||!builtInByCode[c]) return;
+    trash.push({trashId:'trash-'+Date.now()+'-'+k,type:'doc',docId:k,doc:d,
+      topicSnapshots:TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;}),
+      title:nbPlain(d.topic)+' (כפילות – נשמרה גרסת 2.11)',deletedAt:Date.now()});
     delete savedDocs[k];
   });
 }
