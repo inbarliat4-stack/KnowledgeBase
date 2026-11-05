@@ -1271,7 +1271,7 @@ var NB_USER_TOPIC_START = 2000;
 function nbIsUserTopicId(id){ return (id>52&&id<1000)||id>=NB_USER_TOPIC_START; }
 // Bump this whenever the hardcoded TOPICS/dynamicDocs seed content changes in
 // the code, so a browser with older saved data doesn't keep masking it.
-var NB_SEED_VERSION = 54; // M-00, M-10, M-40, M-60 as operational trees
+var NB_SEED_VERSION = 55; // saved items take the built-in content's update date when it is newer
 // ── KNOWLEDGE ARCHITECTURE (spec §2–3) ──────────────────────────────────
 // עולם תוכן → נושא → פריטי ידע. A knowledge item (window.dynamicDocs entry)
 // belongs to one or more topics (item.topicIds) and one or more content
@@ -4804,6 +4804,8 @@ function nbReconcileSeed(savedDocs,seedDocs,trash,previousVersion){
         if(seed[f]!==undefined) saved[f]=JSON.parse(JSON.stringify(seed[f]));
         else if(f==='body'||f==='draftDoc') delete saved[f];
       });
+      // Built-in content changed after the saved copy did: "עודכן" shows when it changed.
+      if(seed.updatedAt&&(!saved.updatedAt||seed.updatedAt>saved.updatedAt)) saved.updatedAt=seed.updatedAt;
       var meta=NB_SEED_META[k];
       if(meta&&Array.isArray(saved.topicIds)) meta.topics.forEach(function(t){ if(saved.topicIds.indexOf(t)===-1) saved.topicIds.push(t); });
       // Status, tracking notes and owner are editors' work: only fill them in
