@@ -991,6 +991,7 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 .m-target.item:hover{border-color:var(--navy)}
 .m-target-kind{font-size:11.5px;opacity:.85}
 .m-target.end{font-size:12.5px;font-weight:600;color:var(--muted)}
+.m-target.ext{font-size:12.5px;font-weight:600;color:var(--text-2);background:#fff;border:1.5px dashed var(--border-strong);max-width:340px}
 @media(max-width:640px){.m-branch{grid-template-columns:1fr}.m-target{grid-column:1;grid-row:auto;white-space:normal}.m-map-row{flex-direction:column}.m-map-step{min-width:0}}
 
 /* ── TYPE-SPECIFIC CONTENT: editors ── */
