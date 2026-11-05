@@ -42,6 +42,21 @@ node scripts/build-formatted-source.cjs "מסמכי DOCx מוכנים לפרסו
 
 Without `--content`, the script places every line of the origin in the template, highlights missing information, and checks that no origin text was lost. With `--content`, it renders content Claude Code formatted, which can restructure the text into steps, tables and callouts. It then lists the origin lines that were rephrased or left out, so they can be checked. Existing formatted documents are never replaced without `--force`, because editors may have edited them. Empty origin documents are skipped. Origin documents are only read.
 
+### Changes check
+
+When a formatted source docx is edited, the item is updated through a changes check that an editor starts when they choose ("Activate changes check in the source docs"). Nothing runs in the background and nothing is committed automatically.
+
+```powershell
+# Which formatted documents changed since the last check, and the proposed version for each (writes nothing)
+node scripts/check-source-changes.cjs
+# Add those proposed versions to the items and update the snapshot
+node scripts/check-source-changes.cjs --write
+# After an editor approves a proposed version in the app: publish it
+node scripts/check-source-changes.cjs --publish=O-50
+```
+
+The check compares each document's content with its snapshot from the last check (`formatted-source/.changes-check-snapshot.json`, kept out of git), so edits are found whenever and by whomever they were made. A proposed version applies only the lines that changed, so the rest of the item stays as it is. Lines it cannot place are listed in the proposal's notes. Proposed versions appear to editors beside the published version and are never shown to agents before approval. After `--write` or `--publish`, run `node wordpress/build.cjs`, then commit.
+
 ## Where things are stored
 
 - **The app's built-in content** is in `index.html`, one `window.dynamicDocs[…]` entry per item. When built-in content changes, `NB_SEED_VERSION` is increased by one, so browsers that already saved a copy pick up the change.
@@ -56,7 +71,8 @@ KnowledgeBase/
 ├── docs/               ← two original pages, linked from two early items
 ├── shared.css          ← styles for the pages in docs/
 ├── scripts/
-│   └── build-formatted-source.cjs  ← builds formatted source docx from origins
+│   ├── build-formatted-source.cjs  ← builds formatted source docx from origins
+│   └── check-source-changes.cjs    ← changes check: proposed versions from edited docx
 ├── wordpress/          ← WordPress plugin version of the app
 │   ├── build.cjs       ← copies index.html into the plugin's assets
 │   └── wecom-kb/       ← the plugin (see its README)
