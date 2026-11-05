@@ -22,6 +22,9 @@
 // Block types: h1 (section), h2 (sub-heading), p, bold, bullet, step (numbered),
 // missing (yellow ⚠), note (orange box), tip (blue box), script (call script),
 // table (text is an array of rows; the first row is the header).
+// Links: ["h1", text, {"anchor": "step-2"}] marks a heading as a link target. A
+// table cell may be {"text", "anchor"} (jumps to that heading in the document)
+// or {"text", "url"} (opens a web address, e.g. an item in the app).
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -136,7 +139,18 @@ function autoBlocks(items, code) {
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const HIGHLIGHT = '<w:highlight w:val="yellow"/>';
-const run = (t, bold, extra = '') => `<w:r><w:rPr>${bold ? '<w:b/><w:bCs/>' : ''}<w:rtl/>${extra}</w:rPr><w:t xml:space="preserve">${esc(t)}</w:t></w:r>`;
+// Latin words and codes (R-31, eSIM, SMS) get their own left-to-right runs;
+// marked right-to-left, Word reorders their characters ("R-31" shows as "31-R").
+const run = (t, bold, extra = '') => String(t)
+  .split(/([A-Za-z0-9](?:[A-Za-z0-9\-./:_@]*[A-Za-z0-9])?)/)
+  .filter(s => s !== '')
+  .map(s => {
+    const ltr = /^[A-Za-z0-9]/.test(s);
+    // Codes keep together at a line end: a non-breaking hyphen instead of "-".
+    const text = ltr ? esc(s).replace(/-/g, '</w:t><w:noBreakHyphen/><w:t xml:space="preserve">') : esc(s);
+    return `<w:r><w:rPr>${bold ? '<w:b/><w:bCs/>' : ''}${ltr ? '' : '<w:rtl/>'}${extra}</w:rPr><w:t xml:space="preserve">${text}</w:t></w:r>`;
+  })
+  .join('');
 // "Label: text" gets a bold label, as in the template's lists.
 const runs = (t, extra = '') => {
   const m = t.match(/^([^:]{2,40}):\s+(.+)$/);
@@ -148,6 +162,28 @@ const listItem = (t, numId, extra) => para('ListParagraph', runs(t, extra), `<w:
 const BORDER = 'w:val="single" w:sz="4" w:space="0" w:color="D6D9DE"';
 const TABLE_PR = `<w:tblStyle w:val="TableGrid"/><w:bidiVisual/><w:tblW w:w="9638" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders><w:top ${BORDER}/><w:left ${BORDER}/><w:bottom ${BORDER}/><w:right ${BORDER}/><w:insideH ${BORDER}/><w:insideV ${BORDER}/></w:tblBorders><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="100" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar>`;
 const cellPara = (t, bold, extra) => `<w:p><w:pPr><w:spacing w:before="40" w:after="40"/><w:bidi/></w:pPr>${run(t, bold, extra)}</w:p>`;
+
+// Links: anchors jump inside the document; urls get a relationship in the package.
+let linkRels = [];
+const LINK_STYLE = '<w:color w:val="1D45B4"/><w:u w:val="single"/>';
+function linkRun(text, target) {
+  const r = run(text, false, LINK_STYLE);
+  if (target.anchor) return `<w:hyperlink w:anchor="${esc(target.anchor)}" w:history="1">${r}</w:hyperlink>`;
+  const id = `rIdL${linkRels.length + 1}`;
+  linkRels.push({ id, url: target.url });
+  return `<w:hyperlink r:id="${id}" w:history="1">${r}</w:hyperlink>`;
+}
+let bookmarkId = 0;
+const bookmarked = (anchor, inner) => anchor
+  ? `<w:bookmarkStart w:id="${++bookmarkId}" w:name="${esc(anchor)}"/>${inner}<w:bookmarkEnd w:id="${bookmarkId}"/>`
+  : inner;
+// A table cell: plain text, or {text, anchor} / {text, url} for a link.
+function cellContent(cell, head, extra) {
+  if (cell && typeof cell === 'object' && (cell.anchor || cell.url)) {
+    return `<w:p><w:pPr><w:spacing w:before="40" w:after="40"/><w:bidi/></w:pPr>${linkRun(cell.text, cell)}</w:p>`;
+  }
+  return cellPara(cell && typeof cell === 'object' ? cell.text : (cell || ''), head, extra);
+}
 
 function box(inner, color, fill) {
   return `<w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:w="9638" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="80" w:type="dxa"/><w:left w:w="160" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="160" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="9638"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="9638" w:type="dxa"/><w:tcBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="single" w:sz="24" w:space="0" w:color="${color}"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="${fill}"/></w:tcPr><w:p><w:pPr><w:spacing w:before="40" w:after="40"/><w:bidi/></w:pPr>${inner}</w:p></w:tc></w:tr></w:tbl>${SPACER}`;
@@ -166,11 +202,13 @@ function contentTable(rows) {
   const cols = Math.max(...rows.map(r => r.length));
   const width = Math.floor(9638 / cols);
   const tr = (r, head) => `<w:tr><w:trPr><w:cantSplit/>${head ? '<w:tblHeader/>' : ''}</w:trPr>${Array.from({ length: cols }, (_, i) =>
-    `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="E63900"/>' : ''}</w:tcPr>${cellPara(r[i] || '', head, head ? '<w:color w:val="FFFFFF"/>' : '')}</w:tc>`).join('')}</w:tr>`;
+    `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="E63900"/>' : ''}</w:tcPr>${cellContent(r[i], head, head ? '<w:color w:val="FFFFFF"/>' : '')}</w:tc>`).join('')}</w:tr>`;
   return `<w:tbl><w:tblPr>${TABLE_PR}</w:tblPr><w:tblGrid>${`<w:gridCol w:w="${width}"/>`.repeat(cols)}</w:tblGrid>${rows.map((r, i) => tr(r, i === 0)).join('')}</w:tbl>${SPACER}`;
 }
 
 function renderDocument({ code, title, subtitle, details, blocks, review, sources }) {
+  linkRels = [];
+  bookmarkId = 0;
   const out = [para('Title', run(title))];
   if (subtitle) out.push(`<w:p><w:pPr><w:spacing w:after="160"/><w:bidi/></w:pPr>${run(subtitle, false, '<w:color w:val="6B7280"/>')}</w:p>`);
   out.push(detailsTable(details));
@@ -178,10 +216,10 @@ function renderDocument({ code, title, subtitle, details, blocks, review, source
     + run('טקסט מסומן בצהוב', true) + run(' = מידע חסר שבעל/ת התחום צריך להשלים או לאמת. פרק "מקורות" בסוף מפרט מה נלקח מאיפה.'), 'E63900', 'FFF1E8'));
   const numbered = [];
   let current = null;
-  for (const [type, text] of blocks) {
+  for (const [type, text, opts] of blocks) {
     if (type !== 'step') current = null;
     switch (type) {
-      case 'h1': out.push(para('Heading1', run(text))); break;
+      case 'h1': out.push(para('Heading1', bookmarked(opts && opts.anchor, run(text)))); break;
       case 'h2': out.push(para('Heading2', run(text))); break;
       case 'bold': out.push(para('', run(text, true))); break;
       case 'bullet': out.push(listItem(text, 1, MISSING.test(text) ? HIGHLIGHT : '')); break;
@@ -235,7 +273,8 @@ function packageEntries(document, code, title, numbered) {
     ['[Content_Types].xml', `${XML}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="${ct}.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="${ct}.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="${ct}.numbering+xml"/><Override PartName="/word/header1.xml" ContentType="${ct}.header+xml"/><Override PartName="/word/footer1.xml" ContentType="${ct}.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`],
     ['_rels/.rels', `${XML}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${rel}/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`],
     ['docProps/core.xml', `${XML}<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${esc(title)}</dc:title><dc:creator>wecom מאגר ידע – טיוטה</dc:creator><dc:language>he-IL</dc:language><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().slice(0, 19)}Z</dcterms:created></cp:coreProperties>`],
-    ['word/_rels/document.xml.rels', `${XML}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdS" Type="${rel}/styles" Target="styles.xml"/><Relationship Id="rIdN" Type="${rel}/numbering" Target="numbering.xml"/><Relationship Id="rIdH" Type="${rel}/header" Target="header1.xml"/><Relationship Id="rIdF" Type="${rel}/footer" Target="footer1.xml"/></Relationships>`],
+    ['word/_rels/document.xml.rels', `${XML}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdS" Type="${rel}/styles" Target="styles.xml"/><Relationship Id="rIdN" Type="${rel}/numbering" Target="numbering.xml"/><Relationship Id="rIdH" Type="${rel}/header" Target="header1.xml"/><Relationship Id="rIdF" Type="${rel}/footer" Target="footer1.xml"/>`
+      + linkRels.map(l => `<Relationship Id="${l.id}" Type="${rel}/hyperlink" Target="${esc(l.url)}" TargetMode="External"/>`).join('') + '</Relationships>'],
     ['word/document.xml', document],
     ['word/styles.xml', STYLES],
     ['word/numbering.xml', numbering],
