@@ -3011,7 +3011,7 @@ function nbKindBodyHTML(doc){
     case 'M':
       if(nbMIsTree(b)) return nbMTreeHTML(doc,b);
       return '<div class="kv-m">'
-        +(b.intro.length?'<div class="m-intro">'+b.intro.map(function(l){return '<div>'+l+'</div>';}).join('')+'</div>':'')
+        +(b.intro.length?'<div class="m-intro">'+nbMIntroLines(b.intro)+'</div>':'')
         +'<div class="m-flow" id="m-flow" data-doc="'+nbEsc(doc.id)+'"></div>'
         +(b.outro.length?'<div class="m-outro"><div class="m-outro-title">הנחיות כלליות</div><ul>'+b.outro.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>':'')
         +'</div>';
@@ -3058,6 +3058,19 @@ function nbEnhance(root){
     }
     if(frag){ frag.appendChild(document.createTextNode(t.slice(last))); p.replaceChild(frag,n); }
   });
+}
+
+// Section titles from the source document ("מטרת המסמך", "מתי משתמשים במסמך"…)
+// show in bold: a known section name, or a short line with no closing
+// punctuation that is followed by more text.
+var NB_SECTION_TITLES=/^(מטרת המסמך|מטרת האבחון|מתי משתמשים(?: בתהליך| במסמך)?\??|לפני שמתחילים:?|כלל מנחה(?: לנציג)?|הנחיות כלליות|תוצאת האבחון|מידע שיש לאסוף.*|הפניות למסמכי ידע קיימים|סדר העבודה לנציג|הערות)$/;
+function nbIsSectionTitle(lines,i){
+  var t=nbPlain(lines[i]).trim();
+  if(NB_SECTION_TITLES.test(t)) return true;
+  return i<lines.length-1&&t.length>0&&t.length<=40&&!/[.:,;!?"״”)]$/.test(t);
+}
+function nbMIntroLines(lines){
+  return lines.map(function(l,i){ return nbIsSectionTitle(lines,i)?'<div class="m-intro-title">'+l+'</div>':'<div>'+l+'</div>'; }).join('');
 }
 
 // ── Diagnosis as an operational tree (type M with named steps) ──
@@ -3119,7 +3132,7 @@ function nbMTreeHTML(doc,b){
       }).join('')+'</div></section>';
   }).join('');
   return '<div class="kv-m m-tree">'
-    +(b.intro.length?'<div class="m-intro">'+b.intro.map(function(l){return '<div>'+l+'</div>';}).join('')+'</div>':'')
+    +(b.intro.length?'<div class="m-intro">'+nbMIntroLines(b.intro)+'</div>':'')
     +map+steps
     +(b.outro.length?'<div class="m-outro"><div class="m-outro-title">הנחיות כלליות</div><ul>'+b.outro.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>':'')
     +'</div>';

@@ -932,6 +932,8 @@ select.s1-input{height:40px;cursor:pointer}
 @media(max-width:640px){.kv-e{grid-template-columns:1fr}}
 /* M – guided diagnosis */
 .m-intro{background:#F1ECFC;border:1px solid #DCCFF7;border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.65;color:#3B2475;margin-bottom:16px;display:flex;flex-direction:column;gap:4px}
+.m-intro-title{font-weight:700;font-size:14px;color:#2A1760}
+.m-intro-title:not(:first-child){margin-top:8px}
 .m-trail{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .m-trail-item{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:right;font-family:Rubik,sans-serif;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--text-2)}
 .m-trail-item:hover{border-color:#6D3FD1}
