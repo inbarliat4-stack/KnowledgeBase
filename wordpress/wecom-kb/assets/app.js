@@ -1686,13 +1686,13 @@ function nbOpenTrash(){
 
   var head=document.createElement('div');
   head.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)';
-  head.innerHTML='<div style="font-size:16px;font-weight:700;color:var(--navy)">🗑️ סל מיחזור</div>';
+  head.innerHTML='<div style="font-size:16px;font-weight:700;color:var(--navy)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-left:6px"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>סל מיחזור</div>';
 
   var headBtns=document.createElement('div');
   headBtns.style.cssText='display:flex;align-items:center;gap:4px';
 
   var historyBtn=document.createElement('button');
-  historyBtn.textContent='🕓 היסטוריה';
+  historyBtn.textContent='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:4px"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg>היסטוריה';
   historyBtn.style.cssText='background:none;border:1px solid var(--border);border-radius:20px;font-size:11.5px;color:var(--muted);cursor:pointer;padding:5px 10px;font-family:Rubik,sans-serif';
   historyBtn.addEventListener('click',function(){ overlay.remove(); nbOpenHistory(); });
   headBtns.appendChild(historyBtn);
@@ -3554,7 +3554,7 @@ function nbOpenHistory(){
 
   var head=document.createElement('div');
   head.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)';
-  head.innerHTML='<div style="font-size:16px;font-weight:700;color:var(--navy)">🕓 היסטוריית גרסאות</div>';
+  head.innerHTML='<div style="font-size:16px;font-weight:700;color:var(--navy)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-left:6px"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg>היסטוריית גרסאות</div>';
 
   var closeBtn=document.createElement('button');
   closeBtn.textContent='✕';
