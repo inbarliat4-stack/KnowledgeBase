@@ -510,11 +510,32 @@ function nbFindToken(text,tok){
   return null;
 }
 
+// "M-10", "m10", "m 10" → "M-10"; anything else → null.
+function nbCodeQuery(query){
+  var m=/^\s*([a-z])\s*[-–‑]?\s*(\d{1,3})\s*$/i.exec(query||'');
+  return m?m[1].toUpperCase()+'-'+m[2]:null;
+}
 function nbSearchItems(query){
   var docs=window.dynamicDocs||{};
   var tagMode=query.charAt(0)==='#';
   var tokens=tagMode?[nbNorm(query.slice(1)).trim()]:nbNorm(query).split(' ').filter(function(t){return t.length>1||/\d/.test(t);});
   if(!tokens.length||!tokens[0]) return [];
+  // An item code ("M-10", "m10", "m 10") finds that item only; a partial
+  // code ("O-5") finds the items whose code starts with it (O-50 … O-59).
+  var codeQuery=nbCodeQuery(query);
+  if(codeQuery){
+    var exact=[], partial=[];
+    Object.keys(docs).forEach(function(k){
+      var d=docs[k];
+      if(!d||!nbVisible(d)||!nbItemPassesFilters(d)) return;
+      var topics=TOPICS.filter(function(t){return (d.topicIds||[]).indexOf(t.id)!==-1;});
+      if(nbCurrentLibCat!=='all'&&!topics.some(function(t){return nbCatMatches(nbCurrentLibCat,t.cat);})) return;
+      var code=(/^\s*([A-Z]-\d{2,3})(?!\d)/.exec(nbPlain(d.topic))||[])[1]||'';
+      var r={d:d,topics:topics,score:100,where:['קוד'],matched:[nbNorm(code)],matchedCount:1,code:code};
+      if(code===codeQuery) exact.push(r); else if(code.indexOf(codeQuery)===0) partial.push(r);
+    });
+    return (exact.length?exact:partial).sort(function(a,b){return parseInt(a.code.slice(2),10)-parseInt(b.code.slice(2),10);});
+  }
   function findResults(requireEveryToken){
     var results=[];
     Object.keys(docs).forEach(function(k){
@@ -572,7 +593,7 @@ function nbSearchItems(query){
 }
 
 function nbSearchTopicsList(query){
-  if(query.charAt(0)==='#') return [];
+  if(query.charAt(0)==='#'||nbCodeQuery(query)) return [];
   var tokens=nbNorm(query).split(' ').filter(function(t){return t.length>1;});
   if(!tokens.length) return [];
   return TOPICS.filter(function(t){
