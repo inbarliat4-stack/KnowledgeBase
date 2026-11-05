@@ -4838,56 +4838,133 @@ document.addEventListener('DOMContentLoaded',function(){
   if(NB_ROLES[r]) nbApplyRole(r); else nbShowGate();
 });
 
-// ── STAY ON THE SAME SCREEN AFTER A REFRESH ─────────────────────────────
+// ── NAVIGATION: REFRESH, BACK AND SHARED LINKS ──────────────────────────
 // The open item, topic or screen is kept in the address (#item=…, #topic=…,
-// #view=…), so a refresh or a shared link opens it again instead of the
-// library home page. replaceState keeps the browser history unchanged.
+// #review=…, #view=…), so a refresh or a shared link opens it again. Every
+// screen change is a browser history entry: the app's back links and the
+// browser's Back button return to the previous screen, and the library comes
+// back with its search and filters.
 var nbStartLocation=location.hash.replace(/^#/,'');
-function nbSetLocation(value){
-  try{ history.replaceState(null,'',value?'#'+value:location.pathname+location.search); }catch(e){}
+var nbNavBusy=0, nbNavRestoring=false;
+function nbNavState(){
+  var s=history.state;
+  return s&&typeof s.idx==='number'?s:{idx:0,loc:location.hash.replace(/^#/,'')};
+}
+function nbNavUrl(loc){ return loc?'#'+loc:location.pathname+location.search; }
+function nbSetLocation(loc){
+  try{ var s=Object.assign({},nbNavState(),{loc:loc}); history.replaceState(s,'',nbNavUrl(loc)); }catch(e){}
+}
+// How the back link names a screen ("← חזרה …").
+function nbLocLabel(loc){
+  var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), val=m?decodeURIComponent(m[2]):'';
+  var cut=function(s){ s=nbPlain(s||'').trim(); return s.length>45?s.slice(0,44)+'…':s; };
+  if(m&&m[1]==='item'&&window.dynamicDocs[val]) return 'לפריט: '+cut(window.dynamicDocs[val].topic);
+  if(m&&m[1]==='topic'){ var t=TOPICS.find(function(x){return String(x.id)===val;}); if(t) return 'לנושא: '+cut(t.title); }
+  if(m&&m[1]==='review') return 'להשוואת הגרסאות';
+  if(m&&m[1]==='view'&&val==='tracking') return 'למעקב העריכה';
+  if(m&&m[1]==='view'&&val==='new') return 'לפריט החדש';
+  if(nbSearchQuery) return 'לתוצאות החיפוש';
+  if(nbMostViewedFilter) return 'לנצפות ביותר';
+  return 'לספרייה';
+}
+// The screen being left, saved in its own history entry so Back restores it.
+function nbNavSnapshot(){
+  var loc=nbNavState().loc||'';
+  return {loc:loc,label:nbLocLabel(loc),scroll:window.scrollY||0,
+    lib:{world:nbCurrentWorld,kind:nbCurrentKind,cat:nbCurrentLibCat,search:nbSearchQuery,mostViewed:nbMostViewedFilter}};
+}
+function nbNavigate(loc,leaving){
+  if(nbNavRestoring||loc===leaving.loc){ nbSetLocation(loc); return; }
+  try{
+    var s=nbNavState();
+    history.replaceState(Object.assign({},s,{loc:leaving.loc,lib:leaving.lib,scroll:leaving.scroll}),'',nbNavUrl(leaving.loc));
+    history.pushState({idx:(s.idx||0)+1,loc:loc,prevLabel:leaving.label},'',nbNavUrl(loc));
+  }catch(e){}
+}
+// Back links go to the previous screen; on the first screen they keep their own target.
+function nbUpdateBackLinks(){
+  var s=nbNavState();
+  document.querySelectorAll('.view.active .article-back').forEach(function(b){
+    if(!b.hasAttribute('data-nb-back')){ b.setAttribute('data-nb-back',b.getAttribute('onclick')||''); b.setAttribute('data-nb-back-text',b.textContent); }
+    if(s.idx>0&&s.prevLabel){ b.setAttribute('onclick','nbGoBack()'); b.textContent='← חזרה '+s.prevLabel; }
+    else if(b.getAttribute('onclick')==='nbGoBack()'){ b.setAttribute('onclick',b.getAttribute('data-nb-back')); b.textContent=b.getAttribute('data-nb-back-text'); }
+  });
+}
+function nbGoBack(){ history.back(); }
+// Shows a saved screen without adding a history entry.
+function nbShowLocation(loc,lib){
+  var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), key=m&&m[1], val=m?decodeURIComponent(m[2]):'';
+  nbNavRestoring=true;
+  try{
+    if(key==='item'&&window.dynamicDocs[val]&&nbVisible(window.dynamicDocs[val])) showDynamicDoc(val);
+    else if(key==='topic'&&TOPICS.some(function(t){return String(t.id)===val;})) nbOpenTopic(TOPICS.find(function(t){return String(t.id)===val;}).id);
+    else if(key==='review'&&window.dynamicDocs[val]) nbOpenReview(val);
+    else if(key==='view'&&val==='tracking') nbOpenTracking();
+    else if(key==='view'&&val==='new') showView('new');
+    else {
+      if(lib){ nbCurrentWorld=lib.world||'all'; nbCurrentKind=lib.kind||'all'; }
+      showView('library');
+      nbRenderLibFilters(); nbRenderSidebar();
+      if(lib&&lib.mostViewed){ var mv=[].find.call(document.querySelectorAll('#lib-filters .filter-btn'),function(b){return /הנצפות/.test(b.textContent);}); filterMostViewed(mv); }
+      else if(lib&&lib.search){ var inp=document.getElementById('nb-search'); if(inp) inp.value=lib.search; nbSearch(lib.search); }
+      else renderLibrary((lib&&lib.cat)||'all');
+      if(m) nbSetLocation('');
+    }
+  } finally { nbNavRestoring=false; }
+  nbUpdateBackLinks();
 }
 (function(){
-  var origShowView=showView, origShowDoc=showDynamicDoc, origOpenTopic=nbOpenTopic, origOpenReview=nbOpenReview;
-  showView=function(id){
-    var r=origShowView.apply(this,arguments);
-    nbSetLocation(id==='library'?'':(['tracking','new'].indexOf(id)!==-1?'view='+id:location.hash.replace(/^#/,'')));
-    return r;
-  };
-  showDynamicDoc=function(docId){
-    var r=origShowDoc.apply(this,arguments);
-    if(window.dynamicDocs[docId]&&nbVisible(window.dynamicDocs[docId])) nbSetLocation('item='+encodeURIComponent(docId));
-    return r;
-  };
-  nbOpenTopic=function(id){
-    var r=origOpenTopic.apply(this,arguments);
-    nbSetLocation('topic='+encodeURIComponent(id));
-    return r;
-  };
-  nbOpenReview=function(docId){
-    var r=origOpenReview.apply(this,arguments);
+  // Only the outermost call records the screen change (showDynamicDoc calls showView inside).
+  function track(orig,locOf){
+    return function(){
+      if(nbNavBusy) return orig.apply(this,arguments);
+      var leaving=nbNavSnapshot(), r;
+      nbNavBusy++;
+      try{ r=orig.apply(this,arguments); } finally { nbNavBusy--; }
+      var loc=locOf.apply(this,arguments);
+      if(loc!==null) nbNavigate(loc,leaving);
+      nbUpdateBackLinks();
+      return r;
+    };
+  }
+  showView=track(showView,function(id){
+    if(id==='library') return '';
+    if(id==='tracking'||id==='new') return 'view='+id;
+    return null;
+  });
+  showDynamicDoc=track(showDynamicDoc,function(docId){
     var d=window.dynamicDocs[docId];
-    if(d&&d.revision) nbSetLocation('review='+encodeURIComponent(docId));
-    return r;
-  };
+    return d&&nbVisible(d)?'item='+encodeURIComponent(docId):null;
+  });
+  nbOpenTopic=track(nbOpenTopic,function(id){ return TOPICS.some(function(t){return t.id===id;})?'topic='+encodeURIComponent(id):null; });
+  nbOpenReview=track(nbOpenReview,function(docId){
+    var d=window.dynamicDocs[docId];
+    return d&&d.revision?'review='+encodeURIComponent(docId):(d&&nbVisible(d)?'item='+encodeURIComponent(docId):null);
+  });
+  nbOpenTracking=track(nbOpenTracking,function(){ return 'view=tracking'; });
 })();
+window.addEventListener('popstate',function(e){
+  var s=e.state||{loc:location.hash.replace(/^#/,'')};
+  nbShowLocation(s.loc||'',s.lib);
+  setTimeout(function(){ window.scrollTo(0,s.scroll||0); },120);
+});
 function nbRestoreLocation(){
-  var m=/^(item|topic|review|view)=(.+)$/.exec(nbStartLocation||'');
+  var loc=nbStartLocation||'';
   nbStartLocation='';
-  if(!m) return;
-  var key=m[1], val=decodeURIComponent(m[2]);
-  if(key==='item'&&window.dynamicDocs[val]&&nbVisible(window.dynamicDocs[val])) showDynamicDoc(val);
-  else if(key==='topic'&&TOPICS.some(function(t){return String(t.id)===val;})) nbOpenTopic(TOPICS.find(function(t){return String(t.id)===val;}).id);
-  else if(key==='review'&&window.dynamicDocs[val]) nbOpenReview(val);
-  else if(key==='view'&&val==='tracking') nbOpenTracking();
-  else if(key==='view'&&val==='new') showView('new');
-  else nbSetLocation('');
+  if(loc) nbShowLocation(loc,null); else nbUpdateBackLinks();
 }
 // After the library and the role are in place (this listener runs after the
 // ones above). With the demo role gate open, restore once a role is chosen.
 document.addEventListener('DOMContentLoaded',function(){
   if(document.getElementById('nb-gate')){
     var origEnterAs=nbEnterAs;
-    nbEnterAs=function(role){ var r=origEnterAs.apply(this,arguments); nbRestoreLocation(); return r; };
+    nbEnterAs=function(role){
+      nbNavRestoring=true;
+      var r;
+      try{ r=origEnterAs.apply(this,arguments); } finally { nbNavRestoring=false; }
+      nbRestoreLocation();
+      return r;
+    };
     return;
   }
   nbRestoreLocation();
