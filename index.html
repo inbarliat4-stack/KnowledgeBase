@@ -4817,6 +4817,61 @@ document.addEventListener('DOMContentLoaded',function(){
   if(NB_ROLES[r]) nbApplyRole(r); else nbShowGate();
 });
 
+// ── STAY ON THE SAME SCREEN AFTER A REFRESH ─────────────────────────────
+// The open item, topic or screen is kept in the address (#item=…, #topic=…,
+// #view=…), so a refresh or a shared link opens it again instead of the
+// library home page. replaceState keeps the browser history unchanged.
+var nbStartLocation=location.hash.replace(/^#/,'');
+function nbSetLocation(value){
+  try{ history.replaceState(null,'',value?'#'+value:location.pathname+location.search); }catch(e){}
+}
+(function(){
+  var origShowView=showView, origShowDoc=showDynamicDoc, origOpenTopic=nbOpenTopic, origOpenReview=nbOpenReview;
+  showView=function(id){
+    var r=origShowView.apply(this,arguments);
+    nbSetLocation(id==='library'?'':(['tracking','new'].indexOf(id)!==-1?'view='+id:location.hash.replace(/^#/,'')));
+    return r;
+  };
+  showDynamicDoc=function(docId){
+    var r=origShowDoc.apply(this,arguments);
+    if(window.dynamicDocs[docId]&&nbVisible(window.dynamicDocs[docId])) nbSetLocation('item='+encodeURIComponent(docId));
+    return r;
+  };
+  nbOpenTopic=function(id){
+    var r=origOpenTopic.apply(this,arguments);
+    nbSetLocation('topic='+encodeURIComponent(id));
+    return r;
+  };
+  nbOpenReview=function(docId){
+    var r=origOpenReview.apply(this,arguments);
+    var d=window.dynamicDocs[docId];
+    if(d&&d.revision) nbSetLocation('review='+encodeURIComponent(docId));
+    return r;
+  };
+})();
+function nbRestoreLocation(){
+  var m=/^(item|topic|review|view)=(.+)$/.exec(nbStartLocation||'');
+  nbStartLocation='';
+  if(!m) return;
+  var key=m[1], val=decodeURIComponent(m[2]);
+  if(key==='item'&&window.dynamicDocs[val]&&nbVisible(window.dynamicDocs[val])) showDynamicDoc(val);
+  else if(key==='topic'&&TOPICS.some(function(t){return String(t.id)===val;})) nbOpenTopic(TOPICS.find(function(t){return String(t.id)===val;}).id);
+  else if(key==='review'&&window.dynamicDocs[val]) nbOpenReview(val);
+  else if(key==='view'&&val==='tracking') nbOpenTracking();
+  else if(key==='view'&&val==='new') showView('new');
+  else nbSetLocation('');
+}
+// After the library and the role are in place (this listener runs after the
+// ones above). With the demo role gate open, restore once a role is chosen.
+document.addEventListener('DOMContentLoaded',function(){
+  if(document.getElementById('nb-gate')){
+    var origEnterAs=nbEnterAs;
+    nbEnterAs=function(role){ var r=origEnterAs.apply(this,arguments); nbRestoreLocation(); return r; };
+    return;
+  }
+  nbRestoreLocation();
+});
+
 // Single delegated listener for option clicks
 document.addEventListener('click', function(e){
   var opt = e.target.closest('.nb-opt');
