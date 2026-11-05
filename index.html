@@ -2401,7 +2401,7 @@ function nbRenderTracking(){
   var chips=[['all','הכל',all.length]].concat(NB_STATUS_ORDER.map(function(s){return [s,NB_STATUSES[s].label,count(function(d){return d.status===s;})];}))
     .concat([['review','נדרשת לבדיקה',count(function(d){return !!d.revision;})],['gap','עם פער פתוח',count(function(d){return d.track&&d.track.gap;})],['high','עדיפות גבוהה',count(function(d){return d.track&&d.track.priority==='גבוהה';})]]);
   var rows=nbTrackRows();
-  el.innerHTML='<div class="page-header"><div class="page-title">📋 מעקב מסמכים</div>'
+  el.innerHTML='<div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>מעקב מסמכים</div>'
       +'<div class="page-sub">סטטוס, מצב התוכן ופערים לכל פריט ידע — לעורכים בלבד. לחיצה על שורה פותחת את הפריט.</div></div>'
     +'<div class="lib-filter-row">'+chips.map(function(c){
       return '<button class="filter-btn world-btn'+(nbTrackFilter===c[0]?' active':'')+'" onclick="nbTrackFilter=\''+c[0]+'\';nbRenderTracking()">'+c[1]+' <span class="chip-n">'+c[2]+'</span></button>';
