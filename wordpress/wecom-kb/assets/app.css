@@ -1137,6 +1137,11 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 /* ── Links between items, and gaps still to be filled ── */
 .kb-link{color:#1D45B4;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
 .kb-link:hover{color:var(--red)}
+/* Links that carry a Hebrew title (items, stages) read right to left and may wrap */
+.kb-link-item,.kb-link-stage{direction:rtl;white-space:normal}
+.kb-code{direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.nb-flash{animation:mFlash 1.6s ease;border-radius:12px}
+[data-stage]{scroll-margin-top:84px}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .o-steps>li.kb-missing{padding:4px 46px 4px 14px}

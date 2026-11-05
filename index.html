@@ -1148,6 +1148,11 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 /* ── Links between items, and gaps still to be filled ── */
 .kb-link{color:#1D45B4;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
 .kb-link:hover{color:var(--red)}
+/* Links that carry a Hebrew title (items, stages) read right to left and may wrap */
+.kb-link-item,.kb-link-stage{direction:rtl;white-space:normal}
+.kb-code{direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.nb-flash{animation:mFlash 1.6s ease;border-radius:12px}
+[data-stage]{scroll-margin-top:84px}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .o-steps>li.kb-missing{padding:4px 46px 4px 14px}
@@ -2479,6 +2484,7 @@ function showDynamicDoc(docId){
     return;
   }
 
+  var hasStageTitles=doc.stages.some(function(s){return nbStageNum(s.title);});
   var stagesHtml=doc.stages.map(function(s){
     var items=s.items.map(function(item){
       var txt=typeof item==='object'?item.text:item;
@@ -2494,7 +2500,9 @@ function showDynamicDoc(docId){
     var stageImgHtml=(s.images&&s.images.length)?s.images.map(function(img){
       return '<div style="margin:8px 0;width:100%"><img src="'+img+'" onclick="event.stopPropagation();nbOpenLightbox(this.src)" style="width:100%;max-height:400px;object-fit:contain;border-radius:8px;border:1px solid var(--border);background:#f9f9f9;display:block;cursor:zoom-in"></div>';
     }).join(''):'';
-    return '<div class="step-card fade-in" style="margin-bottom:4px">'
+    // When the source numbers its stages in the titles ("שלב 2 - …"), only those are stages to jump to.
+    var stageNo=hasStageTitles?nbStageNum(s.title):s.num;
+    return '<div class="step-card fade-in" style="margin-bottom:4px"'+(stageNo?' data-stage="'+stageNo+'"':'')+'>'
       +'<div class="step-num red">'+s.num+'</div>'
       +'<div class="step-content">'
       +'<div class="step-title">'+s.title+'</div>'
@@ -2516,6 +2524,7 @@ function showDynamicDoc(docId){
     +'</div></div>';
 
   document.getElementById('article-content').innerHTML=html;
+  window.nbShownDocId=doc.id; // an item's own code is not linked
   nbEnhance(document.querySelector('#article-content .article-body'));
   if(doc.kind==='M'&&kindHtml!=null) nbMStart();
 
@@ -4171,7 +4180,7 @@ function nbKindBodyHTML(doc){
   switch(doc.kind){
     case 'O':
       return '<div class="kv-o">'+b.groups.map(function(g){
-        return '<section class="o-group">'+(g.title?'<h2 class="o-title">'+g.title+'</h2>':'')
+        return '<section class="o-group"'+(nbStageNum(g.title)?' data-stage="'+nbStageNum(g.title)+'"':'')+'>'+(g.title?'<h2 class="o-title">'+g.title+'</h2>':'')
           +'<ol class="o-steps">'+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+'</ol></section>';
       }).join('')+'</div>';
     case 'I':
@@ -4224,28 +4233,92 @@ function nbFindByCode(code){
   for(var k in docs){ if(docs[k]&&nbVisible(docs[k])&&re.test(nbPlain(docs[k].topic))) return docs[k]; }
   return null;
 }
-// Runs over rendered item content: links codes and marks "⚠ חסר" lines.
+// The number of a stage title ("שלב 3 - בדיקות במכשיר" → 3), or 0.
+function nbStageNum(title){ var m=/^\s*שלב\s*(\d+)(?!\d)/.exec(nbPlain(title)); return m?parseInt(m[1],10):0; }
+// A stage's name without its number ("שלב 3 - בדיקות במכשיר" → "בדיקות במכשיר").
+function nbStageName(el){
+  var t=el.getAttribute('data-stage-title');
+  if(t==null){ var h=el.querySelector('.step-title,.o-title'); t=h?nbPlain(h.textContent):''; }
+  return t.replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim();
+}
+// Jumps to a stage of the open item and highlights it.
+function nbJumpToStage(n){
+  var el=document.querySelector('#article-content [data-stage="'+n+'"]');
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  el.classList.remove('nb-flash'); void el.offsetWidth; el.classList.add('nb-flash');
+}
+// Title letters only, for comparing a title written in the text with the item's title.
+function nbTitleKey(c){ return /[\s\-‐‑‒–—·"״׳'“”„:|()]/.test(c)?'':c.toLowerCase(); }
+// How far the text after a code repeats the item's title (0 if it does not).
+function nbTitleSpan(after,title){
+  var i=0,j=0,end=0,matched=0,letters=0;
+  for(var k=0;k<title.length;k++) if(nbTitleKey(title.charAt(k))) letters++;
+  while(i<after.length&&j<title.length){
+    var a=nbTitleKey(after.charAt(i)), b=nbTitleKey(title.charAt(j));
+    if(!a&&i<after.length){ i++; continue; }
+    if(!b){ j++; continue; }
+    if(a!==b) break;
+    i++; j++; matched++; end=i;
+  }
+  return matched>=Math.min(10,letters)&&matched>=letters*0.6?end:0;
+}
+// Runs over rendered item content: item codes become links showing the item's
+// title, "שלב N" references jump to that stage, and "⚠ חסר" lines are marked.
+var NB_CODE_RE=/([MROESTIH])[-‐‑‒–](\d{2,3})(?!\d)/g;
+var NB_STAGE_RE=/(שלב)\s*(\d+)(?!\d)/g;
 function nbEnhance(root){
   if(!root) return;
   var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null), nodes=[];
   while(walker.nextNode()) nodes.push(walker.currentNode);
+  var shown=window.nbShownDocId;
   nodes.forEach(function(n){
     var p=n.parentNode, t=n.nodeValue;
-    if(!p||(p.closest&&p.closest('a,button,textarea,input,select,.article-title'))) return;
+    if(!p||(p.closest&&p.closest('a,button,textarea,input,select,.article-title,.m-map'))) return;
+    // Stage titles may link to other items, but "שלב N" in a title is the stage itself.
+    var inTitle=!!p.closest('.step-title,.o-title,.m-step-title');
     if(/⚠\s*חסר/.test(t)){ var host=p.closest('li,.action-item,td')||p; host.classList.add('kb-missing'); }
-    var re=/([MROESTIH]-\d{2,3})(?!\d)/g, m, last=0, frag=null;
-    while((m=re.exec(t))){
-      var d=nbFindByCode(m[1]);
-      if(!d) continue;
-      frag=frag||document.createDocumentFragment();
-      frag.appendChild(document.createTextNode(t.slice(last,m.index)));
-      var a=document.createElement('a');
-      a.className='kb-link'; a.textContent=m[1]; a.title=nbPlain(d.topic); a.setAttribute('data-doc',d.id);
-      a.addEventListener('click',function(e){ e.stopPropagation(); showDynamicDoc(this.getAttribute('data-doc')); window.scrollTo(0,0); });
-      frag.appendChild(a);
-      last=m.index+m[1].length;
+    // Matches in order of position: item codes and stage references.
+    var found=[], m;
+    NB_CODE_RE.lastIndex=0;
+    while((m=NB_CODE_RE.exec(t))){
+      var code=m[1]+'-'+m[2], d=nbFindByCode(code);
+      if(!d||d.id===shown) continue;
+      var title=nbPlain(d.topic).replace(/^\s*[A-Z]-\d{2,3}\s*[·\-–—]?\s*/,'').trim();
+      var after=t.slice(m.index+m[0].length), span=nbTitleSpan(after,title);
+      found.push({at:m.index,codeEnd:m.index+m[0].length,end:m.index+m[0].length+span,doc:d,code:code,addTitle:span?'':title});
     }
-    if(frag){ frag.appendChild(document.createTextNode(t.slice(last))); p.replaceChild(frag,n); }
+    NB_STAGE_RE.lastIndex=0;
+    while(!inTitle&&(m=NB_STAGE_RE.exec(t))){
+      var st=root.ownerDocument.querySelector('#article-content [data-stage="'+m[2]+'"]');
+      if(!st||(p.closest('[data-stage]')===st&&!p.closest('.m-branch,.m-step-hint'))) continue;
+      found.push({at:m.index,end:m.index+m[0].length,stage:parseInt(m[2],10),name:nbStageName(st)});
+    }
+    if(!found.length) return;
+    found.sort(function(a,b){return a.at-b.at;});
+    var frag=document.createDocumentFragment(), last=0;
+    found.forEach(function(f){
+      if(f.at<last) return;
+      frag.appendChild(document.createTextNode(t.slice(last,f.at)));
+      var a=document.createElement('a');
+      if(f.doc){
+        a.className='kb-link kb-link-item'; a.title=nbPlain(f.doc.topic); a.setAttribute('data-doc',f.doc.id);
+        var codeEl=document.createElement('span'); codeEl.className='kb-code'; codeEl.textContent=f.code;
+        a.appendChild(codeEl);
+        // The title as written after the code, or the item's title when the text has only the code.
+        a.appendChild(document.createTextNode(f.addTitle?' — '+f.addTitle:t.slice(f.codeEnd,f.end)));
+        a.addEventListener('click',function(e){ e.stopPropagation(); showDynamicDoc(this.getAttribute('data-doc')); window.scrollTo(0,0); });
+      } else {
+        a.className='kb-link kb-link-stage'; a.setAttribute('data-stage-link',f.stage);
+        a.textContent=t.slice(f.at,f.end)+(f.name?' – '+f.name:'');
+        a.title='מעבר לשלב '+f.stage+' במסמך';
+        a.addEventListener('click',function(e){ e.stopPropagation(); nbJumpToStage(this.getAttribute('data-stage-link')); });
+      }
+      frag.appendChild(a);
+      last=f.end;
+    });
+    frag.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(frag,n);
   });
 }
 
@@ -4293,8 +4366,13 @@ function nbMTreeHTML(doc,b){
   };
   var shortTarget=function(a){
     var go=a.go||'';
-    if(/^q:\d+$/.test(go)) return 'שלב '+(parseInt(go.slice(2),10)+1);
-    if(go.indexOf('item:')===0){ var d=window.dynamicDocs[go.slice(5)]; return d?((/^\s*([A-Z]-\d{2,3})/.exec(nbPlain(d.topic))||[])[1]||nbPlain(d.topic).slice(0,30)):'—'; }
+    if(/^q:\d+$/.test(go)){ var n=parseInt(go.slice(2),10); return 'שלב '+(n+1)+(b.questions[n]?' · '+b.questions[n].title:''); }
+    if(go.indexOf('item:')===0){
+      var d=window.dynamicDocs[go.slice(5)];
+      if(!d) return '—';
+      var t=nbPlain(d.topic).replace(/\s*[-–]\s*מסלול טיפול\s*$/,'');
+      return t.length>48?t.slice(0,47)+'…':t;
+    }
     if(a.ext) return a.ext.length>28?a.ext.slice(0,27)+'…':a.ext;
     return 'סיום';
   };
@@ -4311,7 +4389,7 @@ function nbMTreeHTML(doc,b){
       }).join('')+'</div></div>';
   }).join('')+'</nav>';
   var steps=b.questions.map(function(q,qi){
-    return '<section class="m-step" id="m-step-'+qi+'">'
+    return '<section class="m-step" id="m-step-'+qi+'" data-stage="'+(qi+1)+'" data-stage-title="'+nbEsc(nbPlain(q.title))+'">'
       +'<div class="m-step-head"><span class="m-step-num">'+(qi+1)+'</span><h3 class="m-step-title">שלב '+(qi+1)+' – '+q.title+'</h3><button class="m-step-from" id="m-from-'+qi+'" hidden></button></div>'
       +(q.q?'<div class="m-step-q"><span class="m-step-ask">שאל:</span> '+q.q+'</div>':'')
       +hint(q.hint)
