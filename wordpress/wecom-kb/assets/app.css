@@ -896,6 +896,8 @@ select.s1-input{height:40px;cursor:pointer}
 .o-steps{list-style:none;counter-reset:ostep;display:flex;flex-direction:column;gap:6px}
 .o-steps>li{counter-increment:ostep;position:relative;padding:10px 46px 10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.6}
 .o-steps>li::before{content:counter(ostep);position:absolute;right:12px;top:9px;width:24px;height:24px;border-radius:50%;background:#2E5CE0;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.o-steps.o-plain>li{padding-right:30px}
+.o-steps.o-plain>li::before{content:'';right:13px;top:19px;width:6px;height:6px}
 /* I – rich text */
 .kv-rich{font-size:14.5px;line-height:1.75;color:var(--text)}
 .kv-rich h2{font-size:19px;font-weight:800;color:var(--navy);margin:18px 0 8px}

@@ -907,6 +907,8 @@ select.s1-input{height:40px;cursor:pointer}
 .o-steps{list-style:none;counter-reset:ostep;display:flex;flex-direction:column;gap:6px}
 .o-steps>li{counter-increment:ostep;position:relative;padding:10px 46px 10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.6}
 .o-steps>li::before{content:counter(ostep);position:absolute;right:12px;top:9px;width:24px;height:24px;border-radius:50%;background:#2E5CE0;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.o-steps.o-plain>li{padding-right:30px}
+.o-steps.o-plain>li::before{content:'';right:13px;top:19px;width:6px;height:6px}
 /* I – rich text */
 .kv-rich{font-size:14.5px;line-height:1.75;color:var(--text)}
 .kv-rich h2{font-size:19px;font-weight:800;color:var(--navy);margin:18px 0 8px}
@@ -4146,7 +4148,11 @@ function nbCleanBody(k,b){
   var nonEmpty=function(s){return String(s||'').trim()!=='';};
   switch(k){
     case 'O':
-      b.groups=(b.groups||[]).map(function(g){return {title:(g.title||'').trim(),steps:(g.steps||[]).filter(function(s){return nonEmpty(s.text)||s.img;})};})
+      b.groups=(b.groups||[]).map(function(g){
+        var out={title:(g.title||'').trim(),steps:(g.steps||[]).filter(function(s){return nonEmpty(s.text)||s.img;})};
+        if(g.ordered===false) out.ordered=false;
+        return out;
+      })
         .filter(function(g){return g.steps.length;});
       break;
     case 'I': b.html=nbSanitizeRich(b.html); break;
@@ -4186,7 +4192,7 @@ function nbKindBodyHTML(doc){
     case 'O':
       return '<div class="kv-o">'+b.groups.map(function(g){
         return '<section class="o-group"'+(nbStageNum(g.title)?' data-stage="'+nbStageNum(g.title)+'"':'')+'>'+(g.title?'<h2 class="o-title">'+g.title+'</h2>':'')
-          +'<ol class="o-steps">'+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+'</ol></section>';
+          +(g.ordered===false?'<ul class="o-steps o-plain">':'<ol class="o-steps">')+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+(g.ordered===false?'</ul>':'</ol>')+'</section>';
       }).join('')+'</div>';
     case 'I':
       return '<div class="kv-rich">'+b.html+'</div>';

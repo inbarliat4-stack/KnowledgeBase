@@ -2952,7 +2952,11 @@ function nbCleanBody(k,b){
   var nonEmpty=function(s){return String(s||'').trim()!=='';};
   switch(k){
     case 'O':
-      b.groups=(b.groups||[]).map(function(g){return {title:(g.title||'').trim(),steps:(g.steps||[]).filter(function(s){return nonEmpty(s.text)||s.img;})};})
+      b.groups=(b.groups||[]).map(function(g){
+        var out={title:(g.title||'').trim(),steps:(g.steps||[]).filter(function(s){return nonEmpty(s.text)||s.img;})};
+        if(g.ordered===false) out.ordered=false;
+        return out;
+      })
         .filter(function(g){return g.steps.length;});
       break;
     case 'I': b.html=nbSanitizeRich(b.html); break;
@@ -2992,7 +2996,7 @@ function nbKindBodyHTML(doc){
     case 'O':
       return '<div class="kv-o">'+b.groups.map(function(g){
         return '<section class="o-group"'+(nbStageNum(g.title)?' data-stage="'+nbStageNum(g.title)+'"':'')+'>'+(g.title?'<h2 class="o-title">'+g.title+'</h2>':'')
-          +'<ol class="o-steps">'+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+'</ol></section>';
+          +(g.ordered===false?'<ul class="o-steps o-plain">':'<ol class="o-steps">')+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+(g.ordered===false?'</ul>':'</ol>')+'</section>';
       }).join('')+'</div>';
     case 'I':
       return '<div class="kv-rich">'+b.html+'</div>';
