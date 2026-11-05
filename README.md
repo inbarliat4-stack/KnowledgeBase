@@ -59,7 +59,7 @@ The check compares each document's content with its snapshot from the last check
 
 ## Where things are stored
 
-- **The app's built-in content** is in `index.html`, one `window.dynamicDocs[…]` entry per item. When built-in content changes, `NB_SEED_VERSION` is increased by one, so browsers that already saved a copy pick up the change.
+- **The app's built-in content** is in `index.html`, one `window.dynamicDocs[…]` entry per item. When built-in content changes, `NB_SEED_VERSION` is increased by one, so browsers that already saved a copy pick up the change. Items approved, rejected or edited in the app keep their version: if their built-in content has since changed, the change arrives as a proposed version to review.
 - **Changes made in the app** are saved in the browser (`localStorage`), including the trash and version history. They are not shared between browsers.
 - **Documents are not on GitHub.** The formatted source docx, the drafts and the origin files are kept in the shared OneDrive folder and excluded from git (see `.gitignore`), because this repository and the site are public. Only people with access to that folder can open the document links.
 

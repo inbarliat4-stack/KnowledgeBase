@@ -2349,6 +2349,7 @@ function nbApproveRevision(docId){
   d.source=d.revision.source||d.source;
   d.status='published'; d.publishedAt=Date.now(); d.updatedAt=Date.now();
   delete d.revision;
+  nbMarkLocalEdit(d,docId);
   nbSaveLibrary('אושרה ופורסמה גרסה ממסמך מקור: '+nbPlain(d.topic));
   nbRenderSidebar(); renderLibrary(nbCurrentLibCat||'all');
   showDynamicDoc(docId);
@@ -2368,6 +2369,7 @@ function nbRejectRevision(docId){
   if(!d||!d.revision) return;
   nbConfirmGeneric('דחיית הגרסה המוצעת','הגרסה המפורסמת תישאר כמו שהיא. הגרסה המוצעת תימחק (קובץ המקור נשאר בספריית המדיה).','דחה','var(--red)',function(){
     delete d.revision;
+    nbMarkLocalEdit(d,docId);
     nbSaveLibrary('נדחתה גרסה מוצעת: '+nbPlain(d.topic));
     showDynamicDoc(docId);
   });
@@ -3697,6 +3699,7 @@ function nbCreateDocImpl(){
     var probe={kind:NB_KINDS[s1.kind]?s1.kind:'R'};
     if(!nbApplyBodyToDoc(probe,stages)){ window.nbEditingDocId=docId; return; }
     nbApplyS1Fields(edited,s1);
+    nbMarkLocalEdit(edited,docId);
     edited.stages=probe.stages;
     if(probe.body) edited.body=probe.body; else delete edited.body;
     // The form edits the item's main topic; links to other topics are kept.
@@ -4793,6 +4796,50 @@ var NB_SEED_PUBLICATION_MIGRATIONS={
 // Codes that must exist only once: the built-in item published on 2.11.
 var NB_SEED_SINGLE_COPY=['O-06','O-36','O-37','R-14','R-45','R-50','R-51'];
 var NB_SEED_CONTENT_FIELDS=['topic','stages','body','kind','desc','tags','revision','draftDoc','reviewNotes','originName'];
+var NB_SEED_ITEM_FIELDS=['kind','topic','desc','tags','stages','body'];
+var NB_SEED_SIGS={}; // built-in content signature per item, taken before the saved library replaces it
+
+function nbSeedSig(doc){
+  var s=JSON.stringify(NB_SEED_CONTENT_FIELDS.map(function(f){ return doc[f]===undefined?null:doc[f]; }));
+  var h=5381;
+  for(var i=0;i<s.length;i++) h=(h*33^s.charCodeAt(i))|0;
+  return s.length+'-'+(h>>>0).toString(36);
+}
+function nbTakeSeedSigs(){
+  var docs=window.dynamicDocs||{};
+  Object.keys(docs).forEach(function(k){ NB_SEED_SIGS[k]=nbSeedSig(docs[k]); });
+}
+// An item approved, rejected or edited in the app: built-in updates no longer overwrite its content.
+function nbMarkLocalEdit(d,docId){
+  d.localEdit=true;
+  if(!d.seedSig&&NB_SEED_SIGS[docId]) d.seedSig=NB_SEED_SIGS[docId];
+}
+function nbSameItem(a,b){
+  var key=function(x){ return JSON.stringify(NB_SEED_ITEM_FIELDS.map(function(f){
+    var v=x[f];
+    return (v==null||v===''||(Array.isArray(v)&&!v.length))?null:v;
+  })); };
+  return key(a)===key(b);
+}
+// Built-in content of an item changed in the app: the app's version stays, and
+// anything new in the built-in content comes in as a proposed version to review.
+function nbReconcileEditedDoc(saved,seed,sig){
+  if(saved.seedSig===sig) return;
+  // A proposal an editor uploaded is kept; the built-in update is offered at the next version.
+  if(saved.revision&&!saved.revision.builtIn) return;
+  saved.seedSig=sig;
+  if(nbSameItem(saved,seed.revision?seed.revision.item:seed)){
+    if(saved.revision) delete saved.revision;
+    // The built-in content now is this version (it was published in the code): nothing is local anymore.
+    if(!seed.revision){ delete saved.localEdit; delete saved.seedSig; }
+    return;
+  }
+  if(seed.revision){ saved.revision=JSON.parse(JSON.stringify(seed.revision)); return; }
+  var item={};
+  NB_SEED_ITEM_FIELDS.forEach(function(f){ item[f]=seed[f]===undefined?null:JSON.parse(JSON.stringify(seed[f])); });
+  saved.revision={item:item,issues:['התוכן המובנה של הפריט עודכן, ולפריט יש גרסה שאושרה או נערכה באפליקציה. הגרסה הקיימת נשארת עד שתאשרו.'],
+    source:seed.source||saved.source||null,createdAt:Date.now(),builtIn:true};
+}
 
 // Brings a saved library up to the built-in content of this version.
 // Used by the browser version and by the WordPress bridge.
@@ -4802,12 +4849,15 @@ function nbReconcileSeed(savedDocs,seedDocs,trash,previousVersion){
   Object.keys(seedDocs).forEach(function(k){
     var seed=seedDocs[k], saved=savedDocs[k];
     if(saved){
+      var edited=!!saved.localEdit;
       NB_SEED_CONTENT_FIELDS.forEach(function(f){
+        if(edited&&(f==='revision'||NB_SEED_ITEM_FIELDS.indexOf(f)!==-1)) return;
         if(seed[f]!==undefined) saved[f]=JSON.parse(JSON.stringify(seed[f]));
         else if(f==='body'||f==='draftDoc'||f==='originName') delete saved[f];
       });
       // A built-in proposed version that has since been published (or withdrawn) in the code is no longer pending.
-      if(!seed.revision&&saved.revision&&saved.revision.builtIn) delete saved.revision;
+      if(edited) nbReconcileEditedDoc(saved,seed,NB_SEED_SIGS[k]||nbSeedSig(seed));
+      else if(!seed.revision&&saved.revision&&saved.revision.builtIn) delete saved.revision;
       // Built-in content changed after the saved copy did: "עודכן" shows when it changed.
       if(seed.updatedAt&&(!saved.updatedAt||seed.updatedAt>saved.updatedAt)) saved.updatedAt=seed.updatedAt;
       var meta=NB_SEED_META[k];
@@ -4962,6 +5012,7 @@ function nbLoadDraft(){
 window.addEventListener('beforeunload', nbSaveDraft);
 
 document.addEventListener("DOMContentLoaded", function(){
+  nbTakeSeedSigs();
   nbLoadLibrary();
   nbLoadDraft();
   nbUpdateTrashBadge();
