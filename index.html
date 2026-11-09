@@ -867,7 +867,7 @@ html{overflow-x:hidden}body{font-family:"Rubik",sans-serif;background:var(--bg);
 .sibling-strip{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--r);max-width:960px}
 .ss-label{font-size:12px;color:var(--muted);margin-left:4px}
 .ss-label a{color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-.ss-item{display:inline-flex;align-items:center;gap:5px;font-family:Rubik,sans-serif;font-size:12.5px;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ss-item{display:inline-flex;align-items:center;gap:5px;font-family:Rubik,sans-serif;font-size:12.5px;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;cursor:pointer;max-width:100%;text-align:right;line-height:1.4}
 .ss-item:hover{border-color:var(--navy-m);color:var(--navy)}
 .ss-item.current{background:var(--navy);border-color:var(--navy);color:#fff}
 .article-head .ic-tags{margin-top:10px}
@@ -1159,6 +1159,86 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .o-steps>li.kb-missing{padding:4px 46px 4px 14px}
 .o-steps>li.kb-missing::before{top:50%;transform:translateY(-50%);background:var(--warn)}
+/* A code in the text that matches no item: marked for completion, never a fake link */
+.kb-unresolved{border-bottom:1.5px dashed var(--warn-b);color:var(--warn);cursor:help}
+.kb-unresolved::after{content:'להשלמה';font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-b);border-radius:6px;padding:0 5px;margin-inline-start:4px;vertical-align:1px}
+
+/* ── AGENT VIEW (display spec per item type) ── */
+.av-head .article-title{font-size:22px;line-height:1.35;margin-bottom:6px}
+.av-label-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.av-label{font-size:12px;font-weight:700;letter-spacing:.2px;padding:2px 10px;border-radius:20px;border:1px solid}
+.av-code{font-size:11px;color:var(--muted);direction:ltr;unicode-bidi:isolate}
+.av-date{font-size:12px;color:var(--muted)}
+.av-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 16px}
+.av-toc{flex:1 1 320px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.av-toc-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.av-toc ol{margin:0;padding-right:20px;display:flex;flex-direction:column;gap:3px;font-size:13.5px;line-height:1.5}
+.av-toc a{color:#1D45B4;cursor:pointer;text-decoration:none}
+.av-toc a:hover{text-decoration:underline}
+.av-mode{display:inline-flex;border:1px solid var(--border-strong);border-radius:10px;overflow:hidden;flex-shrink:0;align-self:flex-start}
+.av-mode button{font-family:Rubik,sans-serif;font-size:12.5px;font-weight:600;color:var(--text-2);background:#fff;border:none;padding:7px 12px;cursor:pointer}
+.av-mode button+button{border-right:1px solid var(--border-strong)}
+.av-mode button.on{background:var(--navy);color:#fff}
+.av-intro{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.av-intro-title,.av-sub-title{font-size:14.5px;font-weight:700;color:var(--navy);margin:10px 0 4px}
+.av-intro>.av-intro-title:first-child{margin-top:0}
+.av-part{font-size:15px;font-weight:800;color:var(--navy);margin:22px 0 10px}
+.av-unit{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;background:#fff;scroll-margin-top:84px}
+.av-unit-head{display:flex;align-items:center;gap:10px;width:100%;text-align:right;font-family:Rubik,sans-serif;background:none;border:none;padding:12px 14px;cursor:pointer;color:var(--navy)}
+.av-unit-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.av-unit-title{font-size:16px;font-weight:700;margin:0;line-height:1.4;flex:1;color:var(--navy)}
+.av-chev{font-size:13px;color:var(--muted);transition:transform var(--t);flex-shrink:0}
+.av-unit.open .av-chev{transform:rotate(180deg)}
+.av-unit-body{display:none;padding:2px 18px 14px 14px}
+.av-unit.open .av-unit-body{display:block}
+.av-from{font-family:Rubik,sans-serif;font-size:12px;font-weight:600;color:#1D45B4;background:#EEF3FF;border:1px solid #C9D6FB;border-radius:20px;padding:3px 11px;cursor:pointer;margin-bottom:8px}
+.av-lines{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:1.65}
+.av-lines>li{position:relative;padding-right:16px}
+.av-lines>li::before{content:'';position:absolute;right:3px;top:.72em;width:5px;height:5px;border-radius:50%;background:var(--border-strong)}
+.av-lines>li.av-say-li::before,.av-lines>li.av-ref-li::before{display:none}
+.av-lines>li.av-say-li,.av-lines>li.av-ref-li{padding-right:0}
+.av-tag{font-size:11px;font-weight:700;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+.av-sub{margin-top:12px;padding-right:12px;border-right:3px solid var(--border)}
+.av-warn{color:#8A3B00;font-weight:600}
+.av-ol{list-style:decimal;padding-right:22px}
+.av-ol>li{padding-right:2px}
+.av-ol>li::before{display:none}
+.av-dont{color:#9B1C1C}
+.av-dont::after{content:'לא לומר';font-size:10.5px;font-weight:700;color:#9B1C1C;background:#FDECEC;border:1px solid #F5C2C2;border-radius:6px;padding:0 5px;margin-inline-start:6px;vertical-align:1px}
+/* Wording for the customer: set apart from internal instructions */
+.av-say{display:flex;align-items:flex-start;gap:10px;background:#F4FBF7;border:1px solid #CDEBDA;border-right:4px solid #0E7A4F;border-radius:10px;padding:9px 12px;margin:4px 0}
+.av-say-label{flex-shrink:0;font-size:11px;font-weight:700;color:#0E7A4F;padding-top:3px}
+.av-say-text{flex:1;font-size:14px;line-height:1.65;color:var(--text)}
+.av-copy{flex-shrink:0;font-family:Rubik,sans-serif;font-size:11.5px;font-weight:600;color:#0E7A4F;background:#fff;border:1px solid #CDEBDA;border-radius:6px;padding:3px 9px;cursor:pointer;white-space:nowrap}
+/* A reference: the condition or text on the right, the clickable target box on the left */
+.av-ref-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,320px);gap:6px 14px;align-items:center}
+.av-ref-text{min-width:0}
+.av-ref-boxes{display:flex;flex-direction:column;gap:6px}
+.av-ref{display:flex;align-items:center;gap:8px;width:100%;text-align:right;font-family:Rubik,sans-serif;font-size:13.5px;font-weight:700;line-height:1.4;color:var(--navy);background:#fff;border:1.5px solid var(--border-strong);border-radius:10px;padding:9px 12px;cursor:pointer}
+.av-ref:hover,.av-ref:focus-visible{border-color:#1D45B4;background:#F5F8FF;outline:none}
+.av-ref-arrow{margin-right:auto;color:#1D45B4;font-size:16px;flex-shrink:0}
+.av-ref-inline{font-weight:700}
+@media(max-width:640px){.av-ref-row{grid-template-columns:1fr}.av-head .article-title{font-size:19px}}
+.av-feedback{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;margin-top:22px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.av-feedback button{font-family:Rubik,sans-serif;font-size:13px;font-weight:600;color:var(--navy);background:#fff;border:1.5px solid var(--border-strong);border-radius:10px;padding:7px 14px;cursor:pointer}
+.av-feedback button:hover{border-color:var(--navy)}
+/* M: every case in its own row */
+.m-tree .m-target.item,.m-tree .m-target.ext{max-width:none;width:100%}
+.m-tree .m-branch{grid-template-columns:minmax(0,1fr) minmax(200px,320px)}
+.m-tree .m-target{white-space:normal}
+@media(max-width:640px){.m-tree .m-branch{grid-template-columns:1fr}.m-tree .m-target{grid-column:1;grid-row:auto}}
+.av-todo{font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-b);border-radius:6px;padding:0 5px}
+/* E: areas in the order the spec sets */
+.kv-e.av-e{grid-template-columns:1fr}
+.av-e .e-when{border-color:#F3C78B;background:#FEF7EC;border-right:4px solid #B45309}
+.av-e .e-cond ol{padding-right:20px;font-size:13.5px;line-height:1.65}
+.av-e .e-cond li{margin-bottom:4px}
+/* T: one card per situation */
+.t-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff;scroll-margin-top:84px}
+.t-card-title{font-size:16px;font-weight:700;color:var(--navy);margin:0 0 8px}
+.t-card .t-sub{font-size:13px;font-weight:700;color:var(--text-2);margin:10px 0 4px}
+.t-note{font-size:13.5px;line-height:1.6;color:var(--text-2);margin:4px 0}
+.kv-rich [data-toc-title]{scroll-margin-top:84px}
 
 /* ── DEMO ROLE GATE ── */
 body.gate-open{overflow:hidden}
@@ -2105,8 +2185,9 @@ function nbSiblingStripHTML(doc){
       return '<button class="ss-item'+(d.id===doc.id?' current':'')+'" onclick="showDynamicDoc(\''+nbEsc(d.id)+'\')">'+nbKindBadge(d.kind,true)+' '+d.topic+'</button>';
     }).join('')+'</div>';
 }
-function nbItemMetaHTML(doc){
-  return '<div class="article-meta">'+nbKindBadge(doc.kind)+nbStatusBadge(doc)+'<span class="nb-edit-only">'+nbReviewBadge(doc)+'</span>'
+// noKind: the item page shows the type as its own label under the title.
+function nbItemMetaHTML(doc,noKind){
+  return '<div class="article-meta">'+(noKind?'':nbKindBadge(doc.kind))+nbStatusBadge(doc)+'<span class="nb-edit-only">'+nbReviewBadge(doc)+'</span>'
     +doc.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
     +'</div>'
     // Editors get a direct link to the formatted source document (Word for the web).
@@ -2114,11 +2195,12 @@ function nbItemMetaHTML(doc){
     +(doc.draftDoc&&doc.status!=='published'?'<div class="draft-src nb-edit-only">📝 טיוטת Word לעריכה: '+nbSourceLink(doc.draftDoc)+'</div>':'')
     +(doc.reviewNotes&&doc.reviewNotes.length&&doc.status!=='published'?'<div class="import-issues nb-edit-only"><div class="ii-title">⚠ הערות לפני אישור</div><ul>'+doc.reviewNotes.map(function(note){return '<li>'+nbEsc(note)+'</li>';}).join('')+'</ul></div>':'');
 }
-function nbItemFieldsHTML(doc){
+// noDate: the item page shows the update date in its header.
+function nbItemFieldsHTML(doc,noDate){
   var rows=[];
   if(doc.tags.length) rows.push('<div class="ic-tags">'+doc.tags.map(nbTagChip).join('')+'</div>');
   var meta=[];
-  meta.push(doc.updatedAt?'עודכן לאחרונה: '+nbFmtDate(doc.updatedAt):'תוכן מובנה');
+  if(!noDate) meta.push(doc.updatedAt?'עודכן לאחרונה: '+nbFmtDate(doc.updatedAt):'תוכן מובנה');
   if(doc.owner) meta.push('גורם מקצועי אחראי: '+nbEsc(doc.owner));
   // The read-only origin document (name only, never a link); otherwise editors see the internal ID.
   if(doc.originName) meta.push('מסמך מקור: '+nbEsc(doc.originName));
@@ -2137,6 +2219,8 @@ function nbTrackPanelHTML(doc){
   if(doc.publishedAt) cells.push('<div><span>פורסם</span><b>'+nbFmtDate(doc.publishedAt)+'</b></div>');
   if(t.source) cells.push('<div class="wide"><span>מקור ידע</span><b>'+nbEsc(t.source)+'</b></div>');
   if(t.gap) cells.push('<div class="wide gap"><span>פער / פעולה נדרשת</span><b>'+nbEsc(t.gap)+'</b></div>');
+  var fb=nbFeedbackFor(doc.id);
+  if(fb.length) cells.push('<div class="wide gap"><span>משוב מנציגים ('+fb.length+')</span><b>'+fb.map(function(f){return nbFmtDate(f.at)+': '+nbEsc(f.text);}).join('<br>')+'</b></div>');
   if(doc.source&&(doc.status==='published'||!doc.draftDoc)) cells.push('<div class="wide"><span>מסמך מקור מעוצב</span><b>'+nbSourceLink(doc.source)+'</b></div>');
   var canImport=typeof window.nbImportSourceDoc==='function'&&window.NB_CAN_IMPORT;
   var actions=(doc.revision?'<button type="button" class="tp-btn warn" onclick="nbOpenReview(\''+nbEsc(doc.id)+'\')">🔎 גרסה מוצעת ממתינה — השווה ואשר</button>':'')
@@ -2516,23 +2600,24 @@ function showDynamicDoc(docId){
       +'<div style="padding-right:52px;margin-bottom:16px">'+items+stageImgHtml+'</div>';
   }).join('');
 
+  // R / S (and any item still in plain stages): numbered units the agent opens and closes.
   var kindHtml=nbKindBodyHTML(doc);
+  if(kindHtml==null&&doc.stages.length) kindHtml=nbStagesViewHTML(doc);
   var html=nbSiblingStripHTML(doc)
     +'<div class="article-box">'
-    +'<div class="article-head">'
-    +nbItemMetaHTML(doc)
-    +'<div class="article-title">'+doc.topic+'</div>'
-    +'<div class="article-sub">'+(doc.desc||(NB_KINDS[doc.kind]||NB_KINDS.R).full)+'</div>'
-    +nbItemFieldsHTML(doc)
-    +'</div>'
+    +nbViewHeadHTML(doc)
     +'<div class="article-body">'
+    +'<div class="av-toolbar" id="av-toolbar"></div>'
     +(kindHtml!=null?kindHtml:(doc.stages.length?stagesHtml:'<div class="info-box">לא נבחרו שלבים לפריט הידע זה.</div>'))
+    +nbFeedbackRowHTML(doc)
     +'</div></div>';
 
   document.getElementById('article-content').innerHTML=html;
   window.nbShownDocId=doc.id; // an item's own code is not linked
-  nbEnhance(document.querySelector('#article-content .article-body'));
-  if(doc.kind==='M'&&kindHtml!=null) nbMStart();
+  var body=document.querySelector('#article-content .article-body');
+  nbEnhance(body);
+  nbRefRows(body);
+  nbBuildToolbar(body);
 
   // Add "עדכן מסמך" button
   var btnRow=document.createElement('div');
@@ -4184,48 +4269,354 @@ function nbBodyHasContent(k,b){
 }
 
 // ── AGENT VIEWS ─────────────────────────────────────────────────────────
+// Display spec per type (knowledge_prompts, Nov 2026). The content and its
+// order come from the source and never change with what the agent clicks:
+// opening and closing stages, jumping, going back and copying wording are
+// reading aids only. Nothing is hidden because of an answer, nothing is
+// locked, and no question has to be answered before moving on.
+var NB_VIEW={
+  M:{label:'אבחון',back:'לאבחון'},
+  R:{label:'טיפול',back:'למסלול הטיפול'},
+  O:{label:'הוראות ביצוע',back:'להוראות הביצוע'},
+  E:{label:'העברה לגורם נוסף',back:'להנחיות ההעברה'},
+  S:{label:'מסלול מומחה',back:'למסלול המומחה'},
+  T:{label:'ניסוח ללקוח',back:'לתסריטי השיחה'},
+  I:{label:'מידע',back:'למסמך המידע'}
+};
+function nbViewOf(k){ return NB_VIEW[k]||NB_VIEW.R; }
+// An item's title without its code ("R-01 · אין קליטה…" → code R-01, title "אין קליטה…").
+function nbSplitTitle(topic){
+  var t=nbPlain(topic).trim(), m=/^([A-Z]-\d{2,3})(?!\d)\s*[·\-–—:]?\s*/.exec(t);
+  return m?{code:m[1],title:t.slice(m[0].length).trim()||t}:{code:'',title:t};
+}
+// Section titles that describe the document (shown open at the top, also on direct entry)
+// and titles that close it (shown at the end).
+var NB_INTRO_TITLE=/^(מטרת|מתי משתמשים|מתי להשתמש|לפני שמתחילים|תנאי כניסה|תנאים מקדימים|למי מיועד|קהל היעד|הרשאות|אזהרות|מידע שיש לקבל|מידע שחובה לקבל)/;
+var NB_END_TITLE=/^(תנאי סיום|סיום|סגירת|תוצאות אפשריות|מתי מעבירים|העברה ל|כלל מנחה|הנחיות כלליות)/;
+
+// Header: the full title, the type label, the description and the update date.
+function nbViewHeadHTML(doc){
+  var k=NB_KINDS[doc.kind]||NB_KINDS.R, st=nbSplitTitle(doc.topic), date=doc.publishedAt||doc.updatedAt;
+  return '<div class="article-head av-head">'
+    +'<h1 class="article-title">'+nbEsc(st.title)+'</h1>'
+    +'<div class="av-label-row"><span class="av-label" style="color:'+k.color+';background:'+k.bg+';border-color:'+k.color+'33">'+nbViewOf(doc.kind).label+'</span>'
+    +(st.code?'<span class="av-code">'+nbEsc(st.code)+'</span>':'')
+    +(date?'<span class="av-date">עודכן: '+nbFmtDate(date)+'</span>':'')+'</div>'
+    +(doc.desc?'<div class="article-sub">'+doc.desc+'</div>':'')
+    +nbItemMetaHTML(doc,true)
+    +nbItemFieldsHTML(doc,true)
+    +'</div>';
+}
+
+// ── Lines of content ──
+// Wording for the customer (a quoted line, or "עוגן:") is set apart from internal
+// instructions, with a copy button. Quoted lines after "אין לומר" are examples of
+// what not to say, so they get no copy button.
+function nbIsSayLine(p){ return /^\s*["״“”„]/.test(p)||/^\s*(עוגן|anchor)\s*:/i.test(p); }
+var NB_DONT_SAY=/(אין|אסור|לא|אל)\s+(ל)?(לומר|להגיד|תאמר|תגיד|להבטיח|תבטיח)/;
+// R / S: what kind of action a line is, by its opening word (shown only where it applies).
+function nbLineTag(p){
+  if(/^(שאל|ברר)/.test(p)) return 'מה לשאול';
+  if(/^(בדוק|ודא|וודא|אמת)\s/.test(p)) return 'מה לבדוק';
+  if(/^(אמור|הסבר ללקוח|עדכן את הלקוח|הנחה את הלקוח)/.test(p)) return 'מה לומר ללקוח';
+  if(/^(עבור|המשך|חזור|העבר)\s/.test(p)) return 'איך ממשיכים';
+  return '';
+}
+function nbImgHTML(src){ return src?'<img class="kv-img" src="'+src+'" onclick="event.stopPropagation();nbOpenLightbox(this.src)">':''; }
+function nbSayHTML(text){
+  return '<div class="av-say"><span class="av-say-label">ללקוח</span><div class="av-say-text">'+text+'</div>'
+    +'<button type="button" class="av-copy" onclick="nbCopySay(this)">העתקת נוסח</button></div>';
+}
+// lines: strings or {text,img}. opts: {tags, ordered}
+function nbLinesHTML(lines,opts){
+  opts=opts||{};
+  var dont=false, tag=opts.ordered?'ol':'ul';
+  return '<'+tag+' class="av-lines'+(opts.ordered?' av-ol':'')+'">'+lines.map(function(l){
+    var text=typeof l==='object'?l.text:l, img=typeof l==='object'?nbImgHTML(l.img):'';
+    var p=nbPlain(text).trim();
+    if(nbIsSayLine(p)){
+      if(dont) return '<li class="av-dont">'+text+img+'</li>';
+      return '<li class="av-say-li">'+nbSayHTML(text)+img+'</li>';
+    }
+    dont=NB_DONT_SAY.test(p);
+    var warn=/^(⚠(?!\s*חסר)|חשוב|שים לב|אזהרה)/.test(p), t=opts.tags?nbLineTag(p):'';
+    return '<li'+(warn?' class="av-warn"':'')+'>'+(t?'<span class="av-tag">'+t+'</span>':'')+text+img+'</li>';
+  }).join('')+'</'+tag+'>';
+}
+function nbCopyText(text,done){
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done,function(){});
+  else { var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');done();}catch(e){} ta.remove(); }
+}
+// Copies the customer wording only: no label, no quote marks, placeholders kept as written.
+function nbCopySay(btn){
+  var t=btn.parentNode.querySelector('.av-say-text');
+  var text=(t?t.innerText:'').trim().replace(/^(עוגן|anchor)\s*:\s*/i,'').replace(/^["״“”„]+|["״“”„]+$/g,'').trim();
+  nbCopyText(text,function(){ btn.textContent='✓ הועתק'; setTimeout(function(){btn.textContent='העתקת נוסח';},1500); });
+}
+
+// ── Stages the agent opens and closes (R, S, O) ──
+// u.title is plain text (escaped here).
+function nbUnitHTML(u){
+  return '<section class="av-unit" id="'+u.id+'"'+(u.stage?' data-stage="'+u.stage+'"':'')+' data-toc-title="'+nbEsc(u.title)+'">'
+    +'<div class="av-unit-head" role="button" tabindex="0" aria-expanded="false" onclick="nbToggleUnit(this.parentNode)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();nbToggleUnit(this.parentNode);}">'
+    +(u.num?'<span class="av-unit-num">'+u.num+'</span>':'')
+    +'<h2 class="av-unit-title">'+nbEsc(u.title)+'</h2><span class="av-chev" aria-hidden="true">▾</span></div>'
+    +'<div class="av-unit-body">'+u.body+'</div></section>';
+}
+var NB_MODE_KEY='wecom_kb_view_mode';
+function nbViewMode(){ try{ return localStorage.getItem(NB_MODE_KEY)==='stepped'?'stepped':'full'; }catch(e){ return 'full'; } }
+function nbSetViewMode(m){ try{ localStorage.setItem(NB_MODE_KEY,m); }catch(e){} nbApplyViewMode(m); }
+function nbApplyViewMode(m){
+  var root=document.getElementById('article-content');
+  if(!root) return;
+  root.querySelectorAll('.av-mode button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false'); });
+  root.querySelectorAll('.av-unit').forEach(function(u){ nbSetUnitOpen(u,m==='full'); });
+}
+function nbSetUnitOpen(u,open){
+  u.classList.toggle('open',open);
+  var h=u.querySelector('.av-unit-head'); if(h) h.setAttribute('aria-expanded',open?'true':'false');
+}
+// Opening a stage never opens the next one. In the step-by-step view one stage is open at a time.
+function nbToggleUnit(u){
+  var open=!u.classList.contains('open');
+  if(open&&nbViewMode()==='stepped') document.querySelectorAll('#article-content .av-unit.open').forEach(function(x){ if(x!==u) nbSetUnitOpen(x,false); });
+  nbSetUnitOpen(u,open);
+}
+// Shows a section: opens it if closed, scrolls to it and highlights it.
+function nbRevealEl(el){
+  if(el.classList.contains('av-unit')&&!el.classList.contains('open')) nbToggleUnit(el);
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  el.classList.remove('nb-flash'); void el.offsetWidth; el.classList.add('nb-flash');
+}
+// After a jump inside the item, the target offers a way back to where the agent was.
+function nbMarkFrom(target,from){
+  document.querySelectorAll('#article-content .av-from').forEach(function(b){ b.remove(); });
+  if(!from||from===target||from.contains(target)) return;
+  var n=from.getAttribute('data-stage'), name=from.getAttribute('data-toc-title')||nbStageName(from)||'';
+  var b=document.createElement('button');
+  b.type='button'; b.className='av-from';
+  b.textContent='↩ חזרה ל'+(n?'שלב '+n+(name?' – '+name:''):(name||'מקום הקודם'));
+  b.addEventListener('click',function(e){ e.stopPropagation(); b.remove(); nbRevealEl(from); });
+  var head=target.querySelector('.m-step-head'), body=target.querySelector('.av-unit-body');
+  if(head) head.parentNode.insertBefore(b,head.nextSibling);
+  else if(body) body.insertBefore(b,body.firstChild);
+  else target.insertBefore(b,target.firstChild);
+}
+
+// R / S: the source's stages. "שלב N" titles are the stages; the titles between
+// them are the cases and branches of the stage above. What comes before the
+// first stage describes the document; closing titles after the last one form the end.
+function nbStagesViewHTML(doc){
+  var st=(doc.stages||[]).slice(), own=nbSplitTitle(doc.topic);
+  var bare=function(s){ return !nbStageItems(s).length&&!(s.images&&s.images.length); };
+  // A first section that only repeats the item's title.
+  if(st.length&&bare(st[0])&&own.code&&nbPlain(st[0].title).trim().indexOf(own.code)===0) st.shift();
+  var numbered=st.some(function(s){return nbStageNum(s.title);});
+  var lastNum=-1; st.forEach(function(s,i){ if(nbStageNum(s.title)) lastNum=i; });
+  var intro=[], units=[], end=[];
+  st.forEach(function(s,i){
+    var t=nbPlain(s.title).trim(), n=nbStageNum(s.title);
+    if(end.length){ end.push(s); return; }
+    if(numbered){
+      if(n){ units.push({s:s,subs:[]}); return; }
+      if(!units.length){ intro.push(s); return; }
+      if(i>lastNum&&NB_END_TITLE.test(t)){ end.push(s); return; }
+      units[units.length-1].subs.push(s); return;
+    }
+    if(!units.length&&NB_INTRO_TITLE.test(t)){ intro.push(s); return; }
+    if(units.length&&NB_END_TITLE.test(t)){ end.push(s); return; }
+    units.push({s:s,subs:[]});
+  });
+  var tags=doc.kind==='R'||doc.kind==='S';
+  var block=function(s){
+    var L=nbStageItems(s);
+    return (L.length?nbLinesHTML(L,{tags:tags}):'')
+      +((s.images||[]).map(nbImgHTML).join(''));
+  };
+  var sub=function(s){ return '<div class="av-sub"><div class="av-sub-title">'+s.title+'</div>'+block(s)+'</div>'; };
+  var html='';
+  if(intro.length) html+='<div class="av-intro">'+intro.map(function(s){return '<div class="av-intro-title">'+s.title+'</div>'+block(s);}).join('')+'</div>';
+  html+=units.map(function(u,i){
+    var n=nbStageNum(u.s.title)||(i+1);
+    var title=nbPlain(u.s.title).replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim()||nbPlain(u.s.title);
+    return nbUnitHTML({id:'av-u-'+i,num:n,stage:n,title:title,body:block(u.s)+u.subs.map(sub).join('')});
+  }).join('');
+  if(end.length) html+=nbUnitHTML({id:'av-u-end',title:'סיום והעברה',body:end.map(sub).join('')});
+  return '<div class="av-stages">'+html+'</div>';
+}
+
 function nbKindBodyHTML(doc){
   var b=nbGetBody(doc);
   if(!b) return null;
-  var img=function(src){return src?'<img class="kv-img" src="'+src+'" onclick="event.stopPropagation();nbOpenLightbox(this.src)">':'';};
   switch(doc.kind){
     case 'O':
-      return '<div class="kv-o">'+b.groups.map(function(g){
-        return '<section class="o-group"'+(nbStageNum(g.title)?' data-stage="'+nbStageNum(g.title)+'"':'')+'>'+(g.title?'<h2 class="o-title">'+g.title+'</h2>':'')
-          +(g.ordered===false?'<ul class="o-steps o-plain">':'<ol class="o-steps">')+g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+img(s.img)+'</li>';}).join('')+(g.ordered===false?'</ul>':'</ol>')+'</section>';
-      }).join('')+'</div>';
+      // Purpose, preconditions and warnings at the top; then each action as a numbered stage.
+      var intro=[], rest=[];
+      b.groups.forEach(function(g){
+        if(!rest.length&&(!g.title||NB_INTRO_TITLE.test(nbPlain(g.title).trim()))) intro.push(g); else rest.push(g);
+      });
+      var steps=function(g){
+        return (g.ordered===false?'<ul class="o-steps o-plain">':'<ol class="o-steps">')
+          +g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+nbImgHTML(s.img)+'</li>';}).join('')
+          +(g.ordered===false?'</ul>':'</ol>');
+      };
+      var num=0;
+      return '<div class="kv-o">'
+        +(intro.length?'<div class="av-intro">'+intro.map(function(g){return (g.title?'<div class="av-intro-title">'+g.title+'</div>':'')+steps(g);}).join('')+'</div>':'')
+        +rest.map(function(g,i){
+          // A title with no steps heads the stages after it (e.g. a process name).
+          if(!g.steps.length) return '<div class="av-part">'+g.title+'</div>';
+          num++;
+          var sn=nbStageNum(g.title);
+          var title=nbPlain(g.title).replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim()||nbPlain(g.title)||('שלב '+num);
+          return nbUnitHTML({id:'av-u-'+i,num:sn||num,stage:sn||null,title:title,body:steps(g)});
+        }).join('')+'</div>';
     case 'I':
+      // All content shown; headings feed the table of contents.
       return '<div class="kv-rich">'+b.html+'</div>';
     case 'T':
-      return '<div class="kv-t">'+b.scripts.map(function(s){
-        return '<div class="t-block">'+(s.situation?'<div class="t-sit">'+s.situation+'</div>':'')
-          +s.lines.map(function(l){
-            var anchor=/^\s*(עוגן|anchor)\s*:/i.test(nbPlain(l));
-            return '<div class="t-line'+(anchor?' anchor':'')+'"><div class="t-text">'+l+'</div><button class="t-copy" onclick="nbCopyLine(this)" title="העתק">העתק</button></div>';
-          }).join('')+'</div>';
-      }).join('')+'</div>';
+      // A card per situation. Generic headings ("תסריט", "חשוב"…) belong to the card above them.
+      var GENERIC=/^(תסריט|נוסח|חשוב|הפניה:?|פתרון משלים|דגשים?|הערה)$/;
+      var cards=[], introT=null;
+      b.scripts.forEach(function(s,i){
+        var t=nbPlain(s.situation).trim(), cur=cards[cards.length-1];
+        NB_CODE_RE.lastIndex=0;
+        if(!s.lines.length&&cur&&NB_CODE_RE.test(t)){ cur.parts.push({lines:[s.situation]}); return; }
+        if(i===0&&NB_INTRO_TITLE.test(t)){ introT=s; return; }
+        if(!cur||!GENERIC.test(t)){ cards.push({title:s.situation,parts:[{lines:s.lines}]}); return; }
+        cur.parts.push({sub:s.situation,lines:s.lines});
+      });
+      return '<div class="kv-t">'
+        +(introT?'<div class="av-intro"><div class="av-intro-title">'+introT.situation+'</div>'+nbLinesHTML(introT.lines)+'</div>':'')
+        +cards.map(function(c,i){
+          return '<section class="t-card" id="av-t-'+i+'" data-toc-title="'+nbEsc(nbPlain(c.title))+'"><h2 class="t-card-title">'+c.title+'</h2>'
+            +c.parts.map(function(p){ return (p.sub?'<div class="t-sub">'+p.sub+'</div>':'')+(p.lines.length?nbLinesHTML(p.lines):''); }).join('')
+            +'</section>';
+        }).join('')+'</div>';
     case 'E':
-      var sec=function(icon,title,lines,cls){
+      // Stop and transfer conditions first, then the checks, the receiver, what to document, and the rest in source order.
+      var sec=function(icon,title,lines,cls,ordered){
         return '<div class="e-sec '+cls+'"><div class="e-title"><span class="e-icon">'+icon+'</span>'+title+'</div>'
-          +(lines&&lines.length?'<ul>'+lines.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul>'
+          +(lines&&lines.length?nbLinesHTML(lines,{ordered:ordered})
             :'<div class="e-missing">⚠ לא הוגדר — יש להשלים מול הגורם המקצועי האחראי</div>')+'</div>';
       };
-      return '<div class="kv-e">'
+      return '<div class="kv-e av-e">'
         +sec('⏱','מתי מפסיקים טיפול ומעבירים',b.when,'e-when')
-        +sec('➜','למי מעבירים',b.to,'e-to')
-        +sec('✓','תנאים שחייבים להתקיים לפני ההעברה',b.conditions,'e-cond')
+        +sec('✓','בדיקות חובה לפני ההעברה',b.conditions,'e-cond',true)
+        +sec('➜','הגורם המקבל ואופן ההעברה',b.to,'e-to')
         +sec('✎','מה חובה לתעד',b.document,'e-doc')
-        +(b.extra||[]).map(function(x){return '<div class="e-sec e-extra"><div class="e-title">'+x.title+'</div><ul>'+x.lines.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>';}).join('')
+        +(b.extra||[]).map(function(x){
+          if(!x.lines.length) return '<div class="av-part">'+x.title+'</div>';
+          return '<div class="e-sec e-extra"><div class="e-title">'+x.title+'</div>'+nbLinesHTML(x.lines)+'</div>';
+        }).join('')
         +'</div>';
     case 'M':
-      if(nbMIsTree(b)) return nbMTreeHTML(doc,b);
+      // Every question, condition and referral is shown up front, in source order.
+      if(b.questions&&b.questions.length) return nbMTreeHTML(doc,b);
       return '<div class="kv-m">'
         +(b.intro.length?'<div class="m-intro">'+nbMIntroLines(b.intro)+'</div>':'')
-        +'<div class="m-flow" id="m-flow" data-doc="'+nbEsc(doc.id)+'"></div>'
         +(b.outro.length?'<div class="m-outro"><div class="m-outro-title">הנחיות כלליות</div><ul>'+b.outro.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>':'')
         +'</div>';
   }
   return null;
+}
+
+// ── After rendering: references as boxes, table of contents, view switch ──
+// A line that refers to another item keeps its text on the right and gets a
+// clickable box with the item's full title on the left (stacked on narrow screens).
+function nbRefRows(root){
+  if(!root) return;
+  var hosts=[];
+  root.querySelectorAll('.kb-link-item').forEach(function(a){
+    if(a.closest('.m-branch,.av-say,td,th,.av-unit-head,.t-card-title,.av-sub-title,.av-intro-title,.e-title,.av-part')) return;
+    var h=a.closest('li,p,.o-text,.m-step-hint>div,.m-intro>div');
+    if(h&&root.contains(h)&&hosts.indexOf(h)===-1) hosts.push(h);
+  });
+  hosts.forEach(function(host){
+    var text=document.createElement('div'); text.className='av-ref-text';
+    var boxes=document.createElement('div'); boxes.className='av-ref-boxes';
+    var seen={};
+    host.querySelectorAll('.kb-link-item').forEach(function(a){
+      var id=a.getAttribute('data-doc'), d=window.dynamicDocs[id];
+      var span=document.createElement('span'); span.className='av-ref-inline'; span.textContent=a.textContent;
+      a.parentNode.replaceChild(span,a);
+      if(!d||seen[id]) return;
+      seen[id]=1;
+      var b=document.createElement('button');
+      b.type='button'; b.className='av-ref'; b.title=nbPlain(d.topic);
+      b.innerHTML=nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="av-ref-arrow" aria-hidden="true">←</span>';
+      b.addEventListener('click',function(e){ e.stopPropagation(); showDynamicDoc(id); window.scrollTo(0,0); });
+      boxes.appendChild(b);
+    });
+    while(host.firstChild) text.appendChild(host.firstChild);
+    var row=document.createElement('div'); row.className='av-ref-row';
+    row.appendChild(text); row.appendChild(boxes);
+    host.appendChild(row);
+    host.classList.add('av-ref-li');
+  });
+}
+function nbTocGo(id){ var el=document.getElementById(id); if(el) nbRevealEl(el); }
+function nbBuildToolbar(root){
+  var bar=document.getElementById('av-toolbar');
+  if(!bar||!root) return;
+  // Information items: the headings of the text are its sections.
+  var rich=root.querySelector('.kv-rich');
+  if(rich){
+    var hs=rich.querySelectorAll('h2'); if(hs.length<2) hs=rich.querySelectorAll('h3');
+    hs.forEach(function(h,i){ h.id='av-h-'+i; h.setAttribute('data-toc-title',nbPlain(h.textContent).trim()); });
+  }
+  var entries=[].filter.call(root.querySelectorAll('[data-toc-title]'),function(el){ return el.id&&el.getAttribute('data-toc-title'); });
+  var toc=entries.length>=2?'<nav class="av-toc" aria-label="תוכן עניינים"><div class="av-toc-title">תוכן עניינים</div><ol>'
+    +entries.map(function(el){ return '<li><a onclick="nbTocGo(\''+el.id+'\')">'+nbEsc(el.getAttribute('data-toc-title'))+'</a></li>'; }).join('')+'</ol></nav>':'';
+  var units=root.querySelectorAll('.av-unit').length;
+  var mode=units>1?'<div class="av-mode" role="group" aria-label="אופן התצוגה">'
+    +'<button type="button" data-mode="full" onclick="nbSetViewMode(\'full\')">תצוגה מלאה</button>'
+    +'<button type="button" data-mode="stepped" onclick="nbSetViewMode(\'stepped\')">שלב אחר שלב</button></div>':'';
+  bar.innerHTML=toc+mode;
+  if(!toc&&!mode) bar.remove();
+  nbApplyViewMode(units>1?nbViewMode():'full');
+}
+
+// ── Feedback from agents ──
+// In this version feedback is kept in this browser and shown to editors in the
+// item's tracking panel; on WordPress it will be stored on the server.
+var NB_FEEDBACK_KEY='wecom_kb_feedback';
+function nbFeedbackAll(){ try{ return JSON.parse(localStorage.getItem(NB_FEEDBACK_KEY)||'[]')||[]; }catch(e){ return []; } }
+function nbFeedbackFor(id){ return nbFeedbackAll().filter(function(f){ return f.docId===id; }); }
+function nbFeedbackRowHTML(doc){
+  var src=[];
+  if(doc.originName) src.push('מסמך מקור: '+nbEsc(doc.originName));
+  if(doc.publishedAt) src.push('גרסה שפורסמה: '+nbFmtDate(doc.publishedAt));
+  return '<div class="av-feedback"><span>'+src.join(' · ')+'</span>'
+    +'<button type="button" onclick="nbOpenFeedback(\''+nbEsc(doc.id)+'\')">דיווח על בעיה / משוב</button></div>';
+}
+function nbOpenFeedback(docId){
+  var doc=window.dynamicDocs[docId];
+  if(!doc) return;
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML='<div role="dialog" aria-modal="true" aria-labelledby="nb-fb-title" style="background:#fff;border-radius:16px;padding:22px 20px;max-width:440px;width:100%;font-family:Rubik,sans-serif;direction:rtl">'
+    +'<div id="nb-fb-title" style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">דיווח על בעיה / משוב</div>'
+    +'<div style="font-size:13px;color:var(--muted);margin-bottom:12px">'+nbEsc(nbSplitTitle(doc.topic).title)+'</div>'
+    +'<textarea id="nb-fb-text" rows="5" style="width:100%;box-sizing:border-box;font-family:Rubik,sans-serif;font-size:14px;border:1.5px solid var(--border-strong);border-radius:10px;padding:10px;resize:vertical" placeholder="מה לא ברור, חסר או שגוי במסמך?"></textarea>'
+    +'<div id="nb-fb-msg" style="font-size:12.5px;color:var(--muted);margin:8px 0 14px">המשוב יועבר לעורכי התוכן. הוא לא משנה את המסמך.</div>'
+    +'<div style="display:flex;gap:10px"><button type="button" id="nb-fb-send" style="flex:1;height:40px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif">שליחה</button>'
+    +'<button type="button" id="nb-fb-cancel" style="flex:1;height:40px;background:#fff;color:var(--navy);border:2px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif">ביטול</button></div></div>';
+  document.body.appendChild(overlay);
+  var ta=overlay.querySelector('#nb-fb-text'); ta.focus();
+  var close=function(){ overlay.remove(); };
+  overlay.addEventListener('click',function(e){ if(e.target===overlay) close(); });
+  overlay.querySelector('#nb-fb-cancel').addEventListener('click',close);
+  overlay.querySelector('#nb-fb-send').addEventListener('click',function(){
+    var text=ta.value.trim();
+    if(!text){ ta.focus(); return; }
+    var all=nbFeedbackAll();
+    all.push({docId:doc.id,title:nbPlain(doc.topic),version:doc.publishedAt||doc.updatedAt||null,text:text,at:Date.now()});
+    try{ localStorage.setItem(NB_FEEDBACK_KEY,JSON.stringify(all)); }catch(e){}
+    overlay.firstChild.innerHTML='<div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px">תודה, המשוב התקבל.</div>'
+      +'<button type="button" style="width:100%;height:40px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:Rubik,sans-serif">סגירה</button>';
+    overlay.querySelector('button').addEventListener('click',close);
+  });
 }
 
 function nbCopyLine(btn){
@@ -4249,15 +4640,16 @@ function nbStageNum(title){ var m=/^\s*שלב\s*(\d+)(?!\d)/.exec(nbPlain(title)
 // A stage's name without its number ("שלב 3 - בדיקות במכשיר" → "בדיקות במכשיר").
 function nbStageName(el){
   var t=el.getAttribute('data-stage-title');
-  if(t==null){ var h=el.querySelector('.step-title,.o-title'); t=h?nbPlain(h.textContent):''; }
+  if(t==null){ var h=el.querySelector('.av-unit-title,.step-title,.o-title'); t=h?nbPlain(h.textContent):''; }
   return t.replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim();
 }
-// Jumps to a stage of the open item and highlights it.
-function nbJumpToStage(n){
+// Jumps to a stage of the open item, opens it if it is closed, and highlights it.
+// from: the section the agent jumped from, offered as the way back.
+function nbJumpToStage(n,from){
   var el=document.querySelector('#article-content [data-stage="'+n+'"]');
   if(!el) return;
-  el.scrollIntoView({behavior:'smooth',block:'start'});
-  el.classList.remove('nb-flash'); void el.offsetWidth; el.classList.add('nb-flash');
+  nbMarkFrom(el,from||null);
+  nbRevealEl(el);
 }
 // Title letters only, for comparing a title written in the text with the item's title.
 function nbTitleKey(c){ return /[\s\-‐‑‒–—·"״׳'“”„:|()]/.test(c)?'':c.toLowerCase(); }
@@ -4287,14 +4679,20 @@ function nbEnhance(root){
     var p=n.parentNode, t=n.nodeValue;
     if(!p||(p.closest&&p.closest('a,button,textarea,input,select,.article-title,.m-map'))) return;
     // Stage titles may link to other items, but "שלב N" in a title is the stage itself.
-    var inTitle=!!p.closest('.step-title,.o-title,.m-step-title');
+    var inTitle=!!p.closest('.step-title,.o-title,.m-step-title,.av-unit-title');
     if(/⚠\s*חסר/.test(t)){ var host=p.closest('li,.action-item,td')||p; host.classList.add('kb-missing'); }
     // Matches in order of position: item codes and stage references.
     var found=[], m;
     NB_CODE_RE.lastIndex=0;
     while((m=NB_CODE_RE.exec(t))){
       var code=m[1]+'-'+m[2], d=nbFindByCode(code);
-      if(!d||d.id===shown) continue;
+      // A code with no item (or one not published yet) is marked for completion, never a fake link.
+      if(!d){
+        var cur=shown&&window.dynamicDocs[shown];
+        if(!cur||nbSplitTitle(cur.topic).code!==code) found.push({at:m.index,end:m.index+m[0].length,unresolved:code});
+        continue;
+      }
+      if(d.id===shown) continue;
       var title=nbPlain(d.topic).replace(/^\s*[A-Z]-\d{2,3}\s*[·\-–—]?\s*/,'').trim();
       var after=t.slice(m.index+m[0].length), span=nbTitleSpan(after,title);
       found.push({at:m.index,codeEnd:m.index+m[0].length,end:m.index+m[0].length+span,doc:d,code:code,addTitle:span?'':title});
@@ -4311,6 +4709,12 @@ function nbEnhance(root){
     found.forEach(function(f){
       if(f.at<last) return;
       frag.appendChild(document.createTextNode(t.slice(last,f.at)));
+      if(f.unresolved){
+        var u=document.createElement('span');
+        u.className='kb-unresolved'; u.textContent=t.slice(f.at,f.end);
+        u.title='הפניה שלא זוהתה בפריטי הידע – להשלמה';
+        frag.appendChild(u); last=f.end; return;
+      }
       var a=document.createElement('a');
       if(f.doc){
         a.className='kb-link kb-link-item'; a.title=nbPlain(f.doc.topic); a.setAttribute('data-doc',f.doc.id);
@@ -4323,7 +4727,7 @@ function nbEnhance(root){
         a.className='kb-link kb-link-stage'; a.setAttribute('data-stage-link',f.stage);
         a.textContent=t.slice(f.at,f.end)+(f.name?' – '+f.name:'');
         a.title='מעבר לשלב '+f.stage+' במסמך';
-        a.addEventListener('click',function(e){ e.stopPropagation(); nbJumpToStage(this.getAttribute('data-stage-link')); });
+        a.addEventListener('click',function(e){ e.stopPropagation(); nbJumpToStage(this.getAttribute('data-stage-link'),this.closest('.av-unit,[data-stage]')); });
       }
       frag.appendChild(a);
       last=f.end;
@@ -4369,39 +4773,23 @@ function nbMTreeHTML(doc,b){
       var d=window.dynamicDocs[go.slice(5)];
       if(!d) return '<div class="m-target end">פריט הידע שאליו מפנה התשובה כבר לא קיים</div>';
       if(!nbVisible(d)) return '<div class="m-target end">פריט הידע עדיין לא פורסם — פנו לראש הצוות</div>';
-      return '<button class="m-target item" onclick="'+action(a,from)+'">'+nbKindBadge(d.kind)+'<span>'+d.topic+'</span><span class="m-go-arrow">←</span></button>';
+      return '<button class="m-target item" onclick="'+action(a,from)+'" title="'+nbEsc(nbPlain(d.topic))+'">'+nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="m-go-arrow">←</span></button>';
     }
-    // A document that is not in the app yet (a.ext names it).
-    if(a.ext) return '<div class="m-target ext">📄 '+a.ext+'</div>';
+    // A document that is not in the app yet (a.ext names it): marked for completion, not a link.
+    if(a.ext) return '<div class="m-target ext" title="הפניה שלא זוהתה בפריטי הידע – להשלמה"><span class="av-todo">להשלמה</span> '+a.ext+'</div>';
     return '<div class="m-target end">סיום האבחון</div>';
   };
-  var shortTarget=function(a){
-    var go=a.go||'';
-    if(/^q:\d+$/.test(go)){ var n=parseInt(go.slice(2),10); return 'שלב '+(n+1)+(b.questions[n]?' · '+b.questions[n].title:''); }
-    if(go.indexOf('item:')===0){
-      var d=window.dynamicDocs[go.slice(5)];
-      if(!d) return '—';
-      var t=nbPlain(d.topic).replace(/\s*[-–]\s*מסלול טיפול\s*$/,'');
-      return t.length>48?t.slice(0,47)+'…':t;
-    }
-    if(a.ext) return a.ext.length>28?a.ext.slice(0,27)+'…':a.ext;
-    return 'סיום';
-  };
+  var stepTitle=function(q,qi){ return q.title||nbPlain(q.q).trim()||('שאלה '+(qi+1)); };
   var hint=function(h){
     var L=nbLines(h);
     if(!L.length) return '';
     return '<div class="m-step-hint"><div>'+L[0]+'</div>'+(L.length>1?'<ul>'+L.slice(1).map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul>':'')+'</div>';
   };
-  var map='<nav class="m-map"><div class="m-map-title">מפת האבחון</div>'+b.questions.map(function(q,qi){
-    return '<div class="m-map-row"><button class="m-map-step" onclick="nbMJump(null,'+qi+')"><span class="m-step-num sm">'+(qi+1)+'</span>'+q.title+'</button>'
-      +'<div class="m-map-branches">'+q.answers.map(function(a){
-        var act=action(a,qi);
-        return '<button class="m-map-branch"'+(act?' onclick="'+act+'"':' disabled')+'>'+a.text+' <b>← '+shortTarget(a)+'</b></button>';
-      }).join('')+'</div></div>';
-  }).join('')+'</nav>';
+  // The table of contents (built from data-toc-title) lists the steps; each step shows all its cases.
   var steps=b.questions.map(function(q,qi){
-    return '<section class="m-step" id="m-step-'+qi+'" data-stage="'+(qi+1)+'" data-stage-title="'+nbEsc(nbPlain(q.title))+'">'
-      +'<div class="m-step-head"><span class="m-step-num">'+(qi+1)+'</span><h3 class="m-step-title">שלב '+(qi+1)+' – '+q.title+'</h3><button class="m-step-from" id="m-from-'+qi+'" hidden></button></div>'
+    var title=stepTitle(q,qi);
+    return '<section class="m-step" id="m-step-'+qi+'" data-stage="'+(qi+1)+'" data-stage-title="'+nbEsc(nbPlain(title))+'" data-toc-title="'+nbEsc(nbPlain(title))+'">'
+      +'<div class="m-step-head"><span class="m-step-num">'+(qi+1)+'</span><h2 class="m-step-title">'+(q.title?q.title:'שלב '+(qi+1))+'</h2><button class="m-step-from" id="m-from-'+qi+'" hidden></button></div>'
       +(q.q?'<div class="m-step-q"><span class="m-step-ask">שאל:</span> '+q.q+'</div>':'')
       +hint(q.hint)
       +'<div class="m-branches">'+q.answers.map(function(a){
@@ -4411,7 +4799,7 @@ function nbMTreeHTML(doc,b){
   }).join('');
   return '<div class="kv-m m-tree">'
     +(b.intro.length?'<div class="m-intro">'+nbMIntroLines(b.intro)+'</div>':'')
-    +map+steps
+    +steps
     +(b.outro.length?'<div class="m-outro"><div class="m-outro-title">הנחיות כלליות</div><ul>'+b.outro.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>':'')
     +'</div>';
 }
@@ -5135,7 +5523,8 @@ function nbSetLocation(loc){
 function nbLocLabel(loc){
   var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), val=m?decodeURIComponent(m[2]):'';
   var cut=function(s){ s=nbPlain(s||'').trim(); return s.length>45?s.slice(0,44)+'…':s; };
-  if(m&&m[1]==='item'&&window.dynamicDocs[val]) return 'לפריט: '+cut(window.dynamicDocs[val].topic);
+  // Items are named in full, by their type ("לאבחון: …", "למסלול הטיפול: …").
+  if(m&&m[1]==='item'&&window.dynamicDocs[val]){ var d=window.dynamicDocs[val]; return nbViewOf(d.kind).back+': '+nbSplitTitle(d.topic).title; }
   if(m&&m[1]==='topic'){ var t=TOPICS.find(function(x){return String(x.id)===val;}); if(t) return 'לנושא: '+cut(t.title); }
   if(m&&m[1]==='review') return 'להשוואת הגרסאות';
   if(m&&m[1]==='view'&&val==='tracking') return 'למעקב העריכה';
@@ -5147,14 +5536,26 @@ function nbLocLabel(loc){
 // The screen being left, saved in its own history entry so Back restores it.
 function nbNavSnapshot(){
   var loc=nbNavState().loc||'';
-  return {loc:loc,label:nbLocLabel(loc),scroll:window.scrollY||0,
+  return {loc:loc,label:nbLocLabel(loc),scroll:window.scrollY||0,ui:nbCaptureItemUI(),
     lib:{world:nbCurrentWorld,kind:nbCurrentKind,cat:nbCurrentLibCat,search:nbSearchQuery,mostViewed:nbMostViewedFilter}};
+}
+// Which stages of the open item are open, so Back restores them as they were.
+function nbCaptureItemUI(){
+  var v=document.getElementById('view-article');
+  if(!v||!v.classList.contains('active')) return null;
+  var units=document.querySelectorAll('#article-content .av-unit');
+  if(!units.length) return null;
+  return {open:[].filter.call(units,function(u){return u.classList.contains('open');}).map(function(u){return u.id;})};
+}
+function nbApplyItemUI(ui){
+  if(!ui||!ui.open) return;
+  document.querySelectorAll('#article-content .av-unit').forEach(function(u){ nbSetUnitOpen(u,ui.open.indexOf(u.id)!==-1); });
 }
 function nbNavigate(loc,leaving){
   if(nbNavRestoring||loc===leaving.loc){ nbSetLocation(loc); return; }
   try{
     var s=nbNavState();
-    history.replaceState(Object.assign({},s,{loc:leaving.loc,lib:leaving.lib,scroll:leaving.scroll}),'',nbNavUrl(leaving.loc));
+    history.replaceState(Object.assign({},s,{loc:leaving.loc,lib:leaving.lib,scroll:leaving.scroll,ui:leaving.ui}),'',nbNavUrl(leaving.loc));
     history.pushState({idx:(s.idx||0)+1,loc:loc,prevLabel:leaving.label},'',nbNavUrl(loc));
   }catch(e){}
 }
@@ -5223,6 +5624,7 @@ function nbShowLocation(loc,lib){
 window.addEventListener('popstate',function(e){
   var s=e.state||{loc:location.hash.replace(/^#/,'')};
   nbShowLocation(s.loc||'',s.lib);
+  nbApplyItemUI(s.ui);
   setTimeout(function(){ window.scrollTo(0,s.scroll||0); },120);
 });
 function nbRestoreLocation(){

@@ -15,6 +15,8 @@ Knowledge is organized as content worlds (שירות, טכני, הנדסה) → 
 - **T** — call scripts
 - **I** — reference information
 
+Each type has its own display, following the display spec for that type: the full title with a type label, the description and the update date; a table of contents; references to other items as clickable boxes showing the item's full title, next to the condition they depend on; and a "דיווח על בעיה / משוב" button. Diagnosis items show every question and referral up front. Handling, specialist and instruction items show numbered stages the agent can open and close, in a full or step-by-step view. Customer wording is set apart, with a copy button. Back from a linked item returns to the same place, with the same stages open. A code that matches no item is marked "להשלמה" instead of becoming a link. The display never changes the content or its order.
+
 Agents search and read published items. Editors can also create, edit, delete, review and manage items, and administrators can also manage content worlds. The entry screen lets you pick a role (מנהל מערכת, עורך תוכן, נציג שירות) to see each view; in this version that is a demo and does not restrict access.
 
 Each item has a status: draft, pending approval, published, expired or archived. Agents see only published items. The **הנצפות ביותר** filter shows up to ten items most recently opened in the current browser.
