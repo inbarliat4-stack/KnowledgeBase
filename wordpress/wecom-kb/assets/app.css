@@ -26,8 +26,8 @@ html{overflow-x:hidden;overflow-x:clip}body{font-family:"Rubik",sans-serif;backg
 .nav-search:focus-within{border-color:var(--red);background:rgba(255,255,255,.16);box-shadow:0 0 0 3px rgba(255,61,0,.15)}
 .nav-search input{background:transparent;border:none;outline:none;font-family:"Rubik",sans-serif;font-size:13px;color:#fff;direction:rtl;flex:1;width:100%}
 .nav-search input::placeholder{color:rgba(255,255,255,.35)}
-.app-shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 80px);background:var(--bg);max-width:100%;overflow-x:hidden;overflow-x:clip;align-items:stretch}
-.sidebar-nav{background:var(--white);border-left:1px solid var(--border);padding:16px 10px;width:280px;min-height:100%}
+.app-shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 80px);background:var(--bg);max-width:100%;overflow-x:hidden;overflow-x:clip;align-items:stretch}
+.sidebar-nav{background:var(--white);border-left:1px solid var(--border);padding:16px 10px;width:220px;min-height:100%}
 .snav-section{margin-bottom:4px;padding:0 10px}
 .snav-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:10px 8px 5px}
 .snav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-radius:var(--r-sm);transition:background var(--t),color var(--t);margin-bottom:1px;border:none}
@@ -1257,9 +1257,10 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .snav-doc .av-mode button{flex:1;padding:7px 4px;font-size:12px}
 .snav-doc .av-toc{background:none;border:none;padding:0}
 .snav-doc .av-toc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:0 2px 6px;margin:0}
-.snav-doc .av-toc ol{padding-right:20px;font-size:13px;gap:2px}
-.snav-doc .av-toc li::marker{color:var(--muted)}
-.snav-doc .av-toc a{display:block;padding:5px 8px;color:var(--text-2);border-radius:6px;line-height:1.45;transition:background var(--t),color var(--t)}
+.snav-doc .av-toc ol{padding-right:16px;font-size:11.5px;gap:1px}
+.snav-doc .av-toc li::marker{color:var(--muted);font-size:11px}
+.snav-doc .av-toc a{display:block;padding:4px 6px;color:var(--text-2);border-radius:6px;line-height:1.4;transition:background var(--t),color var(--t)}
+.snav-doc .av-mode button{font-size:11.5px}
 .snav-doc .av-toc a:hover,.snav-doc .av-toc a:focus-visible{color:#1D45B4;background:#E8EEFF;text-decoration:none;outline:none}
 /* Sections of M, T, I and O items: the title opens and closes the section */
 .av-col.av-closed > :not(.av-col-head){display:none!important}
