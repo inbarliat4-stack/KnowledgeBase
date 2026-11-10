@@ -37,8 +37,8 @@ html{overflow-x:hidden;overflow-x:clip}body{font-family:"Rubik",sans-serif;backg
 .nav-search:focus-within{border-color:var(--red);background:rgba(255,255,255,.16);box-shadow:0 0 0 3px rgba(255,61,0,.15)}
 .nav-search input{background:transparent;border:none;outline:none;font-family:"Rubik",sans-serif;font-size:13px;color:#fff;direction:rtl;flex:1;width:100%}
 .nav-search input::placeholder{color:rgba(255,255,255,.35)}
-.app-shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 80px);background:var(--bg);max-width:100%;overflow-x:hidden;overflow-x:clip;align-items:stretch}
-.sidebar-nav{background:var(--white);border-left:1px solid var(--border);padding:16px 10px;width:220px;min-height:100%}
+.app-shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 80px);background:var(--bg);max-width:100%;overflow-x:hidden;overflow-x:clip;align-items:stretch}
+.sidebar-nav{background:var(--white);border-left:1px solid var(--border);padding:16px 10px;width:280px;min-height:100%}
 .snav-section{margin-bottom:4px;padding:0 10px}
 .snav-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:10px 8px 5px}
 .snav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-radius:var(--r-sm);transition:background var(--t),color var(--t);margin-bottom:1px;border:none}
@@ -1263,9 +1263,10 @@ li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .snav-doc .av-mode button{flex:1;padding:7px 4px;font-size:12px}
 .snav-doc .av-toc{background:none;border:none;padding:0}
 .snav-doc .av-toc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:0 2px 6px;margin:0}
-.snav-doc .av-toc ol{padding-right:18px;font-size:12.5px;gap:2px}
-.snav-doc .av-toc a{display:block;padding:3px 2px;color:var(--text-2);border-radius:6px}
-.snav-doc .av-toc a:hover{color:var(--navy);background:var(--bg);text-decoration:none}
+.snav-doc .av-toc ol{padding-right:20px;font-size:13px;gap:2px}
+.snav-doc .av-toc li::marker{color:var(--muted)}
+.snav-doc .av-toc a{display:block;padding:5px 8px;color:var(--text-2);border-radius:6px;line-height:1.45;transition:background var(--t),color var(--t)}
+.snav-doc .av-toc a:hover,.snav-doc .av-toc a:focus-visible{color:#1D45B4;background:#E8EEFF;text-decoration:none;outline:none}
 .av-picker{margin:0 0 20px;scroll-margin-top:84px}
 /* Picked device view: other devices' sections are hidden until "תצוגה מלאה" */
 .av-o-pick .av-dev{display:none}
@@ -1679,18 +1680,14 @@ function nbRenderLibFilters(){
     }).join('');
 }
 
-// Sidebar: content worlds, with live counts. (The categories are on the home page;
-// their place in the sidebar holds the open item's view switch and table of contents.)
+// Sidebar: the content worlds and categories filters are on the home page only;
+// the sidebar holds the main links and, on an item page, the item's view switch
+// and table of contents. This keeps the library count current.
 function nbRenderSidebar(){
   var el=document.getElementById('snav-dynamic');
   if(!el) return;
   nbUpdateLibraryItemCount(nbCurrentLibraryItemCount());
-  var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
-    +WORLDS.map(function(w){
-      var n=TOPICS.filter(function(t){return nbTopicInWorld(t,w.id);}).length;
-      return '<div class="snav-item'+(nbCurrentWorld===w.id?' active':'')+'" onclick="showView(\'library\');filterWorld(\''+nbEsc(w.id)+'\')"><span class="snav-icon">◆</span> '+nbEsc(w.name)+' <span class="snav-badge gray">'+n+'</span></div>';
-    }).join('')+'</div>';
-  el.innerHTML=html;
+  el.innerHTML='';
 }
 
 function nbManageWorlds(){
@@ -5878,7 +5875,8 @@ document.addEventListener('change', function(e){
   <div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>ספריית ידע –   <span id="lib-count">140</span> פריטי ידע</div><div class="page-sub">עולם תוכן ← נושא ← פריטי ידע | לחצו על נושא כדי לראות את כל פריטי הידע שבו</div></div>
   <div class="lib-filter-row" id="lib-worlds"></div>
   <div class="lib-filter-row" id="lib-kinds"></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="lib-filters">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px" id="lib-filters">
+    <span class="filter-label">קטגוריות</span>
     <button class="filter-btn active" onclick="filterLibrary('all',this)">הכל</button>
     <button class="filter-btn" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
     <button class="filter-btn" onclick="filterLibrary('tech',this)">🔧 טכני</button>

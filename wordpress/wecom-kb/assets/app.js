@@ -350,18 +350,14 @@ function nbRenderLibFilters(){
     }).join('');
 }
 
-// Sidebar: content worlds, with live counts. (The categories are on the home page;
-// their place in the sidebar holds the open item's view switch and table of contents.)
+// Sidebar: the content worlds and categories filters are on the home page only;
+// the sidebar holds the main links and, on an item page, the item's view switch
+// and table of contents. This keeps the library count current.
 function nbRenderSidebar(){
   var el=document.getElementById('snav-dynamic');
   if(!el) return;
   nbUpdateLibraryItemCount(nbCurrentLibraryItemCount());
-  var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
-    +WORLDS.map(function(w){
-      var n=TOPICS.filter(function(t){return nbTopicInWorld(t,w.id);}).length;
-      return '<div class="snav-item'+(nbCurrentWorld===w.id?' active':'')+'" onclick="showView(\'library\');filterWorld(\''+nbEsc(w.id)+'\')"><span class="snav-icon">◆</span> '+nbEsc(w.name)+' <span class="snav-badge gray">'+n+'</span></div>';
-    }).join('')+'</div>';
-  el.innerHTML=html;
+  el.innerHTML='';
 }
 
 function nbManageWorlds(){
