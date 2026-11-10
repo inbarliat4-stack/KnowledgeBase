@@ -2944,15 +2944,25 @@ var NB_END_TITLE=/^(תנאי סיום|סיום|סגירת|תוצאות אפשר�
 
 // Header: the full title, the type label, the description and the update date.
 function nbViewHeadHTML(doc){
+  // Each fact once: the title; one row with the type, status, content worlds and date;
+  // the description only when it adds to the title; the tags; the owner. The document
+  // links are in the editing panel ("מעקב עריכה"), not repeated here.
   var k=NB_KINDS[doc.kind]||NB_KINDS.R, st=nbSplitTitle(doc.topic), date=doc.publishedAt||doc.updatedAt;
+  // A description whose words are all in the title only repeats it.
+  var words=function(s){ return nbPlain(s).replace(/[\-–—·.,:;!?()"״'׳/]/g,' ').split(/\s+/).filter(Boolean); };
+  var tw=words(st.title);
+  var desc=doc.desc&&!words(doc.desc).every(function(w){ return tw.indexOf(w)!==-1; })?doc.desc:'';
   return '<div class="article-head av-head">'
     +'<h1 class="article-title">'+nbEsc(st.title)+'</h1>'
     +'<div class="av-label-row"><span class="av-label" style="color:'+k.color+';background:'+k.bg+';border-color:'+k.color+'33">'+nbViewOf(doc.kind).label+'</span>'
-    +(st.code?'<span class="av-code">'+nbEsc(st.code)+'</span>':'')
+    +nbStatusBadge(doc)+'<span class="nb-edit-only">'+nbReviewBadge(doc)+'</span>'
+    +(doc.worlds||[]).map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
     +(date?'<span class="av-date">עודכן: '+nbFmtDate(date)+'</span>':'')+'</div>'
-    +(doc.desc?'<div class="article-sub">'+doc.desc+'</div>':'')
-    +nbItemMetaHTML(doc,true)
-    +nbItemFieldsHTML(doc,true)
+    +(desc?'<div class="article-sub">'+desc+'</div>':'')
+    +(doc.tags&&doc.tags.length?'<div class="ic-tags">'+doc.tags.map(nbTagChip).join('')+'</div>':'')
+    +(doc.owner?'<div class="item-fields">גורם מקצועי אחראי: '+nbEsc(doc.owner)+'</div>':'')
+    +(doc.reviewNotes&&doc.reviewNotes.length&&doc.status!=='published'?'<div class="import-issues nb-edit-only"><div class="ii-title">⚠ הערות לפני אישור</div><ul>'+doc.reviewNotes.map(function(n){return '<li>'+nbEsc(n)+'</li>';}).join('')+'</ul></div>':'')
+    +nbTrackPanelHTML(doc)
     +'</div>';
 }
 

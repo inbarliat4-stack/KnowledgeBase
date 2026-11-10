@@ -1173,6 +1173,8 @@ li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .av-label{font-size:12px;font-weight:700;letter-spacing:.2px;padding:2px 10px;border-radius:20px;border:1px solid}
 .av-code{font-size:11px;color:var(--muted);direction:ltr;unicode-bidi:isolate}
 .av-date{font-size:12px;color:var(--muted)}
+/* Editors see the published and last edited dates in the editing panel, so the header date is for agents only */
+body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 16px}
 .av-toc{flex:1 1 320px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
 .av-toc-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
@@ -4277,15 +4279,25 @@ var NB_END_TITLE=/^(תנאי סיום|סיום|סגירת|תוצאות אפשר�
 
 // Header: the full title, the type label, the description and the update date.
 function nbViewHeadHTML(doc){
+  // Each fact once: the title; one row with the type, status, content worlds and date;
+  // the description only when it adds to the title; the tags; the owner. The document
+  // links are in the editing panel ("מעקב עריכה"), not repeated here.
   var k=NB_KINDS[doc.kind]||NB_KINDS.R, st=nbSplitTitle(doc.topic), date=doc.publishedAt||doc.updatedAt;
+  // A description whose words are all in the title only repeats it.
+  var words=function(s){ return nbPlain(s).replace(/[\-–—·.,:;!?()"״'׳/]/g,' ').split(/\s+/).filter(Boolean); };
+  var tw=words(st.title);
+  var desc=doc.desc&&!words(doc.desc).every(function(w){ return tw.indexOf(w)!==-1; })?doc.desc:'';
   return '<div class="article-head av-head">'
     +'<h1 class="article-title">'+nbEsc(st.title)+'</h1>'
     +'<div class="av-label-row"><span class="av-label" style="color:'+k.color+';background:'+k.bg+';border-color:'+k.color+'33">'+nbViewOf(doc.kind).label+'</span>'
-    +(st.code?'<span class="av-code">'+nbEsc(st.code)+'</span>':'')
+    +nbStatusBadge(doc)+'<span class="nb-edit-only">'+nbReviewBadge(doc)+'</span>'
+    +(doc.worlds||[]).map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')
     +(date?'<span class="av-date">עודכן: '+nbFmtDate(date)+'</span>':'')+'</div>'
-    +(doc.desc?'<div class="article-sub">'+doc.desc+'</div>':'')
-    +nbItemMetaHTML(doc,true)
-    +nbItemFieldsHTML(doc,true)
+    +(desc?'<div class="article-sub">'+desc+'</div>':'')
+    +(doc.tags&&doc.tags.length?'<div class="ic-tags">'+doc.tags.map(nbTagChip).join('')+'</div>':'')
+    +(doc.owner?'<div class="item-fields">גורם מקצועי אחראי: '+nbEsc(doc.owner)+'</div>':'')
+    +(doc.reviewNotes&&doc.reviewNotes.length&&doc.status!=='published'?'<div class="import-issues nb-edit-only"><div class="ii-title">⚠ הערות לפני אישור</div><ul>'+doc.reviewNotes.map(function(n){return '<li>'+nbEsc(n)+'</li>';}).join('')+'</ul></div>':'')
+    +nbTrackPanelHTML(doc)
     +'</div>';
 }
 
