@@ -1243,6 +1243,13 @@ li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .av-o .o-steps.o-plain>li{padding-right:20px}
 .av-o .o-steps.o-plain>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
 .av-picker{margin:0 0 20px;scroll-margin-top:84px}
+/* Picked device view: other devices' sections are hidden until "תצוגה מלאה" */
+.av-o-pick .av-dev{display:none}
+.av-o-pick.av-o-full .av-dev,.av-o-pick .av-dev.av-picked{display:block}
+.av-dev-btn.on{border-color:#1D45B4;background:#EEF3FF;box-shadow:inset 0 0 0 1px #1D45B4}
+.av-o-full .av-dev-btn.on{background:#fff;box-shadow:none;border-color:var(--border-strong)}
+.av-pick-hint{display:none;font-size:12.5px;color:var(--muted);margin-top:10px}
+.av-o-none .av-pick-hint{display:block}
 .av-picker-title{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:8px}
 .av-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .av-dev-btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:right;font-family:Rubik,sans-serif;background:#fff;border:1.5px solid var(--border-strong);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--navy);font-size:14px;font-weight:700;line-height:1.35}

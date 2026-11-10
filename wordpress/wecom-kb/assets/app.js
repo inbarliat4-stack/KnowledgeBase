@@ -3192,6 +3192,27 @@ function nbDeviceNameHTML(title){
   if(!/[֐-׿]/.test(he)) return '<span class="av-he">'+nbEsc(t)+'</span>';
   return '<span class="av-he">'+nbEsc(he)+'</span><span class="av-en">'+nbEsc(lat[0].trim())+'</span>';
 }
+// The device a section is for, so the same device under several stages is one choice.
+function nbDeviceKey(title){ return nbTitleText(title).replace(/[\s–—-]+$/,'').replace(/\s+/g,' ').toLowerCase(); }
+// Picked device view (the default): only the picked device's sections are shown;
+// sections shared by all devices, the explanation and the notes stay. "תצוגה מלאה" shows every device.
+var nbODevice=null, nbOFull=false;
+function nbApplyOView(){
+  var o=document.querySelector('#article-content .av-o-pick');
+  if(!o) return;
+  o.classList.toggle('av-o-full',nbOFull);
+  o.classList.toggle('av-o-none',!nbOFull&&!nbODevice);
+  o.querySelectorAll('.av-dev').forEach(function(s){ s.classList.toggle('av-picked',s.getAttribute('data-dev')===nbODevice); });
+  o.querySelectorAll('.av-dev-btn').forEach(function(b){ var on=b.getAttribute('data-dev')===nbODevice; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
+  document.querySelectorAll('#article-content .av-omode button').forEach(function(b){ var on=(b.getAttribute('data-mode')==='full')===nbOFull; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
+}
+function nbPickDevice(key){
+  nbODevice=key;
+  nbApplyOView();
+  var first=document.querySelector('#article-content .av-dev[data-dev="'+(window.CSS&&CSS.escape?CSS.escape(key):key)+'"]');
+  if(first) nbRevealEl(first);
+}
+function nbSetOMode(full){ nbOFull=!!full; nbApplyOView(); }
 function nbOViewHTML(b){
   var G=b.groups||[], n=G.length;
   var isDev=G.map(function(g){ return nbIsDeviceTitle(g.title); });
@@ -3230,19 +3251,20 @@ function nbOViewHTML(b){
     parts.push({sec:g,id:'av-s-'+i});
   }
   var sub=function(g){ return '<div class="av-sub"><div class="av-sub-title">'+g.title+'</div>'+steps(g)+'</div>'; };
-  // The same device can appear under several stages: the box then names the stage too.
-  var count={}; devs.forEach(function(d){ var k=nbPlain(d.g.title).trim(); count[k]=(count[k]||0)+1; });
-  var html='<div class="kv-o av-o">';
+  // One box per device; a device that appears under several stages has a section in each,
+  // and picking it shows all of them.
+  var keys=[];
+  devs.forEach(function(d){ d.key=nbDeviceKey(d.g.title); if(keys.indexOf(d.key)===-1){ keys.push(d.key); d.first=true; } });
+  var html='<div class="kv-o av-o'+(devs.length?' av-o-pick':'')+'">';
   if(introEnd) html+='<div class="av-intro">'+G.slice(0,introEnd).map(function(g){return (g.title?'<div class="av-intro-title">'+g.title+'</div>':'')+steps(g);}).join('')+'</div>';
   if(devs.length) html+='<nav class="av-picker" id="av-picker" aria-label="בחירת מכשיר"><div class="av-picker-title">בחירת מכשיר</div><div class="av-picker-grid">'
-    +devs.map(function(d){
-      var ctx=count[nbPlain(d.g.title).trim()]>1&&d.stage?'<span class="av-dev-ctx">'+nbEsc(d.stage)+'</span>':'';
-      return '<button type="button" class="av-dev-btn" onclick="nbTocGo(\''+d.id+'\')">'+nbDeviceNameHTML(d.g.title)+ctx+'</button>';
-    }).join('')+'</div></nav>';
+    +devs.filter(function(d){return d.first;}).map(function(d){
+      return '<button type="button" class="av-dev-btn" data-dev="'+nbEsc(d.key)+'" aria-pressed="false" onclick="nbPickDevice(this.getAttribute(\'data-dev\'))">'+nbDeviceNameHTML(d.g.title)+'</button>';
+    }).join('')+'</div><div class="av-pick-hint">בחרו מכשיר כדי להציג את הוראות התפעול שלו. כל המכשירים מוצגים ב"תצוגה מלאה".</div></nav>';
   html+=parts.map(function(p){
     if(p.dev){
       var d=p.dev;
-      return '<section class="av-dev" id="'+d.id+'"><h2 class="av-dev-title">'+nbDeviceNameHTML(d.g.title)+'</h2>'
+      return '<section class="av-dev" id="'+d.id+'" data-dev="'+nbEsc(d.key)+'"><h2 class="av-dev-title">'+nbDeviceNameHTML(d.g.title)+'</h2>'
         +steps(d.g)+d.subs.map(sub).join('')
         +'<button type="button" class="av-back-pick" onclick="nbTocGo(\'av-picker\')">↑ חזרה לבחירת מכשיר</button></section>';
     }
@@ -3395,8 +3417,17 @@ function nbBuildToolbar(root){
   var mode=units>1?'<div class="av-mode" role="group" aria-label="אופן התצוגה">'
     +'<button type="button" data-mode="full" onclick="nbSetViewMode(\'full\')">תצוגה מלאה</button>'
     +'<button type="button" data-mode="stepped" onclick="nbSetViewMode(\'stepped\')">שלב אחר שלב</button></div>':'';
+  // O with devices: the picked device's instructions by default, every device in the full view.
+  var pick=root.querySelector('.av-o-pick');
+  if(pick){
+    nbODevice=null; nbOFull=false;
+    mode='<div class="av-mode av-omode" role="group" aria-label="אופן התצוגה">'
+      +'<button type="button" data-mode="device" onclick="nbSetOMode(false)">המכשיר שנבחר</button>'
+      +'<button type="button" data-mode="full" onclick="nbSetOMode(true)">תצוגה מלאה</button></div>';
+  }
   bar.innerHTML=toc+mode;
   if(!toc&&!mode) bar.remove();
+  if(pick) nbApplyOView();
   nbApplyViewMode(units>1?nbViewMode():'full');
 }
 
@@ -4367,12 +4398,16 @@ function nbCaptureItemUI(){
   var v=document.getElementById('view-article');
   if(!v||!v.classList.contains('active')) return null;
   var units=document.querySelectorAll('#article-content .av-unit');
-  if(!units.length) return null;
-  return {open:[].filter.call(units,function(u){return u.classList.contains('open');}).map(function(u){return u.id;})};
+  var pick=document.querySelector('#article-content .av-o-pick');
+  if(!units.length&&!pick) return null;
+  return {open:[].filter.call(units,function(u){return u.classList.contains('open');}).map(function(u){return u.id;}),
+    device:pick?nbODevice:null,full:pick?nbOFull:false};
 }
+// Also restores the picked device and the view of an operating item.
 function nbApplyItemUI(ui){
-  if(!ui||!ui.open) return;
-  document.querySelectorAll('#article-content .av-unit').forEach(function(u){ nbSetUnitOpen(u,ui.open.indexOf(u.id)!==-1); });
+  if(!ui) return;
+  if(ui.open) document.querySelectorAll('#article-content .av-unit').forEach(function(u){ nbSetUnitOpen(u,ui.open.indexOf(u.id)!==-1); });
+  if(document.querySelector('#article-content .av-o-pick')){ nbODevice=ui.device||null; nbOFull=!!ui.full; nbApplyOView(); }
 }
 function nbNavigate(loc,leaving){
   if(nbNavRestoring||loc===leaving.loc){ nbSetLocation(loc); return; }
