@@ -27,7 +27,8 @@
   --shadow-red:0 4px 20px rgba(255,61,0,.25);
   --t:200ms cubic-bezier(.4,0,.2,1);
 }
-html{overflow-x:hidden}body{font-family:"Rubik",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.65;min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%}
+/* clip (not hidden) keeps sideways overflow out without turning the page into a scroll box, so sticky parts stay put */
+html{overflow-x:hidden;overflow-x:clip}body{font-family:"Rubik",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.65;min-height:100vh;overflow-x:hidden;overflow-x:clip;-webkit-text-size-adjust:100%}
 .topnav{background:var(--navy);height:80px;display:flex;align-items:center;padding:0 28px;gap:16px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.1)}
 .nav-logo{font-size:28px;font-weight:800;color:var(--red);letter-spacing:-.5px;flex-shrink:0;line-height:1}
 .nav-sep{display:none}
@@ -36,7 +37,7 @@ html{overflow-x:hidden}body{font-family:"Rubik",sans-serif;background:var(--bg);
 .nav-search:focus-within{border-color:var(--red);background:rgba(255,255,255,.16);box-shadow:0 0 0 3px rgba(255,61,0,.15)}
 .nav-search input{background:transparent;border:none;outline:none;font-family:"Rubik",sans-serif;font-size:13px;color:#fff;direction:rtl;flex:1;width:100%}
 .nav-search input::placeholder{color:rgba(255,255,255,.35)}
-.app-shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 80px);background:var(--bg);max-width:100%;overflow-x:hidden;align-items:stretch}
+.app-shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 80px);background:var(--bg);max-width:100%;overflow-x:hidden;overflow-x:clip;align-items:stretch}
 .sidebar-nav{background:var(--white);border-left:1px solid var(--border);padding:16px 10px;width:220px;min-height:100%}
 .snav-section{margin-bottom:4px;padding:0 10px}
 .snav-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:10px 8px 5px}
@@ -1253,6 +1254,18 @@ li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .av-o .o-steps>li::before{right:4px;top:7px;width:22px;height:22px;font-size:11.5px}
 .av-o .o-steps.o-plain>li{padding-right:20px}
 .av-o .o-steps.o-plain>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
+/* The open item's view switch and table of contents, in the sidebar (wide screens) */
+.av-toolbar{flex-direction:column;align-items:stretch}
+@media(min-width:769px){#av-toolbar{display:none}}
+.snav-doc{position:sticky;top:92px;max-height:calc(100vh - 104px);overflow-y:auto}
+.snav-doc .snav-section{padding:4px 6px 12px;border-top:1px solid var(--border);margin-top:8px}
+.snav-doc .av-mode{display:flex;width:100%;margin:10px 0 12px}
+.snav-doc .av-mode button{flex:1;padding:7px 4px;font-size:12px}
+.snav-doc .av-toc{background:none;border:none;padding:0}
+.snav-doc .av-toc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:0 2px 6px;margin:0}
+.snav-doc .av-toc ol{padding-right:18px;font-size:12.5px;gap:2px}
+.snav-doc .av-toc a{display:block;padding:3px 2px;color:var(--text-2);border-radius:6px}
+.snav-doc .av-toc a:hover{color:var(--navy);background:var(--bg);text-decoration:none}
 .av-picker{margin:0 0 20px;scroll-margin-top:84px}
 /* Picked device view: other devices' sections are hidden until "תצוגה מלאה" */
 .av-o-pick .av-dev{display:none}
@@ -1533,6 +1546,8 @@ function showView(id){
   var target=document.getElementById('view-'+id);
   if(!target) return;
   target.classList.add('active');
+  // The item's view switch and table of contents in the sidebar belong to the item page only.
+  if(id!=='article'){ var sd=document.getElementById('snav-doc'); if(sd) sd.innerHTML=''; }
   document.querySelectorAll('.snav-item').forEach(function(i){i.classList.remove('active')});
   var sm=document.getElementById('snav-'+id);
   if(sm) sm.classList.add('active');
@@ -1664,21 +1679,16 @@ function nbRenderLibFilters(){
     }).join('');
 }
 
-// Sidebar: content worlds + categories, with live counts.
+// Sidebar: content worlds, with live counts. (The categories are on the home page;
+// their place in the sidebar holds the open item's view switch and table of contents.)
 function nbRenderSidebar(){
   var el=document.getElementById('snav-dynamic');
   if(!el) return;
   nbUpdateLibraryItemCount(nbCurrentLibraryItemCount());
-  var cats=[['sim',SIM_ICON,'SIM / eSIM'],['tech','🔧','תמיכה טכנית'],['billing','💳','חיובים'],['plans','📋','מסלולים'],['intl','✈️','חו"ל ונדידה'],['ops','🎧','טיפול בשיחה']];
   var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
     +WORLDS.map(function(w){
       var n=TOPICS.filter(function(t){return nbTopicInWorld(t,w.id);}).length;
       return '<div class="snav-item'+(nbCurrentWorld===w.id?' active':'')+'" onclick="showView(\'library\');filterWorld(\''+nbEsc(w.id)+'\')"><span class="snav-icon">◆</span> '+nbEsc(w.name)+' <span class="snav-badge gray">'+n+'</span></div>';
-    }).join('')+'</div>'
-    +'<div class="snav-section"><div class="snav-title">קטגוריות</div>'
-    +cats.map(function(c){
-      var n=TOPICS.filter(function(t){return t.cat===c[0]||(c[0]==='tech'&&t.cat==='tech2');}).length;
-      return '<div class="snav-item" onclick="filterCategory(\''+c[0]+'\')"><span class="snav-icon">'+c[1]+'</span> '+c[2]+' <span class="snav-badge">'+n+'</span></div>';
     }).join('')+'</div>';
   el.innerHTML=html;
 }
@@ -4331,7 +4341,8 @@ function nbSetViewMode(m){ try{ localStorage.setItem(NB_MODE_KEY,m); }catch(e){}
 function nbApplyViewMode(m){
   var root=document.getElementById('article-content');
   if(!root) return;
-  root.querySelectorAll('.av-mode button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false'); });
+  // The switch appears in the sidebar and at the top of the item (narrow screens).
+  document.querySelectorAll('.av-mode:not(.av-omode) button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false'); });
   root.querySelectorAll('.av-unit').forEach(function(u){ nbSetUnitOpen(u,m==='full'); });
 }
 function nbSetUnitOpen(u,open){
@@ -4440,7 +4451,7 @@ function nbApplyOView(){
   o.classList.toggle('av-o-none',!nbOFull&&!nbODevice);
   o.querySelectorAll('.av-dev').forEach(function(s){ s.classList.toggle('av-picked',s.getAttribute('data-dev')===nbODevice); });
   o.querySelectorAll('.av-dev-btn').forEach(function(b){ var on=b.getAttribute('data-dev')===nbODevice; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
-  document.querySelectorAll('#article-content .av-omode button').forEach(function(b){ var on=(b.getAttribute('data-mode')==='full')===nbOFull; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
+  document.querySelectorAll('.av-omode button').forEach(function(b){ var on=(b.getAttribute('data-mode')==='full')===nbOFull; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
 }
 function nbPickDevice(key){
   nbODevice=key;
@@ -4661,7 +4672,11 @@ function nbBuildToolbar(root){
       +'<button type="button" data-mode="device" onclick="nbSetOMode(false)">המכשיר שנבחר</button>'
       +'<button type="button" data-mode="full" onclick="nbSetOMode(true)">תצוגה מלאה</button></div>';
   }
-  bar.innerHTML=toc+mode;
+  // The view switch comes first, above the table of contents. On a wide screen both sit in
+  // the sidebar; on a narrow one (no sidebar) they stay at the top of the item.
+  var side=document.getElementById('snav-doc');
+  if(side) side.innerHTML=(mode||toc)?'<div class="snav-section">'+mode+toc+'</div>':'';
+  bar.innerHTML=mode+toc;
   if(!toc&&!mode) bar.remove();
   if(pick) nbApplyOView();
   nbApplyViewMode(units>1?nbViewMode():'full');
@@ -5854,6 +5869,7 @@ document.addEventListener('change', function(e){
     <div class="snav-item" id="snav-history" onclick="nbOpenHistory()"><span class="snav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg></span> היסטוריית גרסאות <span class="snav-badge" id="nb-history-count-nav" style="display:none"></span></div>
   </div>
   <div id="snav-dynamic"></div>
+  <div id="snav-doc" class="snav-doc"></div>
 </nav>
 <main class="content">
 

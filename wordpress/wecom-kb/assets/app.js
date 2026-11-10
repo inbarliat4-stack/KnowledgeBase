@@ -217,6 +217,8 @@ function showView(id){
   var target=document.getElementById('view-'+id);
   if(!target) return;
   target.classList.add('active');
+  // The item's view switch and table of contents in the sidebar belong to the item page only.
+  if(id!=='article'){ var sd=document.getElementById('snav-doc'); if(sd) sd.innerHTML=''; }
   document.querySelectorAll('.snav-item').forEach(function(i){i.classList.remove('active')});
   var sm=document.getElementById('snav-'+id);
   if(sm) sm.classList.add('active');
@@ -348,21 +350,16 @@ function nbRenderLibFilters(){
     }).join('');
 }
 
-// Sidebar: content worlds + categories, with live counts.
+// Sidebar: content worlds, with live counts. (The categories are on the home page;
+// their place in the sidebar holds the open item's view switch and table of contents.)
 function nbRenderSidebar(){
   var el=document.getElementById('snav-dynamic');
   if(!el) return;
   nbUpdateLibraryItemCount(nbCurrentLibraryItemCount());
-  var cats=[['sim',SIM_ICON,'SIM / eSIM'],['tech','🔧','תמיכה טכנית'],['billing','💳','חיובים'],['plans','📋','מסלולים'],['intl','✈️','חו"ל ונדידה'],['ops','🎧','טיפול בשיחה']];
   var html='<div class="snav-section"><div class="snav-title">עולמות תוכן</div>'
     +WORLDS.map(function(w){
       var n=TOPICS.filter(function(t){return nbTopicInWorld(t,w.id);}).length;
       return '<div class="snav-item'+(nbCurrentWorld===w.id?' active':'')+'" onclick="showView(\'library\');filterWorld(\''+nbEsc(w.id)+'\')"><span class="snav-icon">◆</span> '+nbEsc(w.name)+' <span class="snav-badge gray">'+n+'</span></div>';
-    }).join('')+'</div>'
-    +'<div class="snav-section"><div class="snav-title">קטגוריות</div>'
-    +cats.map(function(c){
-      var n=TOPICS.filter(function(t){return t.cat===c[0]||(c[0]==='tech'&&t.cat==='tech2');}).length;
-      return '<div class="snav-item" onclick="filterCategory(\''+c[0]+'\')"><span class="snav-icon">'+c[1]+'</span> '+c[2]+' <span class="snav-badge">'+n+'</span></div>';
     }).join('')+'</div>';
   el.innerHTML=html;
 }
@@ -3015,7 +3012,8 @@ function nbSetViewMode(m){ try{ localStorage.setItem(NB_MODE_KEY,m); }catch(e){}
 function nbApplyViewMode(m){
   var root=document.getElementById('article-content');
   if(!root) return;
-  root.querySelectorAll('.av-mode button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false'); });
+  // The switch appears in the sidebar and at the top of the item (narrow screens).
+  document.querySelectorAll('.av-mode:not(.av-omode) button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false'); });
   root.querySelectorAll('.av-unit').forEach(function(u){ nbSetUnitOpen(u,m==='full'); });
 }
 function nbSetUnitOpen(u,open){
@@ -3124,7 +3122,7 @@ function nbApplyOView(){
   o.classList.toggle('av-o-none',!nbOFull&&!nbODevice);
   o.querySelectorAll('.av-dev').forEach(function(s){ s.classList.toggle('av-picked',s.getAttribute('data-dev')===nbODevice); });
   o.querySelectorAll('.av-dev-btn').forEach(function(b){ var on=b.getAttribute('data-dev')===nbODevice; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
-  document.querySelectorAll('#article-content .av-omode button').forEach(function(b){ var on=(b.getAttribute('data-mode')==='full')===nbOFull; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
+  document.querySelectorAll('.av-omode button').forEach(function(b){ var on=(b.getAttribute('data-mode')==='full')===nbOFull; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
 }
 function nbPickDevice(key){
   nbODevice=key;
@@ -3345,7 +3343,11 @@ function nbBuildToolbar(root){
       +'<button type="button" data-mode="device" onclick="nbSetOMode(false)">המכשיר שנבחר</button>'
       +'<button type="button" data-mode="full" onclick="nbSetOMode(true)">תצוגה מלאה</button></div>';
   }
-  bar.innerHTML=toc+mode;
+  // The view switch comes first, above the table of contents. On a wide screen both sit in
+  // the sidebar; on a narrow one (no sidebar) they stay at the top of the item.
+  var side=document.getElementById('snav-doc');
+  if(side) side.innerHTML=(mode||toc)?'<div class="snav-section">'+mode+toc+'</div>':'';
+  bar.innerHTML=mode+toc;
   if(!toc&&!mode) bar.remove();
   if(pick) nbApplyOView();
   nbApplyViewMode(units>1?nbViewMode():'full');
