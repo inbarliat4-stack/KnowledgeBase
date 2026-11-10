@@ -1340,7 +1340,9 @@ function showDynamicDoc(docId){
   window.nbShownDocId=doc.id; // an item's own code is not linked
   var body=document.querySelector('#article-content .article-body');
   nbEnhance(body);
-  nbRefRows(body);
+  // In a handling item (R) a referral stays one sentence with the target as a link in it;
+  // the other types show referrals as boxes.
+  if(doc.kind!=='R') nbRefRows(body);
   nbBuildToolbar(body);
 
   // Add "עדכן מסמך" button
@@ -3001,7 +3003,7 @@ function nbBodyHasContent(k,b){
 var NB_VIEW={
   M:{label:'אבחון',back:'לאבחון'},
   R:{label:'טיפול',back:'למסלול הטיפול'},
-  O:{label:'הוראות ביצוע',back:'להוראות הביצוע'},
+  O:{label:'תפעול',back:'למסמך התפעול'},
   E:{label:'העברה לגורם נוסף',back:'להנחיות ההעברה'},
   S:{label:'מסלול מומחה',back:'למסלול המומחה'},
   T:{label:'ניסוח ללקוח',back:'לתסריטי השיחה'},
@@ -3079,9 +3081,9 @@ function nbCopySay(btn){
 }
 
 // ── Stages the agent opens and closes (R, S, O) ──
-// u.title is plain text (escaped here).
+// u.title is plain text (escaped here). u.name: the stage's name without "שלב N", for back links.
 function nbUnitHTML(u){
-  return '<section class="av-unit" id="'+u.id+'"'+(u.stage?' data-stage="'+u.stage+'"':'')+' data-toc-title="'+nbEsc(u.title)+'">'
+  return '<section class="av-unit'+(u.plain?' av-plain':'')+'" id="'+u.id+'"'+(u.stage?' data-stage="'+u.stage+'"':'')+(u.name?' data-stage-title="'+nbEsc(u.name)+'"':'')+' data-toc-title="'+nbEsc(u.title)+'">'
     +'<div class="av-unit-head" role="button" tabindex="0" aria-expanded="false" onclick="nbToggleUnit(this.parentNode)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();nbToggleUnit(this.parentNode);}">'
     +(u.num?'<span class="av-unit-num">'+u.num+'</span>':'')
     +'<h2 class="av-unit-title">'+nbEsc(u.title)+'</h2><span class="av-chev" aria-hidden="true">▾</span></div>'
@@ -3116,7 +3118,7 @@ function nbRevealEl(el){
 function nbMarkFrom(target,from){
   document.querySelectorAll('#article-content .av-from').forEach(function(b){ b.remove(); });
   if(!from||from===target||from.contains(target)) return;
-  var n=from.getAttribute('data-stage'), name=from.getAttribute('data-toc-title')||nbStageName(from)||'';
+  var n=from.getAttribute('data-stage'), name=(n?nbStageName(from):from.getAttribute('data-toc-title'))||'';
   var b=document.createElement('button');
   b.type='button'; b.className='av-from';
   b.textContent='↩ חזרה ל'+(n?'שלב '+n+(name?' – '+name:''):(name||'מקום הקודם'));
@@ -3151,22 +3153,139 @@ function nbStagesViewHTML(doc){
     if(units.length&&NB_END_TITLE.test(t)){ end.push(s); return; }
     units.push({s:s,subs:[]});
   });
-  var tags=doc.kind==='R'||doc.kind==='S';
   var block=function(s){
     var L=nbStageItems(s);
-    return (L.length?nbLinesHTML(L,{tags:tags}):'')
-      +((s.images||[]).map(nbImgHTML).join(''));
+    return (L.length?nbParaHTML(L):'')+((s.images||[]).map(nbImgHTML).join(''));
   };
   var sub=function(s){ return '<div class="av-sub"><div class="av-sub-title">'+s.title+'</div>'+block(s)+'</div>'; };
   var html='';
   if(intro.length) html+='<div class="av-intro">'+intro.map(function(s){return '<div class="av-intro-title">'+s.title+'</div>'+block(s);}).join('')+'</div>';
+  // Only the source's own stage numbers are shown, once, in the title.
   html+=units.map(function(u,i){
-    var n=nbStageNum(u.s.title)||(i+1);
-    var title=nbPlain(u.s.title).replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim()||nbPlain(u.s.title);
-    return nbUnitHTML({id:'av-u-'+i,num:n,stage:n,title:title,body:block(u.s)+u.subs.map(sub).join('')});
+    var n=nbStageNum(u.s.title), name=nbPlain(u.s.title).replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim();
+    var title=n?'שלב '+n+(name?' – '+name:''):nbPlain(u.s.title);
+    return nbUnitHTML({id:'av-u-'+i,plain:true,stage:n||null,name:n?name:'',title:title,body:block(u.s)+u.subs.map(sub).join('')});
   }).join('');
-  if(end.length) html+=nbUnitHTML({id:'av-u-end',title:'סיום והעברה',body:end.map(sub).join('')});
+  // Closing sections keep their own titles and get no number.
+  html+=end.map(function(s,i){ return nbUnitHTML({id:'av-u-end-'+i,plain:true,title:nbPlain(s.title),body:block(s)}); }).join('');
   return '<div class="av-stages">'+html+'</div>';
+}
+// ── O (תפעול): operating instructions by device ──
+// The explanation first, then clickable boxes with the device names found in the
+// source, then a section per device with its own numbered actions, and the
+// general notes at the end, each marked with an asterisk. Nothing is reordered
+// except those closing notes, which the spec places at the bottom.
+var NB_DEVICE_RE=/(iphone|אייפון|apple|samsung|סמסונג|galaxy|xiaomi|שיאומי|redmi|poco|huawei|וואווי|pixel|פיקסל|motorola|מוטורולה|realme|רילמי|oppo|אופו|oneplus|one plus|וואן פלוס|vivo|nothing phone|honor|android|אנדרואיד|כשר)/i;
+var NB_NOTE_TITLE=/^(חשוב לנציג|חשוב|כלל מנחה|דגש|דגשים|הערות|הערה|לזכור|מקורות)/;
+var NB_O_AFTER=/^(שלב|לאחר|תוצאה|תוצאת|בדיקת סיום|בדיקה לאחר|סיום|המשך|אם אף|אפליקציות צד שלישי|סדר|מה לתעד|תיעוד)/;
+function nbTitleText(t){ return nbPlain(t).replace(/^[^֐-׿A-Za-z0-9"״]+/,'').trim(); }
+function nbIsDeviceTitle(t){
+  t=nbPlain(t).trim();
+  return t.length>0&&t.length<=48&&!/https?:/.test(t)&&!/^(שלב|אם|לאחר|בדיקת|ב-|החל|יתר)/.test(nbTitleText(t))&&!/:\s*\S/.test(t)&&NB_DEVICE_RE.test(t);
+}
+// A device name in full; an English name next to a Hebrew one goes on its own line.
+function nbDeviceNameHTML(title){
+  var t=nbPlain(title).trim().replace(/[\s–—-]+$/,'');
+  var lat=t.match(/[A-Za-z][A-Za-z0-9.+()\/ \-]*[A-Za-z0-9)+]/g)||[];
+  if(lat.length!==1||!/[֐-׿]/.test(t)) return '<span class="av-he">'+nbEsc(t)+'</span>';
+  var he=t.replace(lat[0],' ').replace(/\s*[–—-]\s*$/,'').replace(/\s{2,}/g,' ').trim();
+  if(!/[֐-׿]/.test(he)) return '<span class="av-he">'+nbEsc(t)+'</span>';
+  return '<span class="av-he">'+nbEsc(he)+'</span><span class="av-en">'+nbEsc(lat[0].trim())+'</span>';
+}
+function nbOViewHTML(b){
+  var G=b.groups||[], n=G.length;
+  var isDev=G.map(function(g){ return nbIsDeviceTitle(g.title); });
+  var hasDev=isDev.indexOf(true)!==-1;
+  var warnRe=/^(⚠(?!\s*חסר)|חשוב|שים לב|אזהרה)/;
+  var steps=function(g){
+    if(!g.steps.length) return '';
+    return (g.ordered===false?'<ul class="o-steps o-plain">':'<ol class="o-steps">')
+      +g.steps.map(function(s){ return '<li'+(warnRe.test(nbPlain(s.text).trim())?' class="av-warn"':'')+'><div class="o-text">'+s.text+'</div>'+nbImgHTML(s.img)+'</li>'; }).join('')
+      +(g.ordered===false?'</ul>':'</ol>');
+  };
+  // Closing notes: the trailing run of note sections after the last device or stage.
+  var notesFrom=n;
+  for(var i=n-1;i>=0;i--){
+    if(isDev[i]||nbStageNum(G[i].title)) break;
+    if(NB_NOTE_TITLE.test(nbTitleText(G[i].title))) notesFrom=i;
+  }
+  var introEnd=0;
+  while(introEnd<notesFrom&&!isDev[introEnd]&&(!G[introEnd].title||NB_INTRO_TITLE.test(nbTitleText(G[introEnd].title)))) introEnd++;
+  var lastDev=-1; for(i=0;i<notesFrom;i++) if(isDev[i]) lastDev=i;
+  // A device's section takes the cases written under it, up to the next device or a new stage.
+  var parts=[], devs=[], cur=null, stageName='';
+  for(i=introEnd;i<notesFrom;i++){
+    var g=G[i], tt=nbTitleText(g.title);
+    if(isDev[i]){
+      cur={g:g,subs:[],id:'av-d-'+devs.length,stage:stageName};
+      devs.push(cur); parts.push({dev:cur}); continue;
+    }
+    if(cur){
+      var empty=!cur.g.steps.length&&!cur.subs.length;
+      var attach=i<lastDev?(empty||!nbStageNum(g.title)):(!cur.g.steps.length&&!NB_O_AFTER.test(tt));
+      if(attach){ cur.subs.push(g); continue; }
+      cur=null;
+    }
+    if(nbStageNum(g.title)) stageName=nbPlain(g.title).replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim();
+    parts.push({sec:g,id:'av-s-'+i});
+  }
+  var sub=function(g){ return '<div class="av-sub"><div class="av-sub-title">'+g.title+'</div>'+steps(g)+'</div>'; };
+  // The same device can appear under several stages: the box then names the stage too.
+  var count={}; devs.forEach(function(d){ var k=nbPlain(d.g.title).trim(); count[k]=(count[k]||0)+1; });
+  var html='<div class="kv-o av-o">';
+  if(introEnd) html+='<div class="av-intro">'+G.slice(0,introEnd).map(function(g){return (g.title?'<div class="av-intro-title">'+g.title+'</div>':'')+steps(g);}).join('')+'</div>';
+  if(devs.length) html+='<nav class="av-picker" id="av-picker" aria-label="בחירת מכשיר"><div class="av-picker-title">בחירת מכשיר</div><div class="av-picker-grid">'
+    +devs.map(function(d){
+      var ctx=count[nbPlain(d.g.title).trim()]>1&&d.stage?'<span class="av-dev-ctx">'+nbEsc(d.stage)+'</span>':'';
+      return '<button type="button" class="av-dev-btn" onclick="nbTocGo(\''+d.id+'\')">'+nbDeviceNameHTML(d.g.title)+ctx+'</button>';
+    }).join('')+'</div></nav>';
+  html+=parts.map(function(p){
+    if(p.dev){
+      var d=p.dev;
+      return '<section class="av-dev" id="'+d.id+'"><h2 class="av-dev-title">'+nbDeviceNameHTML(d.g.title)+'</h2>'
+        +steps(d.g)+d.subs.map(sub).join('')
+        +'<button type="button" class="av-back-pick" onclick="nbTocGo(\'av-picker\')">↑ חזרה לבחירת מכשיר</button></section>';
+    }
+    var g=p.sec, sn=nbStageNum(g.title);
+    if(!g.steps.length) return '<h2 class="av-part" id="'+p.id+'"'+(sn?' data-stage="'+sn+'"':'')+(hasDev?'':' data-toc-title="'+nbEsc(nbPlain(g.title))+'"')+'>'+g.title+'</h2>';
+    return '<section class="av-sec" id="'+p.id+'"'+(sn?' data-stage="'+sn+'"':'')+(hasDev?'':' data-toc-title="'+nbEsc(nbPlain(g.title))+'"')+'>'
+      +(g.title?'<h2 class="av-sec-title">'+g.title+'</h2>':'')+steps(g)+'</section>';
+  }).join('');
+  if(notesFrom<n) html+='<div class="av-notes">'+G.slice(notesFrom).map(function(g){
+    var L=g.steps.map(function(s){ return '<li'+(warnRe.test(nbPlain(s.text).trim())?' class="av-warn"':'')+'>'+s.text+nbImgHTML(s.img)+'</li>'; }).join('');
+    return '<div class="av-notes-title">'+g.title+'</div>'+(L?'<ul>'+L+'</ul>':'');
+  }).join('')+'</div>';
+  return html+'</div>';
+}
+
+// R / S text as readable paragraphs. Bullets only for sub-actions listed after a
+// line ending in ":". A bare "כן" / "לא" line heads the instructions that follow it,
+// shown as "אם כן" / "אם לא" with them. Customer wording stays set apart.
+function nbParaHTML(items){
+  var out='', inList=false, inBranch=false, dont=false;
+  var closeList=function(){ if(inList){ out+='</ul>'; inList=false; } };
+  var LIST_STOP=/^(אם|לאחר|המשך|עבור|חזור|במקרה|כאשר|ודא|וודא|בדוק)\s/;
+  items.forEach(function(it){
+    var text=typeof it==='object'?it.text:it, img=typeof it==='object'?nbImgHTML(it.img):'';
+    var p=nbPlain(text).trim(), yn=/^(?:אם\s+)?(כן|לא)\s*[:.]?$/.exec(p);
+    if(yn){
+      closeList(); if(inBranch) out+='</div>';
+      out+='<div class="av-branch"><div class="av-branch-title">אם '+yn[1]+'</div>'; inBranch=true; dont=false; return;
+    }
+    if(nbIsSayLine(p)){
+      closeList();
+      out+=dont?'<p class="av-p av-dont">'+text+'</p>'+img:nbSayHTML(text)+img;
+      return;
+    }
+    dont=NB_DONT_SAY.test(p);
+    var warn=/^(⚠(?!\s*חסר)|חשוב|שים לב|אזהרה)/.test(p);
+    if(inList&&p.length<=140&&!LIST_STOP.test(p)&&!/:$/.test(p)){ out+='<li'+(warn?' class="av-warn"':'')+'>'+text+img+'</li>'; return; }
+    closeList();
+    out+='<p class="av-p'+(warn?' av-warn':'')+'">'+text+'</p>'+img;
+    if(/:$/.test(p)){ out+='<ul class="av-lines">'; inList=true; }
+  });
+  closeList(); if(inBranch) out+='</div>';
+  return out;
 }
 
 function nbKindBodyHTML(doc){
@@ -3174,27 +3293,7 @@ function nbKindBodyHTML(doc){
   if(!b) return null;
   switch(doc.kind){
     case 'O':
-      // Purpose, preconditions and warnings at the top; then each action as a numbered stage.
-      var intro=[], rest=[];
-      b.groups.forEach(function(g){
-        if(!rest.length&&(!g.title||NB_INTRO_TITLE.test(nbPlain(g.title).trim()))) intro.push(g); else rest.push(g);
-      });
-      var steps=function(g){
-        return (g.ordered===false?'<ul class="o-steps o-plain">':'<ol class="o-steps">')
-          +g.steps.map(function(s){return '<li><div class="o-text">'+s.text+'</div>'+nbImgHTML(s.img)+'</li>';}).join('')
-          +(g.ordered===false?'</ul>':'</ol>');
-      };
-      var num=0;
-      return '<div class="kv-o">'
-        +(intro.length?'<div class="av-intro">'+intro.map(function(g){return (g.title?'<div class="av-intro-title">'+g.title+'</div>':'')+steps(g);}).join('')+'</div>':'')
-        +rest.map(function(g,i){
-          // A title with no steps heads the stages after it (e.g. a process name).
-          if(!g.steps.length) return '<div class="av-part">'+g.title+'</div>';
-          num++;
-          var sn=nbStageNum(g.title);
-          var title=nbPlain(g.title).replace(/^\s*שלב\s*\d+\s*[-–—:.]?\s*/,'').trim()||nbPlain(g.title)||('שלב '+num);
-          return nbUnitHTML({id:'av-u-'+i,num:sn||num,stage:sn||null,title:title,body:steps(g)});
-        }).join('')+'</div>';
+      return nbOViewHTML(b);
     case 'I':
       // All content shown; headings feed the table of contents.
       return '<div class="kv-rich">'+b.html+'</div>';

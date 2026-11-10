@@ -1228,6 +1228,39 @@ li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
 .t-card .t-sub{font-size:13px;font-weight:700;color:var(--text-2);margin:10px 0 4px}
 .t-note{font-size:13.5px;line-height:1.6;color:var(--text-2);margin:4px 0}
 .kv-rich [data-toc-title]{scroll-margin-top:84px}
+/* R / S: stages without frames; the number only in the title */
+.av-unit.av-plain{border:none;border-bottom:1px solid var(--border);border-radius:0;margin-bottom:0}
+.av-unit.av-plain .av-unit-head{padding:14px 2px}
+.av-unit.av-plain .av-unit-body{padding:0 2px 16px}
+.av-p{margin:0 0 6px;font-size:14.5px;line-height:1.7;color:var(--text)}
+.av-unit-body .av-lines{margin:0 18px 8px 0}
+.av-branch{margin:10px 14px 10px 0;padding-right:12px;border-right:3px solid var(--border-strong)}
+.av-branch-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+/* O: device choice, device sections, closing notes */
+.av-o .o-steps{gap:2px}
+.av-o .o-steps>li{background:none;border:none;border-radius:0;padding:5px 34px 5px 0}
+.av-o .o-steps>li::before{right:4px;top:7px;width:22px;height:22px;font-size:11.5px}
+.av-o .o-steps.o-plain>li{padding-right:20px}
+.av-o .o-steps.o-plain>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
+.av-picker{margin:0 0 20px;scroll-margin-top:84px}
+.av-picker-title{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.av-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.av-dev-btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:right;font-family:Rubik,sans-serif;background:#fff;border:1.5px solid var(--border-strong);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--navy);font-size:14px;font-weight:700;line-height:1.35}
+.av-dev-btn:hover,.av-dev-btn:focus-visible{border-color:#1D45B4;background:#F5F8FF;outline:none}
+.av-he,.av-en{display:block}
+.av-en{direction:ltr;unicode-bidi:isolate;text-align:right;font-weight:600}
+.av-dev-btn .av-en{font-size:13px;color:var(--text-2)}
+.av-dev-ctx{font-size:11.5px;font-weight:500;color:var(--muted)}
+.av-dev,.av-sec{margin:0 0 22px;scroll-margin-top:84px}
+.av-dev-title,.av-sec-title{font-size:17px;font-weight:700;color:var(--navy);margin:0 0 10px;padding-bottom:8px;border-bottom:2px solid var(--border);line-height:1.35}
+.av-dev-title .av-en{font-size:14px;color:var(--text-2)}
+h2.av-part{scroll-margin-top:84px}
+.av-back-pick{font-family:Rubik,sans-serif;font-size:12.5px;font-weight:600;color:#1D45B4;background:none;border:none;padding:6px 0 0;cursor:pointer}
+.av-notes{margin-top:24px;padding-top:14px;border-top:1px solid var(--border);font-size:14px;line-height:1.65}
+.av-notes-title{font-weight:700;color:var(--navy);margin:8px 0 4px}
+.av-notes ul{list-style:none;margin:0;padding:0}
+.av-notes li{position:relative;padding-right:16px;margin-bottom:4px}
+.av-notes li::before{content:'*';position:absolute;right:2px;top:0;font-weight:700;color:var(--text-2)}
 
 /* ── DEMO ROLE GATE ── */
 body.gate-open{overflow:hidden}
