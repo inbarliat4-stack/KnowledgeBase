@@ -1272,6 +1272,15 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .snav-doc .av-toc li::marker{color:var(--muted)}
 .snav-doc .av-toc a{display:block;padding:5px 8px;color:var(--text-2);border-radius:6px;line-height:1.45;transition:background var(--t),color var(--t)}
 .snav-doc .av-toc a:hover,.snav-doc .av-toc a:focus-visible{color:#1D45B4;background:#E8EEFF;text-decoration:none;outline:none}
+/* Sections of M, T, I and O items: the title opens and closes the section */
+.av-col.av-closed > :not(.av-col-head){display:none!important}
+.av-col-head{cursor:pointer}
+.av-col-head::after{content:'▾';display:inline-block;font-size:12px;font-weight:400;color:var(--muted);margin-inline-start:8px;transition:transform var(--t)}
+.av-col:not(.av-closed) > .av-col-head::after{transform:rotate(180deg)}
+.av-col-head:focus-visible{outline:2px solid #1D45B4;outline-offset:2px;border-radius:6px}
+.m-step.av-closed .m-step-head{margin-bottom:0}
+.t-card.av-closed .t-card-title{margin-bottom:0}
+.av-rsec{scroll-margin-top:84px}
 .av-picker{margin:0 0 20px;scroll-margin-top:84px}
 /* Picked device view: other devices' sections are hidden until "תצוגה מלאה" */
 .av-o-pick .av-dev{display:none}
@@ -4364,21 +4373,36 @@ function nbApplyViewMode(m){
   if(!root) return;
   // The switch appears in the sidebar and at the top of the item (narrow screens).
   document.querySelectorAll('.av-mode:not(.av-omode) button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false'); });
-  root.querySelectorAll('.av-unit').forEach(function(u){ nbSetUnitOpen(u,m==='full'); });
+  root.querySelectorAll('.av-unit,.av-col').forEach(function(u){ nbSetUnitOpen(u,m==='full'); });
 }
+// Sections the agent opens and closes: R / S / O stages (.av-unit) and the sections of
+// every other item with a table of contents (.av-col: M steps, T cards, I headings, O sections).
+function nbUnitIsOpen(u){ return u.classList.contains('av-col')?!u.classList.contains('av-closed'):u.classList.contains('open'); }
 function nbSetUnitOpen(u,open){
-  u.classList.toggle('open',open);
-  var h=u.querySelector('.av-unit-head'); if(h) h.setAttribute('aria-expanded',open?'true':'false');
+  if(u.classList.contains('av-col')) u.classList.toggle('av-closed',!open);
+  else u.classList.toggle('open',open);
+  var h=u.querySelector(':scope > .av-unit-head, :scope > .av-col-head'); if(h) h.setAttribute('aria-expanded',open?'true':'false');
 }
-// Opening a stage never opens the next one. In the step-by-step view one stage is open at a time.
+// Opening a section never opens the next one. In the step-by-step view one section is open at a time.
 function nbToggleUnit(u){
-  var open=!u.classList.contains('open');
-  if(open&&nbViewMode()==='stepped') document.querySelectorAll('#article-content .av-unit.open').forEach(function(x){ if(x!==u) nbSetUnitOpen(x,false); });
+  var open=!nbUnitIsOpen(u);
+  if(open&&nbViewMode()==='stepped') document.querySelectorAll('#article-content .av-unit,#article-content .av-col').forEach(function(x){ if(x!==u&&nbUnitIsOpen(x)) nbSetUnitOpen(x,false); });
   nbSetUnitOpen(u,open);
 }
+// Section titles of .av-col sections open and close them (mouse and keyboard).
+document.addEventListener('click',function(e){
+  var h=e.target.closest&&e.target.closest('#article-content .av-col-head');
+  if(!h||e.target.closest('a,button:not(.av-col-head)')) return;
+  nbToggleUnit(h.parentNode);
+});
+document.addEventListener('keydown',function(e){
+  var h=e.target.classList&&e.target.classList.contains('av-col-head')?e.target:null;
+  if(!h||(e.key!=='Enter'&&e.key!==' ')) return;
+  e.preventDefault(); nbToggleUnit(h.parentNode);
+});
 // Shows a section: opens it if closed, scrolls to it and highlights it.
 function nbRevealEl(el){
-  if(el.classList.contains('av-unit')&&!el.classList.contains('open')) nbToggleUnit(el);
+  if((el.classList.contains('av-unit')||el.classList.contains('av-col'))&&!nbUnitIsOpen(el)) nbToggleUnit(el);
   el.scrollIntoView({behavior:'smooth',block:'start'});
   el.classList.remove('nb-flash'); void el.offsetWidth; el.classList.add('nb-flash');
 }
@@ -4675,13 +4699,31 @@ function nbBuildToolbar(root){
   // Information items: the headings of the text are its sections.
   var rich=root.querySelector('.kv-rich');
   if(rich){
-    var hs=rich.querySelectorAll('h2'); if(hs.length<2) hs=rich.querySelectorAll('h3');
-    hs.forEach(function(h,i){ h.id='av-h-'+i; h.setAttribute('data-toc-title',nbPlain(h.textContent).trim()); });
+    var hs=[].slice.call(rich.querySelectorAll('h2')); if(hs.length<2) hs=[].slice.call(rich.querySelectorAll('h3'));
+    if(hs.length>=2&&hs.every(function(h){ return h.parentNode===rich; })){
+      // Each heading and the text under it, up to the next heading, form one section.
+      hs.forEach(function(h,i){
+        var sec=document.createElement('section');
+        sec.className='av-rsec'; sec.id='av-h-'+i; sec.setAttribute('data-toc-title',nbPlain(h.textContent).trim());
+        rich.insertBefore(sec,h);
+        for(var n=h;n&&n!==hs[i+1];){ var nx=n.nextSibling; sec.appendChild(n); n=nx; }
+      });
+    } else hs.forEach(function(h,i){ h.id='av-h-'+i; h.setAttribute('data-toc-title',nbPlain(h.textContent).trim()); });
   }
+  // Every section in the table of contents opens and closes from its title, so the
+  // full / step-by-step switch works on every item with a table of contents.
+  [].forEach.call(root.querySelectorAll('[data-toc-title]:not(.av-unit)'),function(sec){
+    if(/^H[1-6]$/.test(sec.tagName)) return; // a heading on its own (no text under it)
+    var head=sec.querySelector(':scope > .m-step-head, :scope > .t-card-title, :scope > .av-sec-title, :scope > h2, :scope > h3, :scope > h4');
+    if(!head||head===sec.lastElementChild) return;
+    sec.classList.add('av-col');
+    head.classList.add('av-col-head');
+    head.setAttribute('role','button'); head.setAttribute('tabindex','0'); head.setAttribute('aria-expanded','true');
+  });
   var entries=[].filter.call(root.querySelectorAll('[data-toc-title]'),function(el){ return el.id&&el.getAttribute('data-toc-title'); });
   var toc=entries.length>=2?'<nav class="av-toc" aria-label="תוכן עניינים"><div class="av-toc-title">תוכן עניינים</div><ol>'
     +entries.map(function(el){ return '<li><a onclick="nbTocGo(\''+el.id+'\')">'+nbEsc(el.getAttribute('data-toc-title'))+'</a></li>'; }).join('')+'</ol></nav>':'';
-  var units=root.querySelectorAll('.av-unit').length;
+  var units=root.querySelectorAll('.av-unit,.av-col').length;
   var mode=units>1?'<div class="av-mode" role="group" aria-label="אופן התצוגה">'
     +'<button type="button" data-mode="full" onclick="nbSetViewMode(\'full\')">תצוגה מלאה</button>'
     +'<button type="button" data-mode="stepped" onclick="nbSetViewMode(\'stepped\')">שלב אחר שלב</button></div>':'';
@@ -4938,6 +4980,7 @@ function nbMJump(from,to){
     var back=document.getElementById('m-from-'+to);
     if(back){ back.hidden=false; back.textContent='↩ חזרה לשלב '+(from+1); back.onclick=function(){ nbMJump(null,from); }; }
   }
+  if(el.classList.contains('av-col')&&!nbUnitIsOpen(el)) nbToggleUnit(el);
   el.scrollIntoView({behavior:'smooth',block:'start'});
   el.classList.remove('m-flash'); void el.offsetWidth; el.classList.add('m-flash');
 }
@@ -5676,16 +5719,16 @@ function nbNavSnapshot(){
 function nbCaptureItemUI(){
   var v=document.getElementById('view-article');
   if(!v||!v.classList.contains('active')) return null;
-  var units=document.querySelectorAll('#article-content .av-unit');
+  var units=document.querySelectorAll('#article-content .av-unit,#article-content .av-col');
   var pick=document.querySelector('#article-content .av-o-pick');
   if(!units.length&&!pick) return null;
-  return {open:[].filter.call(units,function(u){return u.classList.contains('open');}).map(function(u){return u.id;}),
+  return {open:[].filter.call(units,nbUnitIsOpen).map(function(u){return u.id;}),
     device:pick?nbODevice:null,full:pick?nbOFull:false};
 }
 // Also restores the picked device and the view of an operating item.
 function nbApplyItemUI(ui){
   if(!ui) return;
-  if(ui.open) document.querySelectorAll('#article-content .av-unit').forEach(function(u){ nbSetUnitOpen(u,ui.open.indexOf(u.id)!==-1); });
+  if(ui.open) document.querySelectorAll('#article-content .av-unit,#article-content .av-col').forEach(function(u){ nbSetUnitOpen(u,ui.open.indexOf(u.id)!==-1); });
   if(document.querySelector('#article-content .av-o-pick')){ nbODevice=ui.device||null; nbOFull=!!ui.full; nbApplyOView(); }
 }
 function nbNavigate(loc,leaving){
