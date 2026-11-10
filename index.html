@@ -1281,6 +1281,24 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .m-step.av-closed .m-step-head{margin-bottom:0}
 .t-card.av-closed .t-card-title{margin-bottom:0}
 .av-rsec{scroll-margin-top:84px}
+/* One section design for every type, as in M: a card with the type's color on its edge and a bold title */
+.article-body .av-unit,.article-body .av-unit.av-plain,.article-body .av-col:not(.m-step),.article-body .av-dev,.article-body .av-sec,.article-body .t-card,.article-body .av-e .e-sec{
+  background:#fff;border:1.5px solid var(--border);border-right:5px solid var(--kc,var(--navy));border-radius:14px;margin-bottom:14px}
+.article-body .av-col:not(.m-step),.article-body .av-dev,.article-body .av-sec,.article-body .t-card,.article-body .av-e .e-sec{padding:16px 18px}
+.article-body .av-unit,.article-body .av-unit.av-plain{padding:0}
+.article-body .av-unit .av-unit-head,.article-body .av-unit.av-plain .av-unit-head{padding:16px 18px}
+.article-body .av-unit .av-unit-body,.article-body .av-unit.av-plain .av-unit-body{padding:0 18px 16px}
+.article-body .av-unit-title,.article-body .av-sec-title,.article-body .av-dev-title,.article-body .t-card-title,.article-body .av-rsec>h2,.article-body .av-rsec>h3{font-size:17px;font-weight:700;color:var(--navy);line-height:1.4;margin:0}
+.article-body .av-sec-title,.article-body .av-dev-title,.article-body .av-rsec>h2,.article-body .av-rsec>h3{border-bottom:none;padding-bottom:0;margin-bottom:10px}
+.article-body .t-card-title{margin-bottom:10px}
+.article-body .av-col.av-closed>.av-col-head{margin-bottom:0}
+.article-body .av-rsec>:last-child,.article-body .av-sec>:last-child{margin-bottom:0}
+.article-body .av-e .e-when{background:#FEF7EC}
+@media(max-width:640px){
+  .article-body .av-col:not(.m-step),.article-body .av-dev,.article-body .av-sec,.article-body .t-card,.article-body .av-e .e-sec{padding:14px}
+  .article-body .av-unit .av-unit-head,.article-body .av-unit.av-plain .av-unit-head{padding:14px}
+  .article-body .av-unit .av-unit-body,.article-body .av-unit.av-plain .av-unit-body{padding:0 14px 14px}
+}
 .av-picker{margin:0 0 20px;scroll-margin-top:84px}
 /* Picked device view: other devices' sections are hidden until "תצוגה מלאה" */
 .av-o-pick .av-dev{display:none}
@@ -2686,6 +2704,8 @@ function showDynamicDoc(docId){
   document.getElementById('article-content').innerHTML=html;
   window.nbShownDocId=doc.id; // an item's own code is not linked
   var body=document.querySelector('#article-content .article-body');
+  // Section cards take the item type's color on their edge (as M steps do).
+  body.style.setProperty('--kc',(NB_KINDS[doc.kind]||NB_KINDS.R).color);
   nbEnhance(body);
   // In a handling item (R) a referral stays one sentence with the target as a link in it;
   // the other types show referrals as boxes.

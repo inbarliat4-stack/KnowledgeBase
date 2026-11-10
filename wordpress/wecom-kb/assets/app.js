@@ -1342,6 +1342,8 @@ function showDynamicDoc(docId){
   document.getElementById('article-content').innerHTML=html;
   window.nbShownDocId=doc.id; // an item's own code is not linked
   var body=document.querySelector('#article-content .article-body');
+  // Section cards take the item type's color on their edge (as M steps do).
+  body.style.setProperty('--kc',(NB_KINDS[doc.kind]||NB_KINDS.R).color);
   nbEnhance(body);
   // In a handling item (R) a referral stays one sentence with the target as a link in it;
   // the other types show referrals as boxes.
