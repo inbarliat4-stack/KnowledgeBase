@@ -2257,6 +2257,7 @@ function nbTrackPanelHTML(doc){
   if(t.state) cells.push('<div><span>מצב התוכן</span><b>'+nbEsc(t.state)+'</b></div>');
   if(t.priority) cells.push('<div><span>עדיפות</span><b>'+nbEsc(t.priority)+'</b></div>');
   if(doc.publishedAt) cells.push('<div><span>פורסם</span><b>'+nbFmtDate(doc.publishedAt)+'</b></div>');
+  cells.push('<div><span>עודכן לאחרונה</span><b>'+(doc.updatedAt?nbFmtDate(doc.updatedAt):'—')+'</b></div>');
   if(t.source) cells.push('<div class="wide"><span>מקור ידע</span><b>'+nbEsc(t.source)+'</b></div>');
   if(t.gap) cells.push('<div class="wide gap"><span>פער / פעולה נדרשת</span><b>'+nbEsc(t.gap)+'</b></div>');
   var fb=nbFeedbackFor(doc.id);
