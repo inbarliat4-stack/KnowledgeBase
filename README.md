@@ -25,7 +25,7 @@ Each item has a status: draft, pending approval, published, expired or archived.
 
 App items are built from source documents in three stages:
 
-1. **Origin documents.** The original documents sit in the SharePoint folder "מסמכי DOCx מוכנים לפרסום". They are read-only and are never linked from the app.
+1. **Origin documents.** The original documents sit in the SharePoint folder "מסמכי DOCx מוכנים לפרסום". They are read-only. Editors open them from the item's "מעקב עריכה" panel, which links the origin document (read-only), the formatted document to edit, the published and last edited dates, and a numbered list of the missing details marked in yellow in the formatted document. These links and details come from `node scripts/doc-info.cjs`, which the changes check also runs.
 2. **Formatted source docx.** AI formats each origin into one unified Word document per item, in `formatted-source/` (for example `M-10.docx`). Every formatted document follows the same template: a details table (code, type, topic, content world, owner, status, origin file), numbered steps, editor callouts, a "לבדיקת העורך/ת – פערים והערות" section and a "מקורות" section. Missing information is highlighted in yellow, and the origin's state (מוכן לפרסום, טיוטה – בבדיקה, להשלים) appears in the status field. The formatted documents are editable and open in Word for the web, without downloading.
 3. **App items.** Each item links only to its formatted source docx, shown to editors as "מסמך מקור מעוצב". A proposed new version of an item is built from its formatted docx only when requested. It appears alongside the current item, and the editor can compare, edit, approve or reject it. It replaces the published item only after approval.
 

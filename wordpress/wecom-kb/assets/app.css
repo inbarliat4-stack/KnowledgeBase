@@ -1068,6 +1068,9 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 .tp-grid span{font-size:11px;color:var(--muted)}
 .tp-grid b{font-weight:500;color:var(--text);line-height:1.5}
 .tp-grid .gap b{color:var(--warn)}
+.tp-missing{margin:4px 0 0;padding-right:20px;color:var(--text)}
+.tp-missing li{margin-bottom:3px;padding-right:2px}
+.tp-missing li::marker{color:var(--warn);font-weight:700}
 .s1-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chip-n{font-size:11px;opacity:.7;margin-right:2px}
 .track-table-wrap{overflow-x:auto;background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm)}

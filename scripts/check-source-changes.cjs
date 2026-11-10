@@ -13,7 +13,8 @@
 // Proposed versions apply only the lines that changed, so the rest of the item
 // (structure, images, links) stays as it is. Lines that cannot be placed
 // automatically are listed in the proposal's notes for the editor.
-// After --write or --publish, run node wordpress/build.cjs before committing.
+// --write, --publish and --baseline also refresh the editing panel's document links and
+// missing details (scripts/doc-info.cjs). After them, run node wordpress/build.cjs before committing.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -271,3 +272,5 @@ function main() {
 }
 
 main();
+// The editing panel's document links and missing details follow the documents as they are now.
+if (write || publishCode || baseline) require('./doc-info.cjs').write();
