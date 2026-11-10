@@ -2278,6 +2278,10 @@ function nbTrackPanelHTML(doc){
       :!miss.length?'אין פרטים חסרים מסומנים במסמך לעריכה'
       :miss.length+(miss.length===1?' פרט חסר':' פרטים חסרים')+' (מסומנים בצהוב במסמך לעריכה):<ol class="tp-missing">'+miss.map(function(m){return '<li>'+nbEsc(m)+'</li>';}).join('')+'</ol>')
     +'</b></div>');
+  // Feedback agents sent from the item page ("דיווח על בעיה / משוב"), newest first.
+  var fb=nbFeedbackFor(doc.id).slice().reverse();
+  if(fb.length) cells.push('<div class="wide gap"><span>משוב מנציגים ('+fb.length+')</span><b><ul class="tp-missing">'
+    +fb.map(function(f){return '<li>'+nbFmtDate(f.at)+': '+nbEsc(f.text)+'</li>';}).join('')+'</ul></b></div>');
   var canImport=typeof window.nbImportSourceDoc==='function'&&window.NB_CAN_IMPORT;
   var actions=(doc.revision?'<button type="button" class="tp-btn warn" onclick="nbOpenReview(\''+nbEsc(doc.id)+'\')">🔎 גרסה מוצעת ממתינה — השווה ואשר</button>':'')
     +(canImport?'<button type="button" class="tp-btn" onclick="nbStartSourceUpdate(\''+nbEsc(doc.id)+'\')">📄 עדכון ממסמך מקור</button>':'');
