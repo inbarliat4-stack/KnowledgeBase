@@ -1182,8 +1182,6 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-unit-head{display:flex;align-items:center;gap:10px;width:100%;text-align:right;font-family:Rubik,sans-serif;background:none;border:none;padding:12px 14px;cursor:pointer;color:var(--navy)}
 .av-unit-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .av-unit-title{font-size:16px;font-weight:700;margin:0;line-height:1.4;flex:1;color:var(--navy)}
-.av-chev{font-size:13px;color:var(--muted);transition:transform var(--t);flex-shrink:0}
-.av-unit.open .av-chev{transform:rotate(180deg)}
 .av-unit-body{display:none;padding:2px 18px 14px 14px}
 .av-unit.open .av-unit-body{display:block}
 .av-from{font-family:Rubik,sans-serif;font-size:12px;font-weight:600;color:#1D45B4;background:#EEF3FF;border:1px solid #C9D6FB;border-radius:20px;padding:3px 11px;cursor:pointer;margin-bottom:8px}
@@ -1264,9 +1262,12 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .snav-doc .av-toc a:hover,.snav-doc .av-toc a:focus-visible{color:#1D45B4;background:#E8EEFF;text-decoration:none;outline:none}
 /* Sections of M, T, I and O items: the title opens and closes the section */
 .av-col.av-closed > :not(.av-col-head){display:none!important}
-.av-col-head{cursor:pointer}
-.av-col-head::after{content:'▾';display:inline-block;font-size:12px;font-weight:400;color:var(--muted);margin-inline-start:8px;transition:transform var(--t)}
-.av-col:not(.av-closed) > .av-col-head::after{transform:rotate(180deg)}
+/* The title row spans the card; the open/close arrow sits at its left end */
+.av-col-head{cursor:pointer;display:flex!important;align-items:center;gap:10px}
+.av-col-head::after,.av-chev{content:'';display:inline-block;flex-shrink:0;box-sizing:border-box;width:11px;height:11px;border:solid #6B7785;border-width:0 2.5px 2.5px 0;border-radius:1px;font-size:0;margin-inline-start:auto;margin-left:8px;transform:translateY(-3px) rotate(45deg);transition:transform var(--t)}
+.av-col-head .m-step-from{order:2;margin-right:10px}
+.av-col:not(.av-closed) > .av-col-head::after,.av-unit.open .av-chev{transform:translateY(3px) rotate(-135deg)}
+.av-col-head:hover::after,.av-unit-head:hover .av-chev{border-color:var(--navy)}
 .av-col-head:focus-visible{outline:2px solid #1D45B4;outline-offset:2px;border-radius:6px}
 .m-step.av-closed .m-step-head{margin-bottom:0}
 .t-card.av-closed .t-card-title{margin-bottom:0}
