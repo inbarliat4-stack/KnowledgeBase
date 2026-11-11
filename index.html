@@ -1374,15 +1374,15 @@ var TOPICS=[
   {id:8,cat:'sim',title:'איסוף SIM מהום סנטר',desc:'תנאי איסוף, מה לקוח צריך להביא'},
   {id:9,cat:'sim',title:'תאימות מכשיר – VoLTE/eSIM/5G',desc:'בדיקת דגם, גרסת מערכת, הסבר מגבלות'},
   {id:10,cat:'sim',title:'קווים שנרכשו ולא הופעלו',desc:'בדיקת סטטוס, הדרכת הפעלה, סגירת טיפול'},
-  {id:11,cat:'tech',title:'אין גלישה סלולרית',desc:'אבחון, חבילה וקו, נתונים, APN, איפוס, הסלמה'},
-  {id:12,cat:'tech',title:'גלישה איטית / ניתוקים',desc:'אזור, דור רשת, עומס, מכשיר, שיפור'},
+  {id:11,cat:'data',title:'אין גלישה סלולרית',desc:'אבחון, חבילה וקו, נתונים, APN, איפוס, הסלמה'},
+  {id:12,cat:'data',title:'גלישה איטית / ניתוקים',desc:'אזור, דור רשת, עומס, מכשיר, שיפור'},
   {id:13,cat:'intl',title:'הגדרת APN במכשיר',desc:'בחו"ל: ערך APN נדרש, איפוס לברירת מחדל, לפי יצרן'},
-  {id:14,cat:'tech',title:'אין קליטה / אין שירות',desc:'רשת, SIM, מצב טיסה, אזור גיאוגרפי, איפוס'},
-  {id:15,cat:'tech',title:'לא מצליח להוציא/לקבל שיחות',desc:'חסימות, חוב, VoLTE, קליטה, מצב קו'},
-  {id:16,cat:'tech',title:'שיחות מתנתקות / שמע ירוד',desc:'אזור, מכשיר, VoLTE, קליטה, SIM'},
-  {id:17,cat:'tech',title:'בעיות VoLTE ומכשירים ישנים',desc:'זיהוי חוסר תמיכה, חלופות, הסבר'},
-  {id:18,cat:'tech',title:'בעיות SMS וקודי אימות',desc:'קבלת SMS, חסימות, קודי בנקים, איפוס'},
-  {id:19,cat:'tech',title:'Hotspot לא עובד',desc:'תמיכה בחבילה, APN, הגדרות שיתוף'},
+  {id:14,cat:'signal',title:'אין קליטה / אין שירות',desc:'רשת, SIM, מצב טיסה, אזור גיאוגרפי, איפוס'},
+  {id:15,cat:'calls',title:'לא מצליח להוציא/לקבל שיחות',desc:'חסימות, חוב, VoLTE, קליטה, מצב קו'},
+  {id:16,cat:'calls',title:'שיחות מתנתקות / שמע ירוד',desc:'אזור, מכשיר, VoLTE, קליטה, SIM'},
+  {id:17,cat:'calls',title:'בעיות VoLTE ומכשירים ישנים',desc:'זיהוי חוסר תמיכה, חלופות, הסבר'},
+  {id:18,cat:'sms',title:'בעיות SMS וקודי אימות',desc:'קבלת SMS, חסימות, קודי בנקים, איפוס'},
+  {id:19,cat:'data',title:'Hotspot לא עובד',desc:'תמיכה בחבילה, APN, הגדרות שיתוף'},
   {id:20,cat:'tech',title:'טרבלשוטינג בסיסי: כיבוי ואיפוס',desc:'סדר פעולות אחיד, הסבר ללקוח, מתי להסלים'},
   {id:21,cat:'billing',title:'בירור חיוב גבוה / לא מזוהה',desc:'פירוק חיוב, השוואה לחודשים, שירותים נלווים'},
   {id:22,cat:'billing',title:'הסבר חשבונית וסעיפי חיוב',desc:'מבנה חשבונית, קבועים/משתנים, זיכויים, מע"מ'},
@@ -1441,7 +1441,7 @@ var NB_USER_TOPIC_START = 2000;
 function nbIsUserTopicId(id){ return (id>52&&id<1000)||id>=NB_USER_TOPIC_START; }
 // Bump this whenever the hardcoded TOPICS/dynamicDocs seed content changes in
 // the code, so a browser with older saved data doesn't keep masking it.
-var NB_SEED_VERSION = 70; // 72 items without an origin document in the ready-to-publish folder dropped
+var NB_SEED_VERSION = 71; // technical topics split into browsing, reception, calls and SMS categories
 // ── KNOWLEDGE ARCHITECTURE (spec §2–3) ──────────────────────────────────
 // עולם תוכן → נושא → פריטי ידע. A knowledge item (window.dynamicDocs entry)
 // belongs to one or more topics (item.topicIds) and one or more content
@@ -1486,7 +1486,7 @@ NB_SEED_META.kbnew_r45={topics:[46],kind:'R'};
 NB_SEED_META.kbnew_r50={topics:[4],kind:'R'};
 NB_SEED_META.kbnew_r51={topics:[5],kind:'R'};
 // Default department for existing items, by their old category.
-var NB_CAT_TO_WORLD={sim:'tech',tech:'tech',tech2:'tech',intl:'tech',billing:'service',plans:'service',ops:'service'};
+var NB_CAT_TO_WORLD={sim:'tech',data:'tech',signal:'tech',calls:'tech',sms:'tech',tech:'tech',tech2:'tech',intl:'tech',billing:'service',plans:'service',ops:'service'};
 
 function nbEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function nbWorldName(id){var w=WORLDS.find(function(x){return x.id===id;});return w?w.name:id;}
@@ -1569,7 +1569,9 @@ function nbNormalizeModel(){
   });
 }
 var SIM_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:1px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg>';
-var CAT={sim:SIM_ICON+' SIM/eSIM',tech:'🔧 טכני',tech2:'🔧 טכני',billing:'💳 חיובים',plans:'📋 מסלולים',intl:'✈️ חו"ל',ops:'🎧 שיחה'};
+// Categories in the order of the library filter row. 'tech' is kept for
+// older topics and items that have no specific technical category.
+var CAT={sim:SIM_ICON+' SIM/eSIM',data:'🌐 גלישה',signal:'📶 קליטה',calls:'📞 שיחות',sms:'✉️ SMS',intl:'✈️ חו"ל',tech:'🔧 טכני',tech2:'🔧 טכני',billing:'💳 חיובים',plans:'📋 מסלולים',intl:'✈️ חו"ל',ops:'🎧 שיחה'};
 
 function setTocActive(el){
   document.querySelectorAll('.doc-toc-item').forEach(function(i){i.classList.remove('active')});
@@ -1590,6 +1592,8 @@ function showView(id){
   if(id==='library'){var sl=document.getElementById('snav-library');if(sl)sl.classList.toggle('active',nbCurrentWorld==='all');}
   if(id==='library'){
     nbMostViewedFilter=false;
+    nbCurrentKind='all';
+    nbRenderLibFilters();
     renderLibrary('all');
     var fb=document.querySelectorAll('#lib-filters .filter-btn');
     fb.forEach(function(b,i){b.classList.toggle('active',i===0);});
@@ -1669,8 +1673,12 @@ function filterKind(kind){
   nbRenderLibFilters();
   renderLibrary(nbCurrentLibCat);
 }
+// Choosing a category or a content world sets the item type back to "הכל",
+// so a type picked earlier doesn't silently hide items.
 function filterLibrary(cat,btn){
   nbMostViewedFilter=false;
+  nbCurrentKind='all';
+  nbRenderLibFilters();
   document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.remove('active')});
   if(btn) btn.classList.add('active');
   renderLibrary(cat);
@@ -1678,6 +1686,7 @@ function filterLibrary(cat,btn){
 function filterWorld(world){
   nbMostViewedFilter=false;
   nbCurrentWorld=world;
+  nbCurrentKind='all';
   nbRenderLibFilters();
   nbRenderSidebar();
   renderLibrary(nbCurrentLibCat);
@@ -2077,19 +2086,17 @@ function nbTagChip(tg){
 
 function filterCategory(cat){
   showView('library');
-  var btns=document.querySelectorAll('#lib-filters .filter-btn');
-  var cats=['all','sim','tech','billing','plans','intl','ops'];
-  setTimeout(function(){filterLibrary(cat,btns[cats.indexOf(cat)])},100);
+  setTimeout(function(){filterLibrary(cat,document.querySelector('#lib-filters .filter-btn[data-cat="'+cat+'"]'))},100);
 }
 
-var CAT_RAIL={sim:'#2E5CE0',tech:'#3A4A5C',tech2:'#3A4A5C',billing:'#0E7A4F',plans:'#6D3FD1',intl:'#0891B2',ops:'#C2410C'};
+var CAT_RAIL={sim:'#2E5CE0',data:'#1D6FB8',signal:'#4F46E5',calls:'#0F766E',sms:'#9D4EDD',tech:'#3A4A5C',tech2:'#3A4A5C',billing:'#0E7A4F',plans:'#6D3FD1',intl:'#0891B2',ops:'#C2410C'};
 function cardHTML(t){
   var railColor=CAT_RAIL[t.cat]||'#8A94A3';
   var items=nbTopicItems(t.id);
   var kinds=[];
   items.forEach(function(d){if(kinds.indexOf(d.kind)===-1)kinds.push(d.kind);});
   var delBtn='<span class="tc-del" onclick="event.stopPropagation();nbConfirmDeleteTopic('+t.id+')" title="מחק נושא">🗑️</span>';
-  return '<div class="topic-card fade-in" onclick="nbOpenTopic('+t.id+')">'
+  return '<div class="topic-card fade-in" onclick="nbOpenTopicCard('+t.id+')">'
     +'<div class="tc-rail" style="background:'+railColor+'"></div>'
     +'<div class="tc-body">'
     +delBtn
@@ -2107,6 +2114,15 @@ function cardHTML(t){
 // ── TOPIC VIEW (spec §6) ────────────────────────────────────────────────
 // Every knowledge item in the topic, identifiable at a glance by type.
 var nbCurrentTopicId=null;
+
+// A topic card with a single item opens that item directly; the topic page
+// (a list of one) would be an extra click. The item page still links back to
+// the topic, where editors can add more items.
+function nbOpenTopicCard(id){
+  var items=nbTopicItems(id);
+  if(items.length===1&&items[0].id&&window.dynamicDocs[items[0].id]){ nbCurrentTopicId=id; showDynamicDoc(items[0].id); }
+  else nbOpenTopic(id);
+}
 
 function nbOpenTopic(id){
   var t=TOPICS.find(function(x){return x.id===id;});
@@ -3197,8 +3213,7 @@ function nbFillForm(doc,editingId){
 }
 
 function catLabel(cat){
-  var m={sim:SIM_ICON+' SIM/eSIM',tech:'🔧 טכני',tech2:'🔧 טכני',billing:'💳 חיובים',plans:'📋 מסלולים',intl:'✈️ חו"ל',ops:'🎧 שיחה'};
-  return m[cat]||'📄 כללי';
+  return CAT[cat]||'📄 כללי';
 }
 
 function nbExport(){
@@ -3546,7 +3561,7 @@ function nbRenderStage(s){
         ?'<input class="s1-input" style="margin-top:8px" id="nb-s1-newtopic" value="'+nbEsc(d.newTopic||'')+'" oninput="nbSyncS1(\'newTopic\',this.value)" placeholder="שם הנושא החדש">'
           +'<div class="s1-sublabel">קטגוריה של הנושא החדש</div>'
           +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
-          +[['sim',SIM_ICON+' SIM/eSIM'],['tech','🔧 תמיכה טכנית'],['billing','💳 חיובים'],['plans','📋 מסלולים'],['intl','✈️ חו"ל'],['ops','🎧 שיחה']].map(function(r){
+          +[['sim',SIM_ICON+' SIM/eSIM'],['data',CAT.data],['signal',CAT.signal],['calls',CAT.calls],['sms',CAT.sms],['tech','🔧 תמיכה טכנית'],['billing','💳 חיובים'],['plans','📋 מסלולים'],['intl','✈️ חו"ל'],['ops','🎧 שיחה']].map(function(r){
             return '<label class="radio-item'+(d.cat===r[0]?' sel':'')+'" data-field="cat" data-val="'+r[0]+'" onclick="nbSelR(this)">'
               +'<input type="radio" name="nb-dcat" '+(d.cat===r[0]?'checked':'')+' style="flex-shrink:0;width:14px;height:14px;margin-top:2px;accent-color:var(--red)">'
               +'<div style="font-size:13px;font-weight:500;color:var(--text)">'+r[1]+'</div></label>';
@@ -4691,16 +4706,33 @@ function nbRefRows(root){
     var h=a.closest('li,p,.o-text,.m-step-hint>div,.m-intro>div');
     if(h&&root.contains(h)&&hosts.indexOf(h)===-1) hosts.push(h);
   });
+  // One box per linked item in each section: a later line in the same section
+  // that mentions it again keeps the mention as a link in the text instead.
+  var sections=[], sectionSeen=[];
+  function seenIn(host){
+    var sec=host.parentNode&&host.parentNode.closest('[data-stage],section,.av-unit,.av-rsec')||root;
+    var i=sections.indexOf(sec);
+    if(i===-1){ sections.push(sec); sectionSeen.push({}); i=sections.length-1; }
+    return sectionSeen[i];
+  }
   hosts.forEach(function(host){
+    var seen=seenIn(host), boxed={};
+    var links=[].slice.call(host.querySelectorAll('.kb-link-item'));
+    links.forEach(function(a){
+      var id=a.getAttribute('data-doc');
+      if(window.dynamicDocs[id]&&!seen[id]){ seen[id]=1; boxed[id]=1; }
+    });
+    if(!Object.keys(boxed).length) return;
     var text=document.createElement('div'); text.className='av-ref-text';
     var boxes=document.createElement('div'); boxes.className='av-ref-boxes';
-    var seen={};
-    host.querySelectorAll('.kb-link-item').forEach(function(a){
+    var done={};
+    links.forEach(function(a){
       var id=a.getAttribute('data-doc'), d=window.dynamicDocs[id];
+      if(!boxed[id]) return;
       var span=document.createElement('span'); span.className='av-ref-inline'; span.textContent=a.textContent;
       a.parentNode.replaceChild(span,a);
-      if(!d||seen[id]) return;
-      seen[id]=1;
+      if(done[id]) return;
+      done[id]=1;
       var b=document.createElement('button');
       b.type='button'; b.className='av-ref'; b.title=nbPlain(d.topic);
       b.innerHTML=nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="av-ref-arrow" aria-hidden="true">←</span>';
@@ -4860,11 +4892,25 @@ function nbTitleSpan(after,title){
 // title, "שלב N" references jump to that stage, and "⚠ חסר" lines are marked.
 var NB_CODE_RE=/([MROESTIH])[-‐‑‒–](\d{2,3})(?!\d)/g;
 var NB_STAGE_RE=/(שלב)\s*(\d+)(?!\d)/g;
+// A quoted name ("…", ״…״, “…”) that is exactly an item's title also links to
+// the item, for references written by name without the code.
+var NB_QUOTED_RE=/["״“”„]([^"״“”„\n]{4,120}?)["״“”„]/g;
+function nbNormTitle(s){ return nbPlain(s).replace(/[׳״]/g,' ').replace(/[^֐-׿a-zA-Z0-9]+/g,' ').trim().toLowerCase(); }
+function nbTitleIndex(){
+  var docs=window.dynamicDocs||{}, idx={};
+  Object.keys(docs).forEach(function(k){
+    var d=docs[k]; if(!d||!nbVisible(d)) return;
+    var st=nbSplitTitle(d.topic), key=nbNormTitle(st.title);
+    // Only items with a code, and the same item the code itself would open.
+    if(st.code&&key.length>=6&&!idx[key]&&nbFindByCode(st.code)===d) idx[key]=d;
+  });
+  return idx;
+}
 function nbEnhance(root){
   if(!root) return;
   var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null), nodes=[];
   while(walker.nextNode()) nodes.push(walker.currentNode);
-  var shown=window.nbShownDocId;
+  var shown=window.nbShownDocId, titleIdx=null;
   nodes.forEach(function(n){
     var p=n.parentNode, t=n.nodeValue;
     if(!p||(p.closest&&p.closest('a,button,textarea,input,select,.article-title,.m-map'))) return;
@@ -4886,6 +4932,15 @@ function nbEnhance(root){
       var title=nbPlain(d.topic).replace(/^\s*[A-Z]-\d{2,3}\s*[·\-–—]?\s*/,'').trim();
       var after=t.slice(m.index+m[0].length), span=nbTitleSpan(after,title);
       found.push({at:m.index,codeEnd:m.index+m[0].length,end:m.index+m[0].length+span,doc:d,code:code,addTitle:span?'':title});
+    }
+    NB_QUOTED_RE.lastIndex=0;
+    while((m=NB_QUOTED_RE.exec(t))){
+      titleIdx=titleIdx||nbTitleIndex();
+      var qd=titleIdx[nbNormTitle(m[1])];
+      // Not a title: try again from the next character (the closing mark may open the real quote).
+      if(!qd){ NB_QUOTED_RE.lastIndex=m.index+1; continue; }
+      if(qd.id===shown) continue;
+      found.push({at:m.index,codeEnd:m.index,end:m.index+m[0].length,doc:qd,code:nbSplitTitle(qd.topic).code,byTitle:true});
     }
     NB_STAGE_RE.lastIndex=0;
     while(!inTitle&&(m=NB_STAGE_RE.exec(t))){
@@ -4911,7 +4966,7 @@ function nbEnhance(root){
         var codeEl=document.createElement('span'); codeEl.className='kb-code'; codeEl.textContent=f.code;
         a.appendChild(codeEl);
         // The title as written after the code, or the item's title when the text has only the code.
-        a.appendChild(document.createTextNode(f.addTitle?' — '+f.addTitle:t.slice(f.codeEnd,f.end)));
+        a.appendChild(document.createTextNode(f.byTitle?' '+t.slice(f.at,f.end):f.addTitle?' — '+f.addTitle:t.slice(f.codeEnd,f.end)));
         a.addEventListener('click',function(e){ e.stopPropagation(); showDynamicDoc(this.getAttribute('data-doc')); window.scrollTo(0,0); });
       } else {
         a.className='kb-link kb-link-stage'; a.setAttribute('data-stage-link',f.stage);
@@ -5782,12 +5837,17 @@ function nbShowLocation(loc,lib){
     else if(key==='view'&&val==='tracking') nbOpenTracking();
     else if(key==='view'&&val==='new') showView('new');
     else {
-      if(lib){ nbCurrentWorld=lib.world||'all'; nbCurrentKind=lib.kind||'all'; }
       showView('library');
+      // Going back restores the filters exactly as they were (showView resets the type).
+      if(lib){ nbCurrentWorld=lib.world||'all'; nbCurrentKind=lib.kind||'all'; }
       nbRenderLibFilters(); nbRenderSidebar();
       if(lib&&lib.mostViewed){ var mv=[].find.call(document.querySelectorAll('#lib-filters .filter-btn'),function(b){return /הנצפות/.test(b.textContent);}); filterMostViewed(mv); }
       else if(lib&&lib.search){ var inp=document.getElementById('nb-search'); if(inp) inp.value=lib.search; nbSearch(lib.search); }
-      else renderLibrary((lib&&lib.cat)||'all');
+      else {
+        var rc=(lib&&lib.cat)||'all';
+        document.querySelectorAll('#lib-filters .filter-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-cat')===rc);});
+        renderLibrary(rc);
+      }
       if(m) nbSetLocation('');
     }
   } finally { nbNavRestoring=false; }
@@ -5970,13 +6030,16 @@ document.addEventListener('change', function(e){
   <div class="lib-filter-row" id="lib-kinds"></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px" id="lib-filters">
     <span class="filter-label">קטגוריות</span>
-    <button class="filter-btn active" onclick="filterLibrary('all',this)">הכל</button>
-    <button class="filter-btn" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
-    <button class="filter-btn" onclick="filterLibrary('tech',this)">🔧 טכני</button>
-    <button class="filter-btn" onclick="filterLibrary('billing',this)">💳 חיובים</button>
-    <button class="filter-btn" onclick="filterLibrary('plans',this)">📋 מסלולים</button>
-    <button class="filter-btn" onclick="filterLibrary('intl',this)">✈️ חו"ל</button>
-    <button class="filter-btn" onclick="filterLibrary('ops',this)">🎧 שיחה</button>
+    <button class="filter-btn active" data-cat="all" onclick="filterLibrary('all',this)">הכל</button>
+    <button class="filter-btn" data-cat="sim" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
+    <button class="filter-btn" data-cat="data" onclick="filterLibrary('data',this)">🌐 גלישה</button>
+    <button class="filter-btn" data-cat="signal" onclick="filterLibrary('signal',this)">📶 קליטה</button>
+    <button class="filter-btn" data-cat="calls" onclick="filterLibrary('calls',this)">📞 שיחות</button>
+    <button class="filter-btn" data-cat="sms" onclick="filterLibrary('sms',this)">✉️ SMS</button>
+    <button class="filter-btn" data-cat="intl" onclick="filterLibrary('intl',this)">✈️ חו"ל</button>
+    <button class="filter-btn" data-cat="billing" onclick="filterLibrary('billing',this)">💳 חיובים</button>
+    <button class="filter-btn" data-cat="plans" onclick="filterLibrary('plans',this)">📋 מסלולים</button>
+    <button class="filter-btn" data-cat="ops" onclick="filterLibrary('ops',this)">🎧 שיחה</button>
     <button class="filter-btn" onclick="filterMostViewed(this)">👁️ הנצפות ביותר</button>
   </div>
   <div id="library-content"></div>
