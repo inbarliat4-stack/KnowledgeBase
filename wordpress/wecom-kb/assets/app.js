@@ -4534,7 +4534,105 @@ function nbTakeRoleHandoff(){
   }catch(e){}
   return null;
 }
-function nbItemHref(id){ return location.pathname+location.search+'#item='+encodeURIComponent(id); }
+function nbItemHref(id){ return nbNavUrl('item='+encodeURIComponent(id)); }
+
+// ── READABLE ADDRESSES (WordPress) ──────────────────────────────────────
+// On WordPress every screen has a real address under the knowledge base page:
+//   /kb/O-50-sim-activation   an item: its code + a short English name
+//   /kb/topic/no-mobile-data   a topic
+//   /kb/tracking, /kb/new, /kb/review/O-50-sim-activation
+// The plugin sends every address under /kb/ to the same page. Items are found
+// by their code, so changing an English name never breaks an old link, and
+// old #item=… links still work. The GitHub version has no server to answer
+// such addresses and keeps #item=….
+var NB_ITEM_SLUGS={
+  'E-01':'abroad-escalation','E-10':'reception-escalation','E-30':'data-escalation','E-40':'calls-escalation','E-60':'sms-escalation',
+  'M-00':'abroad-diagnosis','M-10':'reception-diagnosis','M-30':'data-diagnosis','M-40':'calls-diagnosis','M-60':'sms-diagnosis',
+  'O-01':'roaming-system-check','O-02':'data-roaming-on-device','O-03':'apn-abroad','O-04':'stk-network-identity','O-05':'manual-network-abroad',
+  'O-06':'usa-device-compatibility','O-10':'coverage-map','O-12':'wifi-calling','O-13':'reset-network-settings',
+  'O-31':'mobile-data-settings','O-32':'apn-setup','O-33':'data-saver-limits','O-34':'vpn-on-device','O-35':'managed-line-restrictions',
+  'O-36':'hotspot','O-37':'dual-sim-data','O-40':'line-status-call-blocks','O-41':'call-forwarding-settings','O-42':'device-call-blocks',
+  'O-43':'volte-on-device','O-44':'volte-compatibility','O-50':'sim-activation','O-51':'esim-qr-activation','O-52':'sim-esim-replacement',
+  'O-55':'lost-stolen-sim','O-56':'sim-delivery-status','O-60':'sms-blocks-spam','O-61':'sms-center-number',
+  'O-200':'ownership-transfer','O-201':'data-reports-guide',
+  'R-01':'no-signal-abroad','R-02':'no-data-abroad','R-03':'app-issue-abroad','R-04':'calls-abroad','R-05':'sms-abroad',
+  'R-11':'weak-signal-location','R-12':'weak-signal-driving','R-13':'new-signal-drop','R-14':'no-service',
+  'R-31':'no-data-anywhere','R-32':'no-data-location','R-33':'slow-data-anywhere','R-34':'slow-data-location','R-35':'no-data-during-call',
+  'R-40':'no-calls','R-41':'cannot-make-calls','R-42':'cannot-receive-calls','R-43':'calls-specific-numbers','R-44':'no-calls-after-porting',
+  'R-45':'international-dialing','R-50':'issue-after-activation','R-51':'esim-qr-not-received',
+  'R-60':'cannot-send-sms','R-61':'cannot-receive-sms','R-62':'sms-specific-number','R-63':'otp-not-received',
+  'S-30':'data-specialist','S-40':'calls-specialist','S-60':'sms-network-blocks','T-10':'network-expectations'
+};
+var NB_TOPIC_SLUGS={
+  1:'sim-activation',2:'esim-qr',3:'sim-esim-switch',4:'issue-after-activation',5:'qr-not-scanned',6:'lost-stolen-sim',
+  7:'sim-delivery',8:'home-center-pickup',9:'device-compatibility',10:'unactivated-lines',11:'no-mobile-data',12:'slow-data',
+  13:'apn-setup',14:'no-signal',15:'calls-not-working',16:'dropped-calls',17:'volte-old-devices',18:'sms-otp',19:'hotspot',
+  20:'basic-troubleshooting',21:'high-bill',22:'invoice-explained',23:'debt-payment',24:'payment-method',25:'credits-refunds',
+  26:'invoice-copy',27:'plan-change',28:'add-line-5g',29:'cancel-line',30:'freeze-line',31:'ownership-transfer',
+  32:'customer-details',33:'number-porting',34:'abroad-package',35:'abroad-data-signal',36:'abroad-rates',
+  37:'customer-verification',38:'call-transfer',39:'callback',40:'complaints-escalations',41:'churn',
+  42:'abroad-diagnosis',43:'no-signal-abroad',44:'no-data-abroad',45:'app-issue-abroad',46:'calls-abroad',47:'sms-abroad',
+  48:'data-roaming',50:'stk-network-identity',51:'manual-network',52:'abroad-escalation',
+  1001:'data-sim',1002:'international-dialing',1003:'extra-services',1004:'new-customer',1005:'personal-area',
+  1006:'customer-deceased',1007:'line-status',1008:'number-change',1009:'accessibility',1010:'marketing-opt-out',
+  1011:'premium-numbers',1012:'business-vip',1013:'class-actions',1014:'ownership-transfer-hq',1015:'data-reports'
+};
+// The knowledge base page's own path (e.g. "/kb/"), or null outside WordPress
+// or without pretty permalinks.
+function nbPathBase(){
+  var b=window.WECOM_KB&&window.WECOM_KB.baseUrl;
+  if(!b) return null;
+  try{ var u=new URL(b,location.href); return u.search?null:u.pathname.replace(/\/?$/,'/'); }catch(e){ return null; }
+}
+function nbSlugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+function nbItemSlug(d,key){
+  var st=nbSplitTitle(d.topic);
+  if(st.code){ var n=NB_ITEM_SLUGS[st.code]||nbSlugify(d.slug); return st.code+(n?'-'+n:''); }
+  return 'item-'+nbSlugify(key||d.id);
+}
+function nbTopicSlug(t){ return NB_TOPIC_SLUGS[t.id]||String(t.id); }
+// "O-50-sim-activation" → the item's key. Found by the code; the name is only for people.
+function nbDocKeyFromSlug(s){
+  var docs=window.dynamicDocs||{}, m=/^([A-Za-z])-(\d{2,3})(?![0-9])/.exec(s), k, found=null;
+  if(m){
+    var code=m[1].toUpperCase()+'-'+m[2];
+    for(k in docs){ if(docs[k]&&nbSplitTitle(docs[k].topic).code===code){ if(nbVisible(docs[k])) return k; found=found||k; } }
+    return found;
+  }
+  m=/^item-(.+)$/.exec(s);
+  if(m) for(k in docs){ if(nbSlugify(k)===m[1]) return k; }
+  return null;
+}
+function nbLocToPath(loc){
+  var base=nbPathBase(), m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), val=m?decodeURIComponent(m[2]):'';
+  if(!m) return base;
+  if(m[1]==='item'||m[1]==='review'){
+    var d=window.dynamicDocs[val], slug=d?nbItemSlug(d,val):'item-'+nbSlugify(val);
+    return base+(m[1]==='review'?'review/':'')+encodeURI(slug);
+  }
+  if(m[1]==='topic'){ var t=TOPICS.find(function(x){return String(x.id)===val;}); return base+'topic/'+encodeURI(t?nbTopicSlug(t):val); }
+  return base+encodeURI(val);
+}
+function nbPathToLoc(path){
+  var base=nbPathBase();
+  if(!base||path.indexOf(base)!==0) return '';
+  var rest; try{ rest=decodeURIComponent(path.slice(base.length)); }catch(e){ rest=path.slice(base.length); }
+  var p=rest.replace(/\/+$/,'').split('/'), key;
+  if(!p[0]) return '';
+  if(p[0]==='topic'&&p[1]){
+    var t=TOPICS.find(function(x){ return nbTopicSlug(x)===p[1]||String(x.id)===p[1]; });
+    return t?'topic='+encodeURIComponent(t.id):'';
+  }
+  if(p[0]==='review'&&p[1]){ key=nbDocKeyFromSlug(p[1]); return key?'review='+encodeURIComponent(key):''; }
+  if(p[0]==='tracking'||p[0]==='new') return 'view='+p[0];
+  key=nbDocKeyFromSlug(p[0]);
+  return key?'item='+encodeURIComponent(key):'';
+}
+// The screen the address names: the path on WordPress, else (and for old links) the #… part.
+function nbCurrentLoc(){
+  var l=nbPathBase()?nbPathToLoc(location.pathname):'';
+  return l||location.hash.replace(/^#/,'');
+}
 var NB_NEWTAB_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
 function nbNewTabIcon(id){
   return '<span class="nb-newtab" role="link" tabindex="0" data-newtab="'+nbEsc(id)+'" title="פתיחה בלשונית חדשה" aria-label="פתיחה בלשונית חדשה">'+NB_NEWTAB_SVG+'</span>';
@@ -4565,12 +4663,18 @@ document.addEventListener('mousedown',function(e){
 // browser's Back button return to the previous screen, and the library comes
 // back with its search and filters.
 var nbStartLocation=location.hash.replace(/^#/,'');
+// On WordPress the address is a path; it's read once the library has loaded
+// (nbRestoreLocation), so keep it before anything rewrites the address.
+var nbStartPath=location.pathname;
 var nbNavBusy=0, nbNavRestoring=false;
 function nbNavState(){
   var s=history.state;
-  return s&&typeof s.idx==='number'?s:{idx:0,loc:location.hash.replace(/^#/,'')};
+  return s&&typeof s.idx==='number'?s:{idx:0,loc:nbCurrentLoc()};
 }
-function nbNavUrl(loc){ return loc?'#'+loc:location.pathname+location.search; }
+function nbNavUrl(loc){
+  if(nbPathBase()) return nbLocToPath(loc);
+  return loc?'#'+loc:location.pathname+location.search;
+}
 function nbSetLocation(loc){
   try{ var s=Object.assign({},nbNavState(),{loc:loc}); history.replaceState(s,'',nbNavUrl(loc)); }catch(e){}
 }
@@ -4812,14 +4916,14 @@ function nbShowLocation(loc,lib){
   nbOpenTracking=track(nbOpenTracking,function(){ return 'view=tracking'; });
 })();
 window.addEventListener('popstate',function(e){
-  var s=e.state||{loc:location.hash.replace(/^#/,'')};
+  var s=e.state||{loc:nbCurrentLoc()};
   nbShowLocation(s.loc||'',s.lib);
   nbApplyItemUI(s.ui);
   setTimeout(function(){ window.scrollTo(0,s.scroll||0); },120);
 });
 function nbRestoreLocation(){
-  var loc=nbStartLocation||'';
-  nbStartLocation='';
+  var loc=nbStartLocation||(nbPathBase()?nbPathToLoc(nbStartPath):'');
+  nbStartLocation=''; nbStartPath='';
   if(loc) nbShowLocation(loc,null); else nbUpdateBackLinks();
 }
 // After the library and the role are in place (this listener runs after the

@@ -20,6 +20,23 @@ wecom-kb/
     └── wp-bridge.js/.css ← hand-written WordPress layer (persistence, read-only mode)
 ```
 
+## What's new in 1.4.0 (11.11.2026)
+
+**Readable addresses.** Every screen has a real address under the knowledge base page, instead of `/kb/#item=kbd_o10`:
+
+| Screen | Address |
+|---|---|
+| Item | `/kb/O-50-sim-activation`: the item's code + a short English name |
+| Topic | `/kb/topic/no-mobile-data` |
+| Library | `/kb/` |
+| Document tracking / new item | `/kb/tracking`, `/kb/new` |
+| Proposed version | `/kb/review/O-50-sim-activation` |
+
+- **How it works.** The plugin adds a rewrite rule that sends every address under the knowledge base page to that page (and stops WordPress from redirecting it back to `/kb/`); the boot data carries the page's address (`baseUrl`), and the app reads the rest. WordPress's stored rules refresh by themselves after the update.
+- **Links don't break.** Items are found by their code, so `/kb/O-50`, a wrong or changed English name, and old `#item=…` links all open the item; the address bar then shows the readable form. The English names are in `NB_ITEM_SLUGS` and `NB_TOPIC_SLUGS` in `index.html`; a new item with a code gets `/kb/<code>` until a name is added there.
+- **Requirements.** Pretty permalinks (any setting other than "Plain"), and the knowledge base page is the one the plugin created (`wecom_kb_page_id`). With plain permalinks the app keeps `#item=…` addresses. The GitHub version always uses `#item=…`.
+- **Tested** on a local WordPress (WordPress Playground): direct addresses, links inside items, the browser's Back button, topics, the library, tracking and old `#item=` links.
+
 ## What's new in 1.3.0 (11.11.2026)
 
 The front-end changes come from `index.html` as usual; the plugin's PHP is unchanged apart from the version number.
