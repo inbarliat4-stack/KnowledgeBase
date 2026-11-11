@@ -4406,22 +4406,62 @@ var NB_ROLES={
 var NB_ROLE_KEY='wecom_kb_demo_role';
 function nbGetRole(){ try{ return sessionStorage.getItem(NB_ROLE_KEY); }catch(e){ return null; } }
 
+// ── SITE PASSWORD (GitHub version only) ─────────────────────────────────
+// Before the role screen, the GitHub version asks for a password. Only its
+// SHA-256 hash is kept here. The site is static and public, so this keeps
+// casual visitors out; it does not hide the content from someone who reads
+// the page's code. The browser tab stays unlocked until it is closed.
+// WordPress has its own login and never shows this step.
+var NB_SITE_PW_HASH='8e314059d60884de414898c3d73acedeafd3d10d948277e29a00a4d3bd74f8a6';
+var NB_UNLOCK_KEY='wecom_kb_unlocked';
+function nbIsUnlocked(){ try{ return sessionStorage.getItem(NB_UNLOCK_KEY)==='1'; }catch(e){ return false; } }
+function nbSha256(text){
+  return crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)).then(function(buf){
+    return [].map.call(new Uint8Array(buf),function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+  });
+}
+function nbGateLockHTML(){
+  return '<h1 class="gate-title">מאגר ידע פנימי</h1>'
+    +'<div class="gate-sub">הזינו את הסיסמה כדי להיכנס</div>'
+    +'<form class="gate-lock" id="nb-lock-form" onsubmit="event.preventDefault();nbTryUnlock()">'
+    +'<label class="sr-only" for="nb-lock-pw">סיסמה</label>'
+    +'<input type="password" id="nb-lock-pw" class="gate-pw" autocomplete="current-password" placeholder="סיסמה" required>'
+    +'<button type="submit" class="gate-pw-btn">כניסה</button>'
+    +'<div class="gate-pw-err" id="nb-lock-err" role="alert" hidden>הסיסמה שגויה. נסו שוב.</div>'
+    +'</form>';
+}
+function nbTryUnlock(){
+  var inp=document.getElementById('nb-lock-pw'), err=document.getElementById('nb-lock-err');
+  if(!inp||!inp.value) return;
+  nbSha256(inp.value).then(function(h){
+    if(h!==NB_SITE_PW_HASH){ err.hidden=false; inp.value=''; inp.focus(); return; }
+    try{ sessionStorage.setItem(NB_UNLOCK_KEY,'1'); }catch(e){}
+    var r=nbGetRole();
+    if(NB_ROLES[r]){ nbEnterAs(r); return; }
+    var card=document.querySelector('#nb-gate .gate-card');
+    if(card) card.innerHTML=nbGateBrandHTML()+nbGateRolesHTML();
+    var first=document.querySelector('#nb-gate .gate-role'); if(first) first.focus();
+  });
+}
+function nbGateBrandHTML(){ return '<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'').replace(/ onclick="[^"]*"/,'')+'</div>'; }
+
 function nbShowGate(){
   var overlay=document.createElement('div');
   overlay.id='nb-gate';
-  overlay.innerHTML='<div class="gate-card">'
-    +'<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'')+'</div>'
-    +'<h1 class="gate-title">מאגר ידע פנימי</h1>'
+  overlay.innerHTML='<div class="gate-card">'+nbGateBrandHTML()+(nbIsUnlocked()?nbGateRolesHTML():nbGateLockHTML())+'</div>';
+  document.body.appendChild(overlay);
+  document.body.classList.add('gate-open');
+  var pw=document.getElementById('nb-lock-pw'); if(pw) pw.focus();
+}
+function nbGateRolesHTML(){
+  return '<h1 class="gate-title">מאגר ידע פנימי</h1>'
     +'<div class="gate-sub">בחרו תפקיד כדי להיכנס</div>'
     +'<div class="gate-roles">'+Object.keys(NB_ROLES).map(function(r){
       var R=NB_ROLES[r];
       return '<button class="gate-role" onclick="nbEnterAs(\''+r+'\')"><span class="gate-icon">'+R.icon+'</span>'
         +'<span class="gate-role-name">'+R.name+'</span><span class="gate-role-desc">'+R.desc+'</span></button>';
     }).join('')+'</div>'
-    +'<div class="gate-note">גרסת הדגמה: בחירת התפקיד מציגה מה כל משתמש רואה. ההרשאות האמיתיות, עם שם משתמש וסיסמה, מנוהלות באתר ה-WordPress.</div>'
-    +'</div>';
-  document.body.appendChild(overlay);
-  document.body.classList.add('gate-open');
+    +'<div class="gate-note">גרסת הדגמה: בחירת התפקיד מציגה מה כל משתמש רואה. ההרשאות האמיתיות, עם שם משתמש וסיסמה, מנוהלות באתר ה-WordPress.</div>';
 }
 
 function nbEnterAs(role){
@@ -4469,7 +4509,8 @@ document.addEventListener('DOMContentLoaded',function(){
   if(window.WECOM_KB) return; // WordPress: real login and permissions
   var r=nbGetRole();
   if(!NB_ROLES[r]) r=nbTakeRoleHandoff();
-  if(NB_ROLES[r]) nbApplyRole(r); else nbShowGate();
+  // The password comes first; then the role (skipped when this tab already has one).
+  if(NB_ROLES[r]&&nbIsUnlocked()) nbApplyRole(r); else nbShowGate();
 });
 
 // ── OPEN AN ITEM IN A NEW TAB ───────────────────────────────────────────
@@ -4487,7 +4528,8 @@ function nbTakeRoleHandoff(){
   try{
     var h=JSON.parse(localStorage.getItem(NB_ROLE_HANDOFF)||'null');
     localStorage.removeItem(NB_ROLE_HANDOFF);
-    if(h&&NB_ROLES[h.role]&&Date.now()-h.at<30000){ sessionStorage.setItem(NB_ROLE_KEY,h.role); return h.role; }
+    // Only an unlocked tab hands its role over, so the new browser tab is unlocked too.
+    if(h&&NB_ROLES[h.role]&&Date.now()-h.at<30000){ sessionStorage.setItem(NB_ROLE_KEY,h.role); sessionStorage.setItem(NB_UNLOCK_KEY,'1'); return h.role; }
   }catch(e){}
   return null;
 }
