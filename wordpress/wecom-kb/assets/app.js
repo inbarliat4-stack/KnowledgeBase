@@ -663,7 +663,7 @@ function nbRenderSearch(){
       var d=r.d, snip=r.where.indexOf('תוכן')!==-1?nbSnippet(d,r.matched):'';
       return '<div class="result-card fade-in" style="--kind:'+(NB_KINDS[d.kind]||NB_KINDS.R).color+'" onclick="nbOpenResult(\''+nbEsc(d.id)+'\')">'
         +'<div class="rc-top">'+nbKindBadge(d.kind)+nbStatusBadge(d)
-        +'<span class="rc-title">'+nbHighlight(d.topic,r.matched)+'</span></div>'
+        +'<span class="rc-title">'+nbHighlight(d.topic,r.matched)+'</span>'+nbNewTabIcon(d.id)+'</div>'
         +'<div class="rc-path">'+(r.topics.length?r.topics.map(function(t){return '<a onclick="event.stopPropagation();nbOpenTopic('+t.id+')">'+nbEsc(nbPlain(t.title))+'</a>';}).join(' · '):'ללא נושא')
         +' · '+d.worlds.map(function(w){return nbEsc(nbWorldName(w));}).join(', ')+'</div>'
         +(d.desc?'<div class="rc-desc">'+nbHighlight(d.desc,r.matched)+'</div>':'')
@@ -714,7 +714,7 @@ function nbRenderMostViewed(){
       var viewedAt=new Date(row.entry.viewedAt);
       var time=viewedAt.toLocaleDateString('he-IL')+' '+viewedAt.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
       return '<div class="result-card fade-in" style="--kind:'+(NB_KINDS[d.kind]||NB_KINDS.R).color+'" onclick="nbOpenResult(\''+nbEsc(d.id)+'\')">'
-        +'<div class="rc-top">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'<span class="rc-title">'+nbEsc(nbPlain(d.topic))+'</span></div>'
+        +'<div class="rc-top">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'<span class="rc-title">'+nbEsc(nbPlain(d.topic))+'</span>'+nbNewTabIcon(d.id)+'</div>'
         +'<div class="rc-path">'+(topics.length?topics.map(function(t){return nbEsc(nbPlain(t.title));}).join(' · '):'ללא נושא')
         +(d.worlds&&d.worlds.length?' · '+d.worlds.map(function(w){return nbEsc(nbWorldName(w));}).join(', '):'')+'</div>'
         +(d.desc?'<div class="rc-desc">'+nbEsc(d.desc)+'</div>':'')
@@ -802,7 +802,7 @@ function nbOpenTopic(id){
 function nbItemCardHTML(d){
   var k=NB_KINDS[d.kind]||NB_KINDS.R;
   return '<div class="item-card fade-in'+(nbActive(d)?'':' inactive')+'" style="--kind:'+k.color+'" onclick="showDynamicDoc(\''+nbEsc(d.id)+'\')">'
-    +'<div class="ic-top"><span class="ic-badges">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'<span class="nb-edit-only">'+nbReviewBadge(d)+'</span></span><span class="ic-worlds">'+d.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')+'</span></div>'
+    +'<div class="ic-top"><span class="ic-badges">'+nbKindBadge(d.kind)+nbStatusBadge(d)+'<span class="nb-edit-only">'+nbReviewBadge(d)+'</span></span><span class="ic-worlds">'+d.worlds.map(function(w){return '<span class="world-chip">'+nbEsc(nbWorldName(w))+'</span>';}).join('')+nbNewTabIcon(d.id)+'</span></div>'
     +'<div class="ic-title">'+d.topic+'</div>'
     +(d.desc?'<div class="ic-desc">'+d.desc+'</div>':'')
     +(d.tags.length?'<div class="ic-tags">'+d.tags.map(nbTagChip).join('')+'</div>':'')
@@ -3444,7 +3444,7 @@ function nbRefRows(root){
       done[id]=1;
       var b=document.createElement('button');
       b.type='button'; b.className='av-ref'; b.title=nbPlain(d.topic);
-      b.innerHTML=nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="av-ref-arrow" aria-hidden="true">←</span>';
+      b.innerHTML=nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="av-ref-arrow" aria-hidden="true">←</span>'+nbNewTabIcon(id);
       b.addEventListener('click',function(e){ e.stopPropagation(); showDynamicDoc(id); window.scrollTo(0,0); });
       boxes.appendChild(b);
     });
@@ -3676,7 +3676,13 @@ function nbEnhance(root){
         a.appendChild(codeEl);
         // The title as written after the code, or the item's title when the text has only the code.
         a.appendChild(document.createTextNode(f.byTitle?' '+t.slice(f.at,f.end):f.addTitle?' — '+f.addTitle:t.slice(f.codeEnd,f.end)));
-        a.addEventListener('click',function(e){ e.stopPropagation(); showDynamicDoc(this.getAttribute('data-doc')); window.scrollTo(0,0); });
+        a.href=nbItemHref(f.doc.id);
+        a.addEventListener('click',function(e){
+          e.stopPropagation();
+          // Ctrl / ⌘ / Shift + click: the browser opens the link in a new tab or window.
+          if(e.ctrlKey||e.metaKey||e.shiftKey){ nbRoleHandoff(); return; }
+          e.preventDefault(); showDynamicDoc(this.getAttribute('data-doc')); window.scrollTo(0,0);
+        });
       } else {
         a.className='kb-link kb-link-stage'; a.setAttribute('data-stage-link',f.stage);
         a.textContent=t.slice(f.at,f.end)+(f.name?' – '+f.name:'');
@@ -3727,7 +3733,7 @@ function nbMTreeHTML(doc,b){
       var d=window.dynamicDocs[go.slice(5)];
       if(!d) return '<div class="m-target end">פריט הידע שאליו מפנה התשובה כבר לא קיים</div>';
       if(!nbVisible(d)) return '<div class="m-target end">פריט הידע עדיין לא פורסם — פנו לראש הצוות</div>';
-      return '<button class="m-target item" onclick="'+action(a,from)+'" title="'+nbEsc(nbPlain(d.topic))+'">'+nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="m-go-arrow">←</span></button>';
+      return '<button class="m-target item" onclick="'+action(a,from)+'" title="'+nbEsc(nbPlain(d.topic))+'">'+nbKindBadge(d.kind,true)+'<span>'+nbEsc(nbSplitTitle(d.topic).title)+'</span><span class="m-go-arrow">←</span>'+nbNewTabIcon(go.slice(5))+'</button>';
     }
     // A document that is not in the app yet (a.ext names it): marked for completion, not a link.
     if(a.ext) return '<div class="m-target ext" title="הפניה שלא זוהתה בפריטי הידע – להשלמה"><span class="av-todo">להשלמה</span> '+a.ext+'</div>';
@@ -4462,8 +4468,57 @@ function nbSwitchUser(){
 document.addEventListener('DOMContentLoaded',function(){
   if(window.WECOM_KB) return; // WordPress: real login and permissions
   var r=nbGetRole();
+  if(!NB_ROLES[r]) r=nbTakeRoleHandoff();
   if(NB_ROLES[r]) nbApplyRole(r); else nbShowGate();
 });
+
+// ── OPEN AN ITEM IN A NEW TAB ───────────────────────────────────────────
+// Item links have a real address (#item=…), so Ctrl+click, middle-click and
+// "open in new tab" work, and a ↗ icon on reference boxes and item cards opens
+// the item in a new tab while this tab stays where it is.
+// Demo only: the role is kept per tab, so the new tab receives it for a few
+// seconds instead of asking again (WordPress has its own login).
+var NB_ROLE_HANDOFF='wecom_kb_role_handoff';
+function nbRoleHandoff(){
+  var r=nbGetRole();
+  if(r) try{ localStorage.setItem(NB_ROLE_HANDOFF,JSON.stringify({role:r,at:Date.now()})); }catch(e){}
+}
+function nbTakeRoleHandoff(){
+  try{
+    var h=JSON.parse(localStorage.getItem(NB_ROLE_HANDOFF)||'null');
+    localStorage.removeItem(NB_ROLE_HANDOFF);
+    if(h&&NB_ROLES[h.role]&&Date.now()-h.at<30000){ sessionStorage.setItem(NB_ROLE_KEY,h.role); return h.role; }
+  }catch(e){}
+  return null;
+}
+function nbItemHref(id){ return location.pathname+location.search+'#item='+encodeURIComponent(id); }
+function nbOpenInNewTab(id){
+  if(!window.dynamicDocs[id]) return;
+  nbRoleHandoff();
+  window.open(nbItemHref(id),'_blank','noopener');
+}
+var NB_NEWTAB_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
+function nbNewTabIcon(id){
+  return '<span class="nb-newtab" role="link" tabindex="0" data-newtab="'+nbEsc(id)+'" title="פתיחה בלשונית חדשה" aria-label="פתיחה בלשונית חדשה">'+NB_NEWTAB_SVG+'</span>';
+}
+// Runs before the card's or box's own click, so the current page doesn't change.
+document.addEventListener('click',function(e){
+  var t=e.target.closest&&e.target.closest('[data-newtab]');
+  if(!t) return;
+  e.preventDefault(); e.stopPropagation();
+  nbOpenInNewTab(t.getAttribute('data-newtab'));
+},true);
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  var t=e.target.closest&&e.target.closest('[data-newtab]');
+  if(!t) return;
+  e.preventDefault(); e.stopPropagation();
+  nbOpenInNewTab(t.getAttribute('data-newtab'));
+},true);
+// Middle-click and right-click ("open in new tab") on an item link: hand the role over too.
+document.addEventListener('mousedown',function(e){
+  if(e.target.closest&&e.target.closest('a.kb-link-item')) nbRoleHandoff();
+},true);
 
 // ── NAVIGATION: REFRESH, BACK AND SHARED LINKS ──────────────────────────
 // The open item, topic or screen is kept in the address (#item=…, #topic=…,

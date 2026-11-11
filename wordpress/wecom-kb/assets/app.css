@@ -1216,6 +1216,11 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-ref{display:flex;align-items:center;gap:8px;width:100%;text-align:right;font-family:Rubik,sans-serif;font-size:13.5px;font-weight:700;line-height:1.4;color:var(--navy);background:#fff;border:1.5px solid var(--border-strong);border-radius:10px;padding:9px 12px;cursor:pointer}
 .av-ref:hover,.av-ref:focus-visible{border-color:#1D45B4;background:#F5F8FF;outline:none}
 .av-ref-arrow{margin-right:auto;color:#1D45B4;font-size:16px;flex-shrink:0}
+/* "Open in a new tab" icon on reference boxes, diagnosis targets, item cards and search results. */
+.nb-newtab{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:26px;height:26px;border-radius:7px;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer;transition:background var(--t),color var(--t),border-color var(--t)}
+.nb-newtab:hover,.nb-newtab:focus-visible{color:#1D45B4;background:#E8EEFF;border-color:#C9D6FF;outline:none}
+.rc-top .nb-newtab{margin-right:auto}
+.ic-worlds .nb-newtab{margin-right:4px}
 .av-ref-inline{font-weight:700}
 @media(max-width:640px){.av-ref-row{grid-template-columns:1fr}.av-head .article-title{font-size:19px}}
 .av-feedback{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;margin-top:22px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
