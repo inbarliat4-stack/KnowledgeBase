@@ -6,7 +6,7 @@ Live development version: https://inbarliat4-stack.github.io/KnowledgeBase/
 
 ## What users see
 
-Knowledge is organized as content worlds (שירות, טכני, הנדסה) → topics → knowledge items. The library filters topics by content world, item type and category. Technical topics have their own categories: SIM/eSIM, גלישה, קליטה, שיחות, SMS and חו"ל. Choosing a category or content world sets the item type back to הכל. A topic with a single item opens that item directly. Each item has a code (for example `M-10` or `O-51`) and a format suited to its purpose:
+Knowledge is organized as content worlds (שירות, טכני, הנדסה, מטה) → topics → knowledge items. The library filters topics by content world, item type and category. Technical topics have their own categories: SIM/eSIM, גלישה, קליטה, שיחות, SMS and חו"ל. Choosing a category or content world sets the item type back to הכל. A topic with a single item opens that item directly. Each item has a code (for example `M-10` or `O-51`) and a format suited to its purpose:
 
 - **M** — guided diagnosis and routing
 - **R / S** — handling and specialist procedures

@@ -40,9 +40,9 @@ const force = args.includes('--force');
 const outDir = path.resolve(root, option('out') || 'formatted-source');
 
 const KIND_NAMES = { M: 'אבחון והכוונה למסלול טיפול', R: 'מסלול טיפול', S: 'הליך מקצועי / מומחה', O: 'מסמך תפעול', E: 'הסלמה והעברה', T: 'תסריט שיחה', I: 'מידע לעיון' };
-const WORLD_NAMES = { service: 'שירות', tech: 'טכני', eng: 'הנדסה' };
+const WORLD_NAMES = { service: 'שירות', tech: 'טכני', eng: 'הנדסה', hq: 'מטה' };
 // Same default the app applies when an item has no worlds (index.html: NB_CAT_TO_WORLD).
-const CAT_TO_WORLD = { sim: 'tech', tech: 'tech', tech2: 'tech', intl: 'tech', billing: 'service', plans: 'service', ops: 'service' };
+const CAT_TO_WORLD = { hq: 'hq', sim: 'tech', tech: 'tech', tech2: 'tech', intl: 'tech', billing: 'service', plans: 'service', ops: 'service' };
 
 // ── Origin documents ────────────────────────────────────────────────────
 
