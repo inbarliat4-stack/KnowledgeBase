@@ -19,7 +19,7 @@ Each type has its own display, following the display spec for that type: the ful
 
 Agents search and read published items. Editors can also create, edit, delete, review and manage items, and administrators can also manage content worlds. The entry screen lets you pick a role (מנהל מערכת, עורך תוכן, נציג שירות) to see each view; in this version that is a demo and does not restrict access.
 
-Each item has a status: draft, pending approval, published, expired or archived. Agents see only published items. The **הנצפות ביותר** filter shows up to ten items most recently opened in the current browser.
+Agents send feedback on an item with "דיווח על בעיה / משוב". Editors see it in the item's "מעקב עריכה" panel and, for all items, in the **משוב** tab of "מעקב מסמכים": a table with the date, item, feedback text and the version the agent read, where each one is marked חדש or טופל and can be exported to Excel. In this version feedback is kept in the browser it was sent from; on WordPress it is to be stored on the server. Each item has a status: draft, pending approval, published, expired or archived. Agents see only published items. The **הנצפות ביותר** filter shows up to ten items most recently opened in the current browser.
 
 ## How app items are updated
 

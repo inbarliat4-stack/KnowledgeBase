@@ -1249,13 +1249,15 @@ function nbRenderTracking(){
   var count=function(fn){return all.filter(fn).length;};
   var chips=[['all','הכל',all.length]].concat(NB_STATUS_ORDER.map(function(s){return [s,NB_STATUSES[s].label,count(function(d){return d.status===s;})];}))
     .concat([['review','נדרשת לבדיקה',count(function(d){return !!d.revision;})],['gap','עם פער פתוח',count(function(d){return d.track&&d.track.gap;})],['high','עדיפות גבוהה',count(function(d){return d.track&&d.track.priority==='גבוהה';})]]);
-  var rows=nbTrackRows();
+  var fbAll=nbFeedbackAll();
+  chips.push(['feedback','💬 משוב',fbAll.length]);
+  var rows=nbTrackFilter==='feedback'?[]:nbTrackRows();
   el.innerHTML='<div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>מעקב מסמכים</div>'
       +'<div class="page-sub">סטטוס, מצב התוכן ופערים לכל פריט ידע — לעורכים בלבד. לחיצה על שורה פותחת את הפריט.</div></div>'
     +'<div class="lib-filter-row">'+chips.map(function(c){
       return '<button class="filter-btn world-btn'+(nbTrackFilter===c[0]?' active':'')+'" onclick="nbTrackFilter=\''+c[0]+'\';nbRenderTracking()">'+c[1]+' <span class="chip-n">'+c[2]+'</span></button>';
     }).join('')+'<button class="filter-btn world-btn ghost" onclick="nbExportTracking()">⬇ ייצוא ל-Excel</button></div>'
-    +(rows.length?'<div class="track-table-wrap"><table class="track-table"><thead><tr>'
+    +(nbTrackFilter==='feedback'?nbFeedbackTableHTML(fbAll):rows.length?'<div class="track-table-wrap"><table class="track-table"><thead><tr>'
       +'<th>קוד</th><th>שם</th><th>סוג</th><th>נושא</th><th>סטטוס</th><th>מצב התוכן</th><th>עדיפות</th><th>פער / פעולה נדרשת</th><th>אחראי</th><th>עודכן</th></tr></thead><tbody>'
       +rows.map(function(r){
         return '<tr onclick="showDynamicDoc(\''+nbEsc(r.d.id)+'\')">'
@@ -1281,16 +1283,69 @@ function nbRenderTracking(){
       }).join('')+'</div>'
       :'<div class="empty-state">אין פריטים בסינון הזה</div>');
 }
-// Download the tracking table as a CSV that Excel opens (UTF-8 with BOM, Hebrew safe).
+// The "משוב" tab: everything agents sent with "דיווח על בעיה / משוב", newest
+// first, in the same table style. Editors mark each one as handled.
+function nbFeedbackRows(all){
+  return all.map(function(f,i){
+    var d=window.dynamicDocs[f.docId], st=nbSplitTitle(d?d.topic:f.title);
+    return {f:f,i:i,d:d,code:st.code,title:st.title};
+  }).reverse();
+}
+function nbFeedbackTableHTML(all){
+  var rows=nbFeedbackRows(all);
+  if(!rows.length) return '<div class="empty-state">עדיין לא התקבל משוב מנציגים. משוב נשלח מכפתור "דיווח על בעיה / משוב" בתחתית כל פריט.</div>';
+  var open=function(r){ return r.d?' onclick="showDynamicDoc(\''+nbEsc(r.d.id)+'\')"':''; };
+  var done=function(r){
+    return '<button type="button" class="fb-state'+(r.f.done?' done':'')+'" onclick="event.stopPropagation();nbToggleFeedbackDone('+r.i+')" title="'+(r.f.done?'סמן כפתוח':'סמן כטופל')+'">'+(r.f.done?'✓ טופל':'חדש')+'</button>';
+  };
+  var version=function(r){ return r.f.version?nbFmtDate(r.f.version):''; };
+  return '<div class="track-table-wrap"><table class="track-table"><thead><tr>'
+      +'<th>התקבל</th><th>קוד</th><th>פריט</th><th>סוג</th><th>משוב</th><th>גרסה שנקראה</th><th>טיפול</th></tr></thead><tbody>'
+      +rows.map(function(r){
+        return '<tr'+open(r)+(r.f.done?' class="fb-done"':'')+'>'
+          +'<td class="tt-muted">'+nbFmtDate(r.f.at)+'</td><td class="tt-code">'+nbEsc(r.code)+'</td>'
+          +'<td class="tt-title">'+nbEsc(r.title)+(r.d?'':' <span class="tt-muted">(הפריט נמחק)</span>')+'</td>'
+          +'<td>'+(r.d?nbKindBadge(r.d.kind,true):'')+'</td>'
+          +'<td class="tt-gap fb-text">'+nbEsc(r.f.text)+'</td>'
+          +'<td class="tt-muted">'+version(r)+'</td><td>'+done(r)+'</td></tr>';
+      }).join('')+'</tbody></table></div>'
+    +'<div class="track-cards">'+rows.map(function(r){
+      return '<div class="track-card'+(r.f.done?' fb-done':'')+'"'+open(r)+'>'
+        +'<div class="tc2-top">'+(r.d?nbKindBadge(r.d.kind,true):'')+(r.code?'<span class="tt-code">'+nbEsc(r.code)+'</span>':'')
+        +'<span class="tc2-title">'+nbEsc(r.title)+'</span></div>'
+        +'<div class="tc2-gap"><span>משוב</span>'+nbEsc(r.f.text)+'</div>'
+        +'<div class="tc2-meta">'+['התקבל: '+nbFmtDate(r.f.at),r.f.version?'גרסה שנקראה: '+version(r):''].filter(Boolean).join(' · ')+'</div>'
+        +'<div class="tc2-badges">'+done(r)+'</div>'
+        +'</div>';
+    }).join('')+'</div>';
+}
+function nbToggleFeedbackDone(i){
+  var all=nbFeedbackAll();
+  if(!all[i]) return;
+  all[i].done=!all[i].done;
+  try{ localStorage.setItem(NB_FEEDBACK_KEY,JSON.stringify(all)); }catch(e){}
+  nbRenderTracking();
+}
+// Download the tracking table (or, in the "משוב" tab, the feedback) as a CSV
+// that Excel opens (UTF-8 with BOM, Hebrew safe).
 function nbExportTracking(){
   var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
-  var head=['קוד','שם','סוג','נושא','סטטוס','מצב התוכן','עדיפות','פער / פעולה נדרשת','מקור ידע','אחראי','פורסם','עודכן'];
-  var lines=[head.join(',')].concat(nbTrackRows().map(function(r){
-    return [r.code,r.title,(NB_KINDS[r.d.kind]||{}).full,r.topics.join('; '),NB_STATUSES[r.d.status].label,r.t.state,r.t.priority,r.t.gap,r.t.source,r.d.owner,nbFmtDate(r.d.publishedAt),nbFmtDate(r.d.updatedAt)].map(q).join(',');
-  }));
+  var fb=nbTrackFilter==='feedback', head, body;
+  if(fb){
+    head=['התקבל','קוד','פריט','סוג','משוב','גרסה שנקראה','טיפול'];
+    body=nbFeedbackRows(nbFeedbackAll()).map(function(r){
+      return [nbFmtDate(r.f.at),r.code,r.title,r.d?(NB_KINDS[r.d.kind]||{}).full:'',r.f.text,r.f.version?nbFmtDate(r.f.version):'',r.f.done?'טופל':'חדש'].map(q).join(',');
+    });
+  } else {
+    head=['קוד','שם','סוג','נושא','סטטוס','מצב התוכן','עדיפות','פער / פעולה נדרשת','מקור ידע','אחראי','פורסם','עודכן'];
+    body=nbTrackRows().map(function(r){
+      return [r.code,r.title,(NB_KINDS[r.d.kind]||{}).full,r.topics.join('; '),NB_STATUSES[r.d.status].label,r.t.state,r.t.priority,r.t.gap,r.t.source,r.d.owner,nbFmtDate(r.d.publishedAt),nbFmtDate(r.d.updatedAt)].map(q).join(',');
+    });
+  }
+  var lines=[head.join(',')].concat(body);
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));
-  a.download='מעקב-מסמכים.csv';
+  a.download=fb?'משוב-מנציגים.csv':'מעקב-מסמכים.csv';
   document.body.appendChild(a); a.click(); a.remove();
 }
 
