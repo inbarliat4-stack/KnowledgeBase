@@ -48,7 +48,7 @@ html{overflow-x:hidden;overflow-x:clip}body{font-family:"Rubik",sans-serif;backg
 .snav-item.active .snav-icon{opacity:1}
 .snav-badge{margin-inline-start:auto;font-size:10px;font-weight:400;background:var(--red);color:#fff;border-radius:20px;padding:1px 7px;min-width:18px;text-align:center}
 .snav-badge.gray{background:var(--border);color:var(--muted)}
-.content{padding:24px 20px 60px;overflow-y:auto;background:var(--bg);min-width:0;max-width:100%}
+.content{padding:24px 20px 60px;overflow-x:clip;overflow-y:visible;background:var(--bg);min-width:0;max-width:100%}
 .view{display:none}.view.active{display:block}
 .page-header{margin-bottom:28px}
 .page-title{font-size:24px;font-weight:800;color:var(--navy);margin-bottom:5px;letter-spacing:-.3px}
@@ -1232,7 +1232,7 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .nb-newtab:hover,.nb-newtab:focus-visible{color:#1D45B4;background:#E8EEFF;border-color:#C9D6FF;outline:none}
 .rc-top .nb-newtab{margin-right:auto}
 /* Tabs inside the app: a strip under the top bar, shown from two tabs on. */
-.nb-tabs{margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.nb-tabs{position:sticky;top:52px;z-index:60;margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
 .nb-tabs[hidden]{display:none}
 .nb-tabs-row{display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:-1px}
 .nb-tab{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:250px;padding:7px 6px 7px 10px;background:#E9EDF2;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;font-size:12.5px;color:var(--text-2);transition:background var(--t)}
@@ -6020,9 +6020,19 @@ function nbTabLabel(loc){
 function nbRenderTabs(){
   var el=document.getElementById('nb-tabs');
   if(!el||!nbTabs) return;
+  // When the strip appears or disappears, the page below it must not move under the mouse.
+  var view=document.querySelector('.view.active'), before=view?view.getBoundingClientRect().top:0;
+  var keepPlace=function(){
+    if(!view||window.scrollY<=0) return;
+    var diff=view.getBoundingClientRect().top-before;
+    if(diff) window.scrollBy(0,diff);
+  };
   el.hidden=nbTabs.length<2;
   document.body.classList.toggle('nb-has-tabs',nbTabs.length>1);
-  if(nbTabs.length<2){ el.innerHTML=''; return; }
+  if(nbTabs.length<2){ el.innerHTML=''; keepPlace(); return; }
+  // Pinned right under the top bar, whatever its height on this screen.
+  var bar=document.querySelector('.topnav');
+  el.style.top=(bar&&getComputedStyle(bar).position==='sticky'?bar.getBoundingClientRect().height:0)+'px';
   el.innerHTML='<div class="nb-tabs-row" role="tablist" aria-label="לשוניות פתוחות">'+nbTabs.map(function(t,i){
     var L=nbTabLabel(t.loc), on=i===nbActiveTab;
     return '<div class="nb-tab'+(on?' active':'')+'" role="tab" tabindex="0" aria-selected="'+on+'" data-tab="'+i+'" title="'+nbEsc((L.code?L.code+' · ':'')+L.text)+'"'
@@ -6032,7 +6042,10 @@ function nbRenderTabs(){
       +'<span class="nb-tab-text">'+(L.code?'<b>'+nbEsc(L.code)+'</b> ':'')+nbEsc(L.text)+'</span>'
       +'<button type="button" class="nb-tab-x" aria-label="סגירת הלשונית" title="סגירה" onclick="nbCloseTab('+i+',event)">×</button></div>';
   }).join('')+'</div>';
-  var a=el.querySelector('.nb-tab.active'); if(a&&a.scrollIntoView) a.scrollIntoView({block:'nearest',inline:'nearest'});
+  keepPlace();
+  // Bring the active tab into view inside the strip only (scrollIntoView would also scroll the page).
+  var row=el.querySelector('.nb-tabs-row'), a=el.querySelector('.nb-tab.active');
+  if(row&&a){ var rb=row.getBoundingClientRect(), ab=a.getBoundingClientRect(); if(ab.left<rb.left||ab.right>rb.right) row.scrollLeft+=ab.left<rb.left?ab.left-rb.left:ab.right-rb.right; }
 }
 // Shows a tab's saved screen as it was left.
 function nbShowTab(t){
@@ -6072,7 +6085,11 @@ function nbOpenInAppTab(id){
   if(at===-1){ nbTabs.push({loc:loc}); at=nbTabs.length-1; }
   nbTabsSave(); nbRenderTabs();
   var tab=document.querySelector('#nb-tabs .nb-tab[data-tab="'+at+'"]');
-  if(tab){ tab.classList.remove('nb-tab-flash'); void tab.offsetWidth; tab.classList.add('nb-tab-flash'); if(tab.scrollIntoView) tab.scrollIntoView({block:'nearest',inline:'nearest'}); }
+  if(tab){
+    tab.classList.remove('nb-tab-flash'); void tab.offsetWidth; tab.classList.add('nb-tab-flash');
+    var row=tab.parentNode, rb=row.getBoundingClientRect(), tb=tab.getBoundingClientRect();
+    if(tb.left<rb.left||tb.right>rb.right) row.scrollLeft+=tb.left<rb.left?tb.left-rb.left:tb.right-rb.right;
+  }
 }
 // Shows a saved screen without adding a history entry.
 function nbShowLocation(loc,lib){

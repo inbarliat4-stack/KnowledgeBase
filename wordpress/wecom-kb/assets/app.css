@@ -37,7 +37,7 @@ html{overflow-x:hidden;overflow-x:clip}body{font-family:"Rubik",sans-serif;backg
 .snav-item.active .snav-icon{opacity:1}
 .snav-badge{margin-inline-start:auto;font-size:10px;font-weight:400;background:var(--red);color:#fff;border-radius:20px;padding:1px 7px;min-width:18px;text-align:center}
 .snav-badge.gray{background:var(--border);color:var(--muted)}
-.content{padding:24px 20px 60px;overflow-y:auto;background:var(--bg);min-width:0;max-width:100%}
+.content{padding:24px 20px 60px;overflow-x:clip;overflow-y:visible;background:var(--bg);min-width:0;max-width:100%}
 .view{display:none}.view.active{display:block}
 .page-header{margin-bottom:28px}
 .page-title{font-size:24px;font-weight:800;color:var(--navy);margin-bottom:5px;letter-spacing:-.3px}
@@ -1221,7 +1221,7 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .nb-newtab:hover,.nb-newtab:focus-visible{color:#1D45B4;background:#E8EEFF;border-color:#C9D6FF;outline:none}
 .rc-top .nb-newtab{margin-right:auto}
 /* Tabs inside the app: a strip under the top bar, shown from two tabs on. */
-.nb-tabs{margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.nb-tabs{position:sticky;top:52px;z-index:60;margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
 .nb-tabs[hidden]{display:none}
 .nb-tabs-row{display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:-1px}
 .nb-tab{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:250px;padding:7px 6px 7px 10px;background:#E9EDF2;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;font-size:12.5px;color:var(--text-2);transition:background var(--t)}

@@ -4629,9 +4629,19 @@ function nbTabLabel(loc){
 function nbRenderTabs(){
   var el=document.getElementById('nb-tabs');
   if(!el||!nbTabs) return;
+  // When the strip appears or disappears, the page below it must not move under the mouse.
+  var view=document.querySelector('.view.active'), before=view?view.getBoundingClientRect().top:0;
+  var keepPlace=function(){
+    if(!view||window.scrollY<=0) return;
+    var diff=view.getBoundingClientRect().top-before;
+    if(diff) window.scrollBy(0,diff);
+  };
   el.hidden=nbTabs.length<2;
   document.body.classList.toggle('nb-has-tabs',nbTabs.length>1);
-  if(nbTabs.length<2){ el.innerHTML=''; return; }
+  if(nbTabs.length<2){ el.innerHTML=''; keepPlace(); return; }
+  // Pinned right under the top bar, whatever its height on this screen.
+  var bar=document.querySelector('.topnav');
+  el.style.top=(bar&&getComputedStyle(bar).position==='sticky'?bar.getBoundingClientRect().height:0)+'px';
   el.innerHTML='<div class="nb-tabs-row" role="tablist" aria-label="לשוניות פתוחות">'+nbTabs.map(function(t,i){
     var L=nbTabLabel(t.loc), on=i===nbActiveTab;
     return '<div class="nb-tab'+(on?' active':'')+'" role="tab" tabindex="0" aria-selected="'+on+'" data-tab="'+i+'" title="'+nbEsc((L.code?L.code+' · ':'')+L.text)+'"'
@@ -4641,7 +4651,10 @@ function nbRenderTabs(){
       +'<span class="nb-tab-text">'+(L.code?'<b>'+nbEsc(L.code)+'</b> ':'')+nbEsc(L.text)+'</span>'
       +'<button type="button" class="nb-tab-x" aria-label="סגירת הלשונית" title="סגירה" onclick="nbCloseTab('+i+',event)">×</button></div>';
   }).join('')+'</div>';
-  var a=el.querySelector('.nb-tab.active'); if(a&&a.scrollIntoView) a.scrollIntoView({block:'nearest',inline:'nearest'});
+  keepPlace();
+  // Bring the active tab into view inside the strip only (scrollIntoView would also scroll the page).
+  var row=el.querySelector('.nb-tabs-row'), a=el.querySelector('.nb-tab.active');
+  if(row&&a){ var rb=row.getBoundingClientRect(), ab=a.getBoundingClientRect(); if(ab.left<rb.left||ab.right>rb.right) row.scrollLeft+=ab.left<rb.left?ab.left-rb.left:ab.right-rb.right; }
 }
 // Shows a tab's saved screen as it was left.
 function nbShowTab(t){
@@ -4681,7 +4694,11 @@ function nbOpenInAppTab(id){
   if(at===-1){ nbTabs.push({loc:loc}); at=nbTabs.length-1; }
   nbTabsSave(); nbRenderTabs();
   var tab=document.querySelector('#nb-tabs .nb-tab[data-tab="'+at+'"]');
-  if(tab){ tab.classList.remove('nb-tab-flash'); void tab.offsetWidth; tab.classList.add('nb-tab-flash'); if(tab.scrollIntoView) tab.scrollIntoView({block:'nearest',inline:'nearest'}); }
+  if(tab){
+    tab.classList.remove('nb-tab-flash'); void tab.offsetWidth; tab.classList.add('nb-tab-flash');
+    var row=tab.parentNode, rb=row.getBoundingClientRect(), tb=tab.getBoundingClientRect();
+    if(tb.left<rb.left||tb.right>rb.right) row.scrollLeft+=tb.left<rb.left?tb.left-rb.left:tb.right-rb.right;
+  }
 }
 // Shows a saved screen without adding a history entry.
 function nbShowLocation(loc,lib){
