@@ -1357,24 +1357,33 @@ h2.av-part{scroll-margin-top:84px}
 
 /* ── DEMO ROLE GATE ── */
 body.gate-open{overflow:hidden}
-#nb-gate{position:fixed;inset:0;z-index:10000;background:var(--navy);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;direction:rtl}
-.gate-card{background:var(--white);border-radius:20px;padding:32px 28px;max-width:720px;width:100%;box-shadow:var(--shadow-lg);text-align:center;margin:auto}
-.gate-brand{background:var(--navy);border-radius:12px;display:inline-flex;padding:10px 16px;margin-bottom:16px}
-.gate-brand img{height:34px;width:auto;display:block}
-.gate-title{font-size:24px;font-weight:800;color:var(--navy);margin-bottom:4px}
-.gate-sub{font-size:14px;color:var(--muted);margin-bottom:22px}
+/* Entry screen (password, then role), styled after shop.we-com.co.il: light grey with a
+   red-orange-to-peach glow, a white card, the red-orange logo on white, an orange CTA. */
+#nb-gate{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;direction:rtl;font-family:Rubik,sans-serif;
+  background:radial-gradient(ellipse 70% 95% at 0% 100%,rgba(255,61,0,.78) 0%,rgba(255,61,0,.42) 22%,rgba(255,181,150,.35) 48%,rgba(255,181,150,0) 75%),linear-gradient(105deg,#E4E6E9 0%,#EEEFF1 45%,#F6F6F7 100%)}
+.gate-card{background:var(--white);border-radius:16px;padding:36px 32px 28px;max-width:720px;width:100%;box-shadow:0 18px 50px rgba(31,46,59,.14),0 3px 10px rgba(31,46,59,.06);text-align:center;margin:auto}
+.gate-card.lock{max-width:420px}
+.gate-brand{display:flex;justify-content:center;margin-bottom:18px}
+.gate-brand img{height:52px;width:auto;display:block}
+.gate-title{font-size:26px;font-weight:800;color:var(--red);margin:0 0 4px;letter-spacing:-.2px}
+.gate-sub{font-size:16px;font-weight:500;color:var(--navy);margin-bottom:24px}
 .gate-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .gate-role{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-family:Rubik,sans-serif;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;transition:all var(--t)}
 .gate-role:hover,.gate-role:focus-visible{border-color:var(--red);background:var(--red-l);box-shadow:var(--shadow-md);outline:none}
 .gate-icon{font-size:28px;line-height:1}
 .gate-role-name{font-size:16px;font-weight:700;color:var(--navy)}
 .gate-role-desc{font-size:12.5px;color:var(--text-2);line-height:1.5}
-.gate-lock{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:380px;margin:0 auto 6px}
-.gate-pw{flex:1 1 200px;min-width:0;height:44px;padding:0 14px;font-family:Rubik,sans-serif;font-size:15px;border:1.5px solid var(--border-strong);border-radius:10px;background:var(--white);color:var(--text);direction:ltr;text-align:right}
-.gate-pw:focus-visible{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-l)}
-.gate-pw-btn{flex:0 0 auto;height:44px;padding:0 22px;font-family:Rubik,sans-serif;font-size:15px;font-weight:700;color:#fff;background:var(--navy);border:none;border-radius:10px;cursor:pointer}
-.gate-pw-btn:hover,.gate-pw-btn:focus-visible{background:var(--red);outline:none}
-.gate-pw-err{flex:1 0 100%;font-size:13px;font-weight:600;color:var(--red)}
+.gate-lock{display:flex;flex-direction:column;gap:12px;text-align:right}
+.gate-pw{width:100%;box-sizing:border-box;height:48px;padding:0 16px;font-family:Rubik,sans-serif;font-size:15px;border:1px solid #E1E3E6;border-radius:8px;background:#F3F4F6;color:var(--navy);direction:ltr;text-align:right;transition:border-color .15s,box-shadow .15s,background .15s}
+.gate-pw::placeholder{color:#8A9099}
+.gate-pw:focus-visible{outline:none;background:var(--white);border-color:var(--red);box-shadow:0 0 0 3px rgba(255,61,0,.15)}
+.gate-pw-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;font-family:Rubik,sans-serif;font-size:16px;font-weight:700;color:#fff;background:var(--red);border:none;border-radius:8px;cursor:pointer;transition:background .15s,box-shadow .15s}
+.gate-pw-btn:hover{background:#E63700;box-shadow:0 6px 16px rgba(255,61,0,.28)}
+.gate-pw-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,61,0,.3)}
+.gate-pw-chev{font-size:20px;line-height:1;margin-top:-2px}
+.gate-pw-err{font-size:13.5px;font-weight:600;color:var(--red);text-align:center}
+.gate-foot{margin-top:18px;font-size:12.5px;color:#8A9099}
+@media(prefers-reduced-motion:reduce){.gate-pw,.gate-pw-btn{transition:none}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .gate-note{font-size:12px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 14px;line-height:1.55}
 .role-badge{display:flex;align-items:center;gap:6px;margin-inline-start:12px;flex-shrink:0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:3px 4px 3px 12px;color:#fff;font-size:12.5px;font-weight:600;white-space:nowrap}
@@ -5824,9 +5833,10 @@ function nbGateLockHTML(){
     +'<form class="gate-lock" id="nb-lock-form" onsubmit="event.preventDefault();nbTryUnlock()">'
     +'<label class="sr-only" for="nb-lock-pw">סיסמה</label>'
     +'<input type="password" id="nb-lock-pw" class="gate-pw" autocomplete="current-password" placeholder="סיסמה" required>'
-    +'<button type="submit" class="gate-pw-btn">כניסה</button>'
+    +'<button type="submit" class="gate-pw-btn">כניסה <span class="gate-pw-chev" aria-hidden="true">›</span></button>'
     +'<div class="gate-pw-err" id="nb-lock-err" role="alert" hidden>הסיסמה שגויה. נסו שוב.</div>'
-    +'</form>';
+    +'</form>'
+    +'<div class="gate-foot">גישה לצוות wecom בלבד</div>';
 }
 function nbTryUnlock(){
   var inp=document.getElementById('nb-lock-pw'), err=document.getElementById('nb-lock-err');
@@ -5837,16 +5847,16 @@ function nbTryUnlock(){
     var r=nbGetRole();
     if(NB_ROLES[r]){ nbEnterAs(r); return; }
     var card=document.querySelector('#nb-gate .gate-card');
-    if(card) card.innerHTML=nbGateBrandHTML()+nbGateRolesHTML();
-    var first=document.querySelector('#nb-gate .gate-role'); if(first) first.focus();
+    if(card){ card.classList.remove('lock'); card.innerHTML=nbGateBrandHTML()+nbGateRolesHTML(); }
   });
 }
-function nbGateBrandHTML(){ return '<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'').replace(/ onclick="[^"]*"/,'')+'</div>'; }
+function nbGateBrandHTML(){ return '<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'').replace(/ onclick="[^"]*"/,'').replace(/ style="[^"]*"/,'').replace(/ title="[^"]*"/,'')+'</div>'; }
 
 function nbShowGate(){
   var overlay=document.createElement('div');
   overlay.id='nb-gate';
-  overlay.innerHTML='<div class="gate-card">'+nbGateBrandHTML()+(nbIsUnlocked()?nbGateRolesHTML():nbGateLockHTML())+'</div>';
+  var locked=!nbIsUnlocked();
+  overlay.innerHTML='<div class="gate-card'+(locked?' lock':'')+'">'+nbGateBrandHTML()+(locked?nbGateLockHTML():nbGateRolesHTML())+'</div>';
   document.body.appendChild(overlay);
   document.body.classList.add('gate-open');
   var pw=document.getElementById('nb-lock-pw'); if(pw) pw.focus();

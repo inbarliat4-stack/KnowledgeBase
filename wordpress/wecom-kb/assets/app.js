@@ -4426,9 +4426,10 @@ function nbGateLockHTML(){
     +'<form class="gate-lock" id="nb-lock-form" onsubmit="event.preventDefault();nbTryUnlock()">'
     +'<label class="sr-only" for="nb-lock-pw">סיסמה</label>'
     +'<input type="password" id="nb-lock-pw" class="gate-pw" autocomplete="current-password" placeholder="סיסמה" required>'
-    +'<button type="submit" class="gate-pw-btn">כניסה</button>'
+    +'<button type="submit" class="gate-pw-btn">כניסה <span class="gate-pw-chev" aria-hidden="true">›</span></button>'
     +'<div class="gate-pw-err" id="nb-lock-err" role="alert" hidden>הסיסמה שגויה. נסו שוב.</div>'
-    +'</form>';
+    +'</form>'
+    +'<div class="gate-foot">גישה לצוות wecom בלבד</div>';
 }
 function nbTryUnlock(){
   var inp=document.getElementById('nb-lock-pw'), err=document.getElementById('nb-lock-err');
@@ -4439,16 +4440,16 @@ function nbTryUnlock(){
     var r=nbGetRole();
     if(NB_ROLES[r]){ nbEnterAs(r); return; }
     var card=document.querySelector('#nb-gate .gate-card');
-    if(card) card.innerHTML=nbGateBrandHTML()+nbGateRolesHTML();
-    var first=document.querySelector('#nb-gate .gate-role'); if(first) first.focus();
+    if(card){ card.classList.remove('lock'); card.innerHTML=nbGateBrandHTML()+nbGateRolesHTML(); }
   });
 }
-function nbGateBrandHTML(){ return '<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'').replace(/ onclick="[^"]*"/,'')+'</div>'; }
+function nbGateBrandHTML(){ return '<div class="gate-brand">'+((document.querySelector('.topnav img')||{}).outerHTML||'').replace(/ onclick="[^"]*"/,'').replace(/ style="[^"]*"/,'').replace(/ title="[^"]*"/,'')+'</div>'; }
 
 function nbShowGate(){
   var overlay=document.createElement('div');
   overlay.id='nb-gate';
-  overlay.innerHTML='<div class="gate-card">'+nbGateBrandHTML()+(nbIsUnlocked()?nbGateRolesHTML():nbGateLockHTML())+'</div>';
+  var locked=!nbIsUnlocked();
+  overlay.innerHTML='<div class="gate-card'+(locked?' lock':'')+'">'+nbGateBrandHTML()+(locked?nbGateLockHTML():nbGateRolesHTML())+'</div>';
   document.body.appendChild(overlay);
   document.body.classList.add('gate-open');
   var pw=document.getElementById('nb-lock-pw'); if(pw) pw.focus();
