@@ -20,6 +20,18 @@ wecom-kb/
     └── wp-bridge.js/.css ← hand-written WordPress layer (persistence, read-only mode)
 ```
 
+## What's new in 1.3.0 (11.11.2026)
+
+The front-end changes come from `index.html` as usual; the plugin's PHP is unchanged apart from the version number.
+
+- **Library filters.** Technical topics have their own categories: SIM/eSIM, גלישה, קליטה, שיחות, SMS and חו"ל. Choosing a category or content world sets the item type back to "הכל". A topic with a single item opens that item directly.
+- **References.** A document named in quotes without its code links to the item with that exact title. Each linked item gets one reference box per section.
+- **Item page.** The table of contents has no automatic numbering.
+- **Tabs inside the app.** A ↗ icon on reference boxes, diagnosis answers, item cards and search results opens the item in a tab of the app's own tab strip, pinned under the top bar, while the current page stays as it is. Each tab keeps its screen, open stages and scroll position; tabs are kept per browser tab in `sessionStorage`. The wecom logo returns to the library with no search or filters and closes every tab.
+- **Feedback tab.** "מעקב מסמכים" has a "משוב" tab listing agents' feedback ("דיווח על בעיה / משוב") with a חדש / טופל toggle and Excel export. See *Before go-live*: feedback isn't stored on the server yet.
+- **Content world "מטה".** A built-in world for HQ guides. A world with the same name that someone created by hand is merged into it, and built-in worlds added later reach saved libraries. Two HQ guides, O-200 (נוהל העברת בעלות) and O-201 (סיכום מדריכי חישובי נתונים), arrive as pending approval.
+- **Content since 1.2.** Items now come from formatted source documents and are published after an editor's approval. The editor panel ("מעקב עריכה") links each item's origin document and formatted document and lists the missing details. `NB_SEED_VERSION` is now 72, so on the first editor visit the built-in content is refreshed by the usual rule (items people created or edited in the app are kept).
+
 ## Install
 
 1. Zip this folder as `wecom-kb.zip` (the folder inside the zip must be named `wecom-kb`) and upload it in **Plugins → Add New Plugin → Upload Plugin**, or copy the folder to `wp-content/plugins/wecom-kb/`. From the repository root, `git archive --format=zip --prefix=wecom-kb/ -o wecom-kb.zip HEAD:wordpress/wecom-kb` creates the zip.
@@ -53,6 +65,8 @@ Editors can upload a source document (PDF, PNG, Word `.docx` or `.txt`, up to 20
 
 ## Permissions
 
+**Not active in the current deployment.** The platform the plugin is installed on handles sign-in itself, so the WordPress roles below don't apply there and everyone sees all content, drafts and pending items included. The table describes what the plugin enforces on a site where WordPress roles are used.
+
 | Who | Capability (filter) | Gets |
 |---|---|---|
 | Agents | `read` (`wecom_kb_view_cap`) | read-only app: no create, edit, delete, trash, history or world management. Search, guided diagnosis and copy buttons work. Elements with class `nb-edit-only` are hidden. |
@@ -73,6 +87,13 @@ Logged-out visitors are redirected to the login page. Read-only is enforced on t
 ## Security notes
 
 The prototype renders titles and step texts with `innerHTML`. That was harmless when each person only saw their own browser's data. Now one editor's input runs in everyone else's browser, including admins'. The sanitizer therefore limits ID fields to `[A-Za-z0-9_-]` and runs any text containing markup through `wp_kses_post`. Still, only give `wecom_kb_edit_cap` to trusted staff. A longer-term fix is to move the app's rendering from string concatenation to `textContent`.
+
+## Before go-live
+
+- **Feedback stays in the browser.** Feedback is still saved in the sending browser's `localStorage`, so the "משוב" tab shows only feedback sent from the same browser. It needs a REST route and storage on the server before editors see everyone's feedback.
+- **Approving on WordPress is untested.** The approve / reject flow has only been tested against a stand-in server, because no PHP or WordPress was available. Test it on the real site before relying on it.
+- **New proposals arrive with plugin updates.** Proposed versions built from the formatted source documents reach WordPress only when a new plugin version is uploaded.
+- **Document links point to OneDrive.** The editor panel's links to origin and formatted documents open in the company OneDrive / SharePoint, so editors need access there.
 
 ## Things to know
 
