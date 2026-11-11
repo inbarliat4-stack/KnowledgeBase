@@ -4683,6 +4683,17 @@ function nbCloseTab(i,e){
   }
   nbTabsSave(); nbRenderTabs();
 }
+// The logo: back to the main page (the library, no search or filters) and
+// every app tab closed.
+function nbGoHome(){
+  nbTabs=[{loc:''}]; nbActiveTab=0; nbTabsSave();
+  nbSearchQuery='';
+  var inp=document.getElementById('nb-search'); if(inp) inp.value='';
+  nbCurrentWorld='all';
+  showView('library');
+  nbRenderLibFilters(); nbRenderSidebar();
+  window.scrollTo(0,0);
+}
 // Opens an item in a new tab without leaving the current screen. An item that
 // already has a tab isn't opened twice: its tab is highlighted.
 function nbOpenInAppTab(id){
