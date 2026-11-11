@@ -1231,6 +1231,23 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .nb-newtab{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:26px;height:26px;border-radius:7px;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer;transition:background var(--t),color var(--t),border-color var(--t)}
 .nb-newtab:hover,.nb-newtab:focus-visible{color:#1D45B4;background:#E8EEFF;border-color:#C9D6FF;outline:none}
 .rc-top .nb-newtab{margin-right:auto}
+/* Tabs inside the app: a strip under the top bar, shown from two tabs on. */
+.nb-tabs{margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.nb-tabs[hidden]{display:none}
+.nb-tabs-row{display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:-1px}
+.nb-tab{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:250px;padding:7px 6px 7px 10px;background:#E9EDF2;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;font-size:12.5px;color:var(--text-2);transition:background var(--t)}
+.nb-tab:hover{background:#F4F6F9}
+.nb-tab.active{background:#fff;color:var(--navy);box-shadow:inset 0 3px 0 var(--red);border-bottom:1px solid #fff}
+.nb-tab:focus-visible{outline:2px solid #1D45B4;outline-offset:-2px}
+.nb-tab-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.nb-tab.active .nb-tab-text{font-weight:600}
+.nb-tab-kind{flex-shrink:0;width:18px;height:18px;border-radius:5px;color:#fff;font-size:10.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.nb-tab-kind.home{background:var(--navy);font-size:12px}
+.nb-tab-x{flex-shrink:0;width:20px;height:20px;border:none;background:transparent;border-radius:5px;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
+.nb-tab-x:hover,.nb-tab-x:focus-visible{background:#DDE3EA;color:var(--navy);outline:none}
+@keyframes nbTabFlash{0%,100%{background:#E9EDF2}35%{background:#FFE3D6}}
+.nb-tab-flash:not(.active){animation:nbTabFlash .9s ease 2}
+@media(max-width:640px){.nb-tabs{margin:-14px -12px 12px;padding:6px 12px 0}.nb-tab{max-width:170px}}
 .ic-worlds .nb-newtab{margin-right:4px}
 .av-ref-inline{font-weight:700}
 @media(max-width:640px){.av-ref-row{grid-template-columns:1fr}.av-head .article-title{font-size:19px}}
@@ -5848,8 +5865,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
 // ── OPEN AN ITEM IN A NEW TAB ───────────────────────────────────────────
 // Item links have a real address (#item=…), so Ctrl+click, middle-click and
-// "open in new tab" work, and a ↗ icon on reference boxes and item cards opens
-// the item in a new tab while this tab stays where it is.
+// "open in new tab" open a browser tab. The ↗ icon opens the item in a tab
+// inside the app instead (nbOpenInAppTab, with the app's tabs below).
 // Demo only: the role is kept per tab, so the new tab receives it for a few
 // seconds instead of asking again (WordPress has its own login).
 var NB_ROLE_HANDOFF='wecom_kb_role_handoff';
@@ -5866,11 +5883,6 @@ function nbTakeRoleHandoff(){
   return null;
 }
 function nbItemHref(id){ return location.pathname+location.search+'#item='+encodeURIComponent(id); }
-function nbOpenInNewTab(id){
-  if(!window.dynamicDocs[id]) return;
-  nbRoleHandoff();
-  window.open(nbItemHref(id),'_blank','noopener');
-}
 var NB_NEWTAB_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
 function nbNewTabIcon(id){
   return '<span class="nb-newtab" role="link" tabindex="0" data-newtab="'+nbEsc(id)+'" title="פתיחה בלשונית חדשה" aria-label="פתיחה בלשונית חדשה">'+NB_NEWTAB_SVG+'</span>';
@@ -5880,14 +5892,14 @@ document.addEventListener('click',function(e){
   var t=e.target.closest&&e.target.closest('[data-newtab]');
   if(!t) return;
   e.preventDefault(); e.stopPropagation();
-  nbOpenInNewTab(t.getAttribute('data-newtab'));
+  nbOpenInAppTab(t.getAttribute('data-newtab'));
 },true);
 document.addEventListener('keydown',function(e){
   if(e.key!=='Enter'&&e.key!==' ') return;
   var t=e.target.closest&&e.target.closest('[data-newtab]');
   if(!t) return;
   e.preventDefault(); e.stopPropagation();
-  nbOpenInNewTab(t.getAttribute('data-newtab'));
+  nbOpenInAppTab(t.getAttribute('data-newtab'));
 },true);
 // Middle-click and right-click ("open in new tab") on an item link: hand the role over too.
 document.addEventListener('mousedown',function(e){
@@ -5962,8 +5974,106 @@ function nbUpdateBackLinks(){
     if(s.idx>0&&s.prevLabel){ b.setAttribute('onclick','nbGoBack()'); b.textContent='← חזרה '+s.prevLabel; }
     else if(b.getAttribute('onclick')==='nbGoBack()'){ b.setAttribute('onclick',b.getAttribute('data-nb-back')); b.textContent=b.getAttribute('data-nb-back-text'); }
   });
+  nbTabsSync();
 }
 function nbGoBack(){ history.back(); }
+
+// ── TABS INSIDE THE APP ─────────────────────────────────────────────────
+// The ↗ icon on a reference box, diagnosis answer, item card or search result
+// opens the item in a new tab of the app's tab strip; the page on screen stays.
+// Each tab remembers its screen (item, topic, library with its filters), the
+// open stages and the scroll position. The strip shows once there are two tabs,
+// and the tabs are kept for this browser tab (they survive a refresh).
+var NB_TABS_KEY='wecom_kb_tabs', nbTabs=null, nbActiveTab=0;
+function nbTabsSave(){
+  try{ sessionStorage.setItem(NB_TABS_KEY,JSON.stringify({tabs:nbTabs,active:nbActiveTab})); }catch(e){}
+}
+function nbTabsLoad(){
+  try{
+    var s=JSON.parse(sessionStorage.getItem(NB_TABS_KEY)||'null');
+    if(s&&Array.isArray(s.tabs)&&s.tabs.length&&s.tabs[s.active]){ nbTabs=s.tabs; nbActiveTab=s.active; return; }
+  }catch(e){}
+  nbTabs=[{loc:''}]; nbActiveTab=0;
+}
+// The screen on display belongs to the active tab.
+function nbTabsCapture(){
+  if(!nbTabs) nbTabsLoad();
+  var s=nbNavSnapshot();
+  nbTabs[nbActiveTab]={loc:s.loc,lib:s.lib,ui:s.ui,scroll:s.scroll};
+}
+// Called after every screen change (from nbUpdateBackLinks).
+function nbTabsSync(){
+  if(!document.getElementById('nb-tabs')) return;
+  nbTabsCapture(); nbTabsSave(); nbRenderTabs();
+}
+function nbTabLabel(loc){
+  var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), val=m?decodeURIComponent(m[2]):'';
+  if(m&&(m[1]==='item'||m[1]==='review')&&window.dynamicDocs[val]){
+    var d=window.dynamicDocs[val], st=nbSplitTitle(d.topic);
+    return {kind:d.kind,code:st.code,text:(m[1]==='review'?'השוואה: ':'')+st.title};
+  }
+  if(m&&m[1]==='topic'){ var t=TOPICS.find(function(x){return String(x.id)===val;}); if(t) return {text:'נושא: '+nbPlain(t.title)}; }
+  if(m&&m[1]==='view'&&val==='tracking') return {text:'מעקב מסמכים'};
+  if(m&&m[1]==='view'&&val==='new') return {text:'פריט ידע חדש'};
+  return {text:'ספריית ידע'};
+}
+function nbRenderTabs(){
+  var el=document.getElementById('nb-tabs');
+  if(!el||!nbTabs) return;
+  el.hidden=nbTabs.length<2;
+  document.body.classList.toggle('nb-has-tabs',nbTabs.length>1);
+  if(nbTabs.length<2){ el.innerHTML=''; return; }
+  el.innerHTML='<div class="nb-tabs-row" role="tablist" aria-label="לשוניות פתוחות">'+nbTabs.map(function(t,i){
+    var L=nbTabLabel(t.loc), on=i===nbActiveTab;
+    return '<div class="nb-tab'+(on?' active':'')+'" role="tab" tabindex="0" aria-selected="'+on+'" data-tab="'+i+'" title="'+nbEsc((L.code?L.code+' · ':'')+L.text)+'"'
+      +' onclick="nbSwitchTab('+i+')" onauxclick="if(event.button===1){event.preventDefault();nbCloseTab('+i+',event)}"'
+      +' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();nbSwitchTab('+i+')}">'
+      +(L.kind?'<span class="nb-tab-kind" style="background:'+(NB_KINDS[L.kind]||NB_KINDS.R).color+'">'+nbEsc(L.kind)+'</span>':'<span class="nb-tab-kind home">⌂</span>')
+      +'<span class="nb-tab-text">'+(L.code?'<b>'+nbEsc(L.code)+'</b> ':'')+nbEsc(L.text)+'</span>'
+      +'<button type="button" class="nb-tab-x" aria-label="סגירת הלשונית" title="סגירה" onclick="nbCloseTab('+i+',event)">×</button></div>';
+  }).join('')+'</div>';
+  var a=el.querySelector('.nb-tab.active'); if(a&&a.scrollIntoView) a.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+// Shows a tab's saved screen as it was left.
+function nbShowTab(t){
+  nbShowLocation(t.loc||'',t.lib||null);
+  nbApplyItemUI(t.ui);
+  setTimeout(function(){ window.scrollTo(0,t.scroll||0); },120);
+}
+function nbSwitchTab(i){
+  if(!nbTabs||!nbTabs[i]||i===nbActiveTab) return;
+  nbTabsCapture();
+  nbActiveTab=i;
+  nbShowTab(nbTabs[i]);
+  nbTabsSave(); nbRenderTabs();
+}
+function nbCloseTab(i,e){
+  if(e) e.stopPropagation();
+  if(!nbTabs||nbTabs.length<2||!nbTabs[i]) return;
+  if(i===nbActiveTab){
+    nbTabs.splice(i,1);
+    nbActiveTab=Math.min(i,nbTabs.length-1);
+    nbShowTab(nbTabs[nbActiveTab]);
+  } else {
+    nbTabsCapture();
+    nbTabs.splice(i,1);
+    if(i<nbActiveTab) nbActiveTab--;
+  }
+  nbTabsSave(); nbRenderTabs();
+}
+// Opens an item in a new tab without leaving the current screen. An item that
+// already has a tab isn't opened twice: its tab is highlighted.
+function nbOpenInAppTab(id){
+  var d=window.dynamicDocs[id];
+  if(!d||!nbVisible(d)) return;
+  nbTabsCapture();
+  var loc='item='+encodeURIComponent(id), at=-1;
+  nbTabs.forEach(function(t,i){ if(t.loc===loc) at=i; });
+  if(at===-1){ nbTabs.push({loc:loc}); at=nbTabs.length-1; }
+  nbTabsSave(); nbRenderTabs();
+  var tab=document.querySelector('#nb-tabs .nb-tab[data-tab="'+at+'"]');
+  if(tab){ tab.classList.remove('nb-tab-flash'); void tab.offsetWidth; tab.classList.add('nb-tab-flash'); if(tab.scrollIntoView) tab.scrollIntoView({block:'nearest',inline:'nearest'}); }
+}
 // Shows a saved screen without adding a history entry.
 function nbShowLocation(loc,lib){
   var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), key=m&&m[1], val=m?decodeURIComponent(m[2]):'';
@@ -6160,6 +6270,7 @@ document.addEventListener('change', function(e){
   <div id="snav-doc" class="snav-doc"></div>
 </nav>
 <main class="content">
+<div id="nb-tabs" class="nb-tabs" hidden></div>
 
 <!-- LIBRARY -->
 <div id="view-library" class="view active">

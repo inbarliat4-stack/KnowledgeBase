@@ -1220,6 +1220,23 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .nb-newtab{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:26px;height:26px;border-radius:7px;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer;transition:background var(--t),color var(--t),border-color var(--t)}
 .nb-newtab:hover,.nb-newtab:focus-visible{color:#1D45B4;background:#E8EEFF;border-color:#C9D6FF;outline:none}
 .rc-top .nb-newtab{margin-right:auto}
+/* Tabs inside the app: a strip under the top bar, shown from two tabs on. */
+.nb-tabs{margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.nb-tabs[hidden]{display:none}
+.nb-tabs-row{display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:-1px}
+.nb-tab{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:250px;padding:7px 6px 7px 10px;background:#E9EDF2;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;font-size:12.5px;color:var(--text-2);transition:background var(--t)}
+.nb-tab:hover{background:#F4F6F9}
+.nb-tab.active{background:#fff;color:var(--navy);box-shadow:inset 0 3px 0 var(--red);border-bottom:1px solid #fff}
+.nb-tab:focus-visible{outline:2px solid #1D45B4;outline-offset:-2px}
+.nb-tab-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.nb-tab.active .nb-tab-text{font-weight:600}
+.nb-tab-kind{flex-shrink:0;width:18px;height:18px;border-radius:5px;color:#fff;font-size:10.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.nb-tab-kind.home{background:var(--navy);font-size:12px}
+.nb-tab-x{flex-shrink:0;width:20px;height:20px;border:none;background:transparent;border-radius:5px;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
+.nb-tab-x:hover,.nb-tab-x:focus-visible{background:#DDE3EA;color:var(--navy);outline:none}
+@keyframes nbTabFlash{0%,100%{background:#E9EDF2}35%{background:#FFE3D6}}
+.nb-tab-flash:not(.active){animation:nbTabFlash .9s ease 2}
+@media(max-width:640px){.nb-tabs{margin:-14px -12px 12px;padding:6px 12px 0}.nb-tab{max-width:170px}}
 .ic-worlds .nb-newtab{margin-right:4px}
 .av-ref-inline{font-weight:700}
 @media(max-width:640px){.av-ref-row{grid-template-columns:1fr}.av-head .article-title{font-size:19px}}

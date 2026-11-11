@@ -4474,8 +4474,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
 // ── OPEN AN ITEM IN A NEW TAB ───────────────────────────────────────────
 // Item links have a real address (#item=…), so Ctrl+click, middle-click and
-// "open in new tab" work, and a ↗ icon on reference boxes and item cards opens
-// the item in a new tab while this tab stays where it is.
+// "open in new tab" open a browser tab. The ↗ icon opens the item in a tab
+// inside the app instead (nbOpenInAppTab, with the app's tabs below).
 // Demo only: the role is kept per tab, so the new tab receives it for a few
 // seconds instead of asking again (WordPress has its own login).
 var NB_ROLE_HANDOFF='wecom_kb_role_handoff';
@@ -4492,11 +4492,6 @@ function nbTakeRoleHandoff(){
   return null;
 }
 function nbItemHref(id){ return location.pathname+location.search+'#item='+encodeURIComponent(id); }
-function nbOpenInNewTab(id){
-  if(!window.dynamicDocs[id]) return;
-  nbRoleHandoff();
-  window.open(nbItemHref(id),'_blank','noopener');
-}
 var NB_NEWTAB_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
 function nbNewTabIcon(id){
   return '<span class="nb-newtab" role="link" tabindex="0" data-newtab="'+nbEsc(id)+'" title="פתיחה בלשונית חדשה" aria-label="פתיחה בלשונית חדשה">'+NB_NEWTAB_SVG+'</span>';
@@ -4506,14 +4501,14 @@ document.addEventListener('click',function(e){
   var t=e.target.closest&&e.target.closest('[data-newtab]');
   if(!t) return;
   e.preventDefault(); e.stopPropagation();
-  nbOpenInNewTab(t.getAttribute('data-newtab'));
+  nbOpenInAppTab(t.getAttribute('data-newtab'));
 },true);
 document.addEventListener('keydown',function(e){
   if(e.key!=='Enter'&&e.key!==' ') return;
   var t=e.target.closest&&e.target.closest('[data-newtab]');
   if(!t) return;
   e.preventDefault(); e.stopPropagation();
-  nbOpenInNewTab(t.getAttribute('data-newtab'));
+  nbOpenInAppTab(t.getAttribute('data-newtab'));
 },true);
 // Middle-click and right-click ("open in new tab") on an item link: hand the role over too.
 document.addEventListener('mousedown',function(e){
@@ -4588,8 +4583,106 @@ function nbUpdateBackLinks(){
     if(s.idx>0&&s.prevLabel){ b.setAttribute('onclick','nbGoBack()'); b.textContent='← חזרה '+s.prevLabel; }
     else if(b.getAttribute('onclick')==='nbGoBack()'){ b.setAttribute('onclick',b.getAttribute('data-nb-back')); b.textContent=b.getAttribute('data-nb-back-text'); }
   });
+  nbTabsSync();
 }
 function nbGoBack(){ history.back(); }
+
+// ── TABS INSIDE THE APP ─────────────────────────────────────────────────
+// The ↗ icon on a reference box, diagnosis answer, item card or search result
+// opens the item in a new tab of the app's tab strip; the page on screen stays.
+// Each tab remembers its screen (item, topic, library with its filters), the
+// open stages and the scroll position. The strip shows once there are two tabs,
+// and the tabs are kept for this browser tab (they survive a refresh).
+var NB_TABS_KEY='wecom_kb_tabs', nbTabs=null, nbActiveTab=0;
+function nbTabsSave(){
+  try{ sessionStorage.setItem(NB_TABS_KEY,JSON.stringify({tabs:nbTabs,active:nbActiveTab})); }catch(e){}
+}
+function nbTabsLoad(){
+  try{
+    var s=JSON.parse(sessionStorage.getItem(NB_TABS_KEY)||'null');
+    if(s&&Array.isArray(s.tabs)&&s.tabs.length&&s.tabs[s.active]){ nbTabs=s.tabs; nbActiveTab=s.active; return; }
+  }catch(e){}
+  nbTabs=[{loc:''}]; nbActiveTab=0;
+}
+// The screen on display belongs to the active tab.
+function nbTabsCapture(){
+  if(!nbTabs) nbTabsLoad();
+  var s=nbNavSnapshot();
+  nbTabs[nbActiveTab]={loc:s.loc,lib:s.lib,ui:s.ui,scroll:s.scroll};
+}
+// Called after every screen change (from nbUpdateBackLinks).
+function nbTabsSync(){
+  if(!document.getElementById('nb-tabs')) return;
+  nbTabsCapture(); nbTabsSave(); nbRenderTabs();
+}
+function nbTabLabel(loc){
+  var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), val=m?decodeURIComponent(m[2]):'';
+  if(m&&(m[1]==='item'||m[1]==='review')&&window.dynamicDocs[val]){
+    var d=window.dynamicDocs[val], st=nbSplitTitle(d.topic);
+    return {kind:d.kind,code:st.code,text:(m[1]==='review'?'השוואה: ':'')+st.title};
+  }
+  if(m&&m[1]==='topic'){ var t=TOPICS.find(function(x){return String(x.id)===val;}); if(t) return {text:'נושא: '+nbPlain(t.title)}; }
+  if(m&&m[1]==='view'&&val==='tracking') return {text:'מעקב מסמכים'};
+  if(m&&m[1]==='view'&&val==='new') return {text:'פריט ידע חדש'};
+  return {text:'ספריית ידע'};
+}
+function nbRenderTabs(){
+  var el=document.getElementById('nb-tabs');
+  if(!el||!nbTabs) return;
+  el.hidden=nbTabs.length<2;
+  document.body.classList.toggle('nb-has-tabs',nbTabs.length>1);
+  if(nbTabs.length<2){ el.innerHTML=''; return; }
+  el.innerHTML='<div class="nb-tabs-row" role="tablist" aria-label="לשוניות פתוחות">'+nbTabs.map(function(t,i){
+    var L=nbTabLabel(t.loc), on=i===nbActiveTab;
+    return '<div class="nb-tab'+(on?' active':'')+'" role="tab" tabindex="0" aria-selected="'+on+'" data-tab="'+i+'" title="'+nbEsc((L.code?L.code+' · ':'')+L.text)+'"'
+      +' onclick="nbSwitchTab('+i+')" onauxclick="if(event.button===1){event.preventDefault();nbCloseTab('+i+',event)}"'
+      +' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();nbSwitchTab('+i+')}">'
+      +(L.kind?'<span class="nb-tab-kind" style="background:'+(NB_KINDS[L.kind]||NB_KINDS.R).color+'">'+nbEsc(L.kind)+'</span>':'<span class="nb-tab-kind home">⌂</span>')
+      +'<span class="nb-tab-text">'+(L.code?'<b>'+nbEsc(L.code)+'</b> ':'')+nbEsc(L.text)+'</span>'
+      +'<button type="button" class="nb-tab-x" aria-label="סגירת הלשונית" title="סגירה" onclick="nbCloseTab('+i+',event)">×</button></div>';
+  }).join('')+'</div>';
+  var a=el.querySelector('.nb-tab.active'); if(a&&a.scrollIntoView) a.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+// Shows a tab's saved screen as it was left.
+function nbShowTab(t){
+  nbShowLocation(t.loc||'',t.lib||null);
+  nbApplyItemUI(t.ui);
+  setTimeout(function(){ window.scrollTo(0,t.scroll||0); },120);
+}
+function nbSwitchTab(i){
+  if(!nbTabs||!nbTabs[i]||i===nbActiveTab) return;
+  nbTabsCapture();
+  nbActiveTab=i;
+  nbShowTab(nbTabs[i]);
+  nbTabsSave(); nbRenderTabs();
+}
+function nbCloseTab(i,e){
+  if(e) e.stopPropagation();
+  if(!nbTabs||nbTabs.length<2||!nbTabs[i]) return;
+  if(i===nbActiveTab){
+    nbTabs.splice(i,1);
+    nbActiveTab=Math.min(i,nbTabs.length-1);
+    nbShowTab(nbTabs[nbActiveTab]);
+  } else {
+    nbTabsCapture();
+    nbTabs.splice(i,1);
+    if(i<nbActiveTab) nbActiveTab--;
+  }
+  nbTabsSave(); nbRenderTabs();
+}
+// Opens an item in a new tab without leaving the current screen. An item that
+// already has a tab isn't opened twice: its tab is highlighted.
+function nbOpenInAppTab(id){
+  var d=window.dynamicDocs[id];
+  if(!d||!nbVisible(d)) return;
+  nbTabsCapture();
+  var loc='item='+encodeURIComponent(id), at=-1;
+  nbTabs.forEach(function(t,i){ if(t.loc===loc) at=i; });
+  if(at===-1){ nbTabs.push({loc:loc}); at=nbTabs.length-1; }
+  nbTabsSave(); nbRenderTabs();
+  var tab=document.querySelector('#nb-tabs .nb-tab[data-tab="'+at+'"]');
+  if(tab){ tab.classList.remove('nb-tab-flash'); void tab.offsetWidth; tab.classList.add('nb-tab-flash'); if(tab.scrollIntoView) tab.scrollIntoView({block:'nearest',inline:'nearest'}); }
+}
 // Shows a saved screen without adding a history entry.
 function nbShowLocation(loc,lib){
   var m=/^(item|topic|review|view)=(.+)$/.exec(loc||''), key=m&&m[1], val=m?decodeURIComponent(m[2]):'';
