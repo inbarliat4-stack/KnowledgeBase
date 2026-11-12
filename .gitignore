@@ -4,3 +4,6 @@ drafts/
 מסמכי DOCx מוכנים לפרסום/
 # Items dropped from the app on 10.11.2026 (no origin document): their documents, kept on OneDrive only.
 dropped items/
+# Local test area for trying new packages (Astryx design system); never published.
+playground/
+node_modules/
