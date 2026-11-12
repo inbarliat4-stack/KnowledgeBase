@@ -1291,6 +1291,11 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 /* No numbered circles on the item page either: every step is a small grey bullet. */
 .av-o .o-steps>li{padding-right:20px}
 .av-o .o-steps>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
+/* A step with a link box beside it: text and bullet start level with the box's middle,
+   so the bullet stays on the text's first line (the row used to centre the text, not the bullet). */
+.av-o .o-steps .av-ref-row{align-items:start}
+.av-o .o-steps .av-ref-text{padding-top:12px}
+.av-o .o-steps>li:has(.av-ref-row)::before{top:26px}
 /* The open item's view switch and table of contents, in the sidebar (wide screens) */
 .av-toolbar{flex-direction:column;align-items:stretch}
 @media(min-width:769px){#av-toolbar{display:none}}
