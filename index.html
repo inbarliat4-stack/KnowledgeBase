@@ -1404,6 +1404,36 @@ body.gate-open{overflow:hidden}
   .search-head{padding:10px 12px}
   .search-count{display:block;margin-top:2px}
 }
+/* ── PLAYGROUND STYLE (12.11.2026) ─────────────────────────────────────────
+   Look taken from the Astryx playground (playground/, local only): quieter
+   filters with aligned labels, roomier cards with a soft shadow and grey hover,
+   brand-orange category line icons, coloured item-type tags, grey active menu item. */
+.nb-cat-ic{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:-4px}
+.filter-btn .nb-cat-ic{width:16px;height:16px;vertical-align:-3px;margin-left:4px}
+/* Topic cards */
+.topic-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.topic-card{border-radius:12px;box-shadow:var(--shadow-sm);transition:background var(--t),box-shadow var(--t)}
+.topic-card:hover{transform:none;background:#F2F2F2;box-shadow:var(--shadow-md)}
+.tc-body{padding:16px}
+.tc-top{margin-bottom:8px}
+.tc-cat{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--red-d)!important}
+.tc-title{font-size:16px;line-height:1.4;margin-bottom:8px}
+.tc-desc{font-size:13px;line-height:1.6;display:block;-webkit-line-clamp:unset;overflow:visible}
+.tc-foot{border-top:none;padding-top:0;margin-top:14px}
+.tc-count{font-size:12px;font-weight:600;color:var(--navy)}
+/* Item-type tags: filled, no outline */
+.kind-badge{border-color:transparent!important;border-radius:6px}
+.kind-badge.sm{min-width:22px;padding:1px 6px;font-weight:700}
+.kind-dot{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:6px;font-size:11px;font-weight:700;margin-left:6px}
+/* Filters: one label width so the "הכל" buttons line up; quiet buttons, grey when selected */
+.lib-filter-row,#lib-filters{gap:4px}
+.filter-label{width:80px;flex-shrink:0;margin-left:8px;font-size:12px;font-weight:600;color:var(--navy);letter-spacing:0}
+.filter-btn,.filter-btn.kind-btn{background:transparent;border:1.5px solid transparent;box-shadow:none;border-radius:8px;padding:5px 12px;font-weight:500;color:var(--navy)}
+.filter-btn:hover{background:#ECECEC;border-color:transparent;color:var(--navy);box-shadow:none}
+.filter-btn.active,.filter-btn.kind-btn.active{background:#E4E4E4;border-color:transparent;color:var(--navy);font-weight:600;box-shadow:none}
+/* Side menu: grey current page, orange count */
+.snav-item.active{background:#ECECEC;color:var(--navy)}
+.snav-badge{background:#FFE6DB;color:var(--red-d);font-weight:600}
 </style>
 <script>
 var TOPICS=[
@@ -1494,9 +1524,9 @@ var NB_SEED_VERSION = 72; // HQ guides O-200 and O-201 in the new content world 
 // worlds (item.worlds), and has one of the 7 document types (item.kind).
 var NB_KINDS={
   M:{label:'אבחון',full:'מסמך מרכזי / אבחון',color:'#6D3FD1',bg:'#F1ECFC',hint:'נקודת כניסה לנושא – מזהה את סוג המקרה ומנתב למסלול המתאים'},
-  R:{label:'טיפול',full:'מסלול טיפול',color:'#D9361B',bg:'#FFEDE6',hint:'טיפול מלא בתרחיש – מהתשאול ועד פתרון או מעבר לשלב הבא'},
+  R:{label:'טיפול',full:'מסלול טיפול',color:'#C2410C',bg:'#FFE4D1',hint:'טיפול מלא בתרחיש – מהתשאול ועד פתרון או מעבר לשלב הבא'},
   O:{label:'תפעול',full:'מסמך תפעול',color:'#2E5CE0',bg:'#EBF1FF',hint:'הוראות לביצוע פעולה ספציפית במערכת, במכשיר או בתהליך'},
-  E:{label:'הסלמה',full:'מסמך הסלמה',color:'#B45309',bg:'#FEF3E2',hint:'מתי מפסיקים טיפול, למי מעבירים ומה חובה לתעד'},
+  E:{label:'הסלמה',full:'מסמך הסלמה',color:'#A16207',bg:'#FEF3C0',hint:'מתי מפסיקים טיפול, למי מעבירים ומה חובה לתעד'},
   S:{label:'מומחה',full:'מסלול מומחה',color:'#0E7490',bg:'#E3F5F8',hint:'המשך טיפול לבעל תפקיד מקצועי או דרג מתקדם'},
   T:{label:'תסריט',full:'תסריטי שיחה',color:'#0E7A4F',bg:'#EDFAF3',hint:'ניסוחים מול לקוח: הסבר, תיאום ציפיות, התנגדות וסיום'},
   I:{label:'מידע',full:'מסמך מידע',color:'#475569',bg:'#F1F3F6',hint:'מידע לדעת או למסור – ללא תהליך אבחון תקלה'}
@@ -1630,7 +1660,9 @@ function nbNormalizeModel(){
 var SIM_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:1px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg>';
 // Categories in the order of the library filter row. 'tech' is kept for
 // older topics and items that have no specific technical category.
-var CAT={hq:'🏢 מטה',sim:SIM_ICON+' SIM/eSIM',data:'🌐 גלישה',signal:'📶 קליטה',calls:'📞 שיחות',sms:'✉️ SMS',intl:'✈️ חו"ל',tech:'🔧 טכני',tech2:'🔧 טכני',billing:'💳 חיובים',plans:'📋 מסלולים',intl:'✈️ חו"ל',ops:'🎧 שיחה'};
+// Category line icons (Heroicons outline + Lucide plane/phone), same as the Astryx playground.
+var NB_CAT_ICONS={"sim":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3\"></path></svg>","data":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418\"></path></svg>","signal":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9.348 14.652a3.75 3.75 0 0 1 0-5.304m5.304 0a3.75 3.75 0 0 1 0 5.304m-7.425 2.121a6.75 6.75 0 0 1 0-9.546m9.546 0a6.75 6.75 0 0 1 0 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788M12 12h.008v.008H12V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z\"></path></svg>","calls":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"nb-cat-ic\" aria-hidden=\"true\"><path d=\"M13 2a9 9 0 0 1 9 9\"></path><path d=\"M13 6a5 5 0 0 1 5 5\"></path><path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\"></path></svg>","sms":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z\"></path></svg>","intl":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"nb-cat-ic\" aria-hidden=\"true\"><path d=\"M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z\"></path></svg>","billing":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z\"></path></svg>","plans":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z\"></path></svg>","ops":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155\"></path></svg>","hq":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z\"></path></svg>","tech":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z\"></path></svg>","doc":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z\"></path></svg>","eye":"<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\" data-slot=\"icon\" class=\"nb-cat-ic\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z\"></path><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z\"></path></svg>"};
+var CAT={hq:NB_CAT_ICONS.hq+' מטה',sim:NB_CAT_ICONS.sim+' SIM/eSIM',data:NB_CAT_ICONS.data+' גלישה',signal:NB_CAT_ICONS.signal+' קליטה',calls:NB_CAT_ICONS.calls+' שיחות',sms:NB_CAT_ICONS.sms+' SMS',intl:NB_CAT_ICONS.intl+' חו"ל',tech:NB_CAT_ICONS.tech+' טכני',tech2:NB_CAT_ICONS.tech+' טכני',billing:NB_CAT_ICONS.billing+' חיובים',plans:NB_CAT_ICONS.plans+' מסלולים',ops:NB_CAT_ICONS.ops+' שיחה'};
 
 function setTocActive(el){
   document.querySelectorAll('.doc-toc-item').forEach(function(i){i.classList.remove('active')});
@@ -1778,7 +1810,7 @@ function nbRenderLibFilters(){
     +'<button class="filter-btn world-btn'+(nbCurrentKind==='all'?' active':'')+'" onclick="filterKind(\'all\')">הכל</button>'
     +NB_KIND_ORDER.map(function(k){
       var K=NB_KINDS[k], on=nbCurrentKind===k;
-      return '<button class="filter-btn kind-btn'+(on?' active':'')+'" style="'+(on?'background:'+K.color+';border-color:'+K.color+';color:#fff':'color:'+K.color)+'" onclick="filterKind(\''+k+'\')" title="'+nbEsc(K.full)+'"><b>'+k+'</b> '+K.label+'</button>';
+      return '<button class="filter-btn kind-btn'+(on?' active':'')+'" onclick="filterKind(\''+k+'\')" title="'+nbEsc(K.full)+'"><span class="kind-dot" style="color:'+K.color+';background:'+K.bg+'">'+k+'</span>'+K.label+'</button>';
     }).join('');
 }
 
@@ -2159,12 +2191,12 @@ function cardHTML(t){
     +'<div class="tc-rail" style="background:'+railColor+'"></div>'
     +'<div class="tc-body">'
     +delBtn
-    +'<div class="tc-top"><span class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||'📄 כללי')+'</span></div>'
+    +'<div class="tc-top"><span class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||NB_CAT_ICONS.doc+' כללי')+'</span></div>'
     +'<div class="tc-title">'+t.title+'</div>'
     +'<div class="tc-desc">'+(t.desc||'')+'</div>'
     +'<div class="tc-foot">'
     +(items.length
-      ?'<span class="tc-count">'+items.length+' '+(items.length===1?'פריט ידע':'פריטי ידע')+'</span><span class="tc-kinds">'+kinds.map(function(k){return nbKindBadge(k,true);}).join('')+'</span>'
+      ?'<span class="tc-count">'+(items.length===1?'פריט ידע אחד':items.length+' פריטי ידע')+'</span><span class="tc-kinds">'+kinds.map(function(k){return nbKindBadge(k,true);}).join('')+'</span>'
       :'<span class="tc-count empty">טרם נכתב תוכן</span>')
     +'</div>'
     +'</div></div>';
@@ -2191,7 +2223,7 @@ function nbOpenTopic(id){
   var railColor=CAT_RAIL[t.cat]||'#8A94A3';
   var el=document.getElementById('topic-content');
   el.innerHTML='<div class="topic-head">'
-      +'<div class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||'📄 כללי')+'</div>'
+      +'<div class="tc-cat" style="color:'+railColor+'">'+(CAT[t.cat]||NB_CAT_ICONS.doc+' כללי')+'</div>'
       +'<h1 class="topic-title">'+t.title+'</h1>'
       +(t.desc?'<div class="topic-desc">'+t.desc+'</div>':'')
       +'<div class="topic-kinds">'+NB_KIND_ORDER.map(function(k){
@@ -3327,7 +3359,7 @@ function nbFillForm(doc,editingId){
 }
 
 function catLabel(cat){
-  return CAT[cat]||'📄 כללי';
+  return CAT[cat]||NB_CAT_ICONS.doc+' כללי';
 }
 
 function nbExport(){
@@ -6471,16 +6503,16 @@ document.addEventListener('change', function(e){
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px" id="lib-filters">
     <span class="filter-label">קטגוריות</span>
     <button class="filter-btn active" data-cat="all" onclick="filterLibrary('all',this)">הכל</button>
-    <button class="filter-btn" data-cat="sim" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
-    <button class="filter-btn" data-cat="data" onclick="filterLibrary('data',this)">🌐 גלישה</button>
-    <button class="filter-btn" data-cat="signal" onclick="filterLibrary('signal',this)">📶 קליטה</button>
-    <button class="filter-btn" data-cat="calls" onclick="filterLibrary('calls',this)">📞 שיחות</button>
-    <button class="filter-btn" data-cat="sms" onclick="filterLibrary('sms',this)">✉️ SMS</button>
-    <button class="filter-btn" data-cat="intl" onclick="filterLibrary('intl',this)">✈️ חו"ל</button>
-    <button class="filter-btn" data-cat="billing" onclick="filterLibrary('billing',this)">💳 חיובים</button>
-    <button class="filter-btn" data-cat="plans" onclick="filterLibrary('plans',this)">📋 מסלולים</button>
-    <button class="filter-btn" data-cat="ops" onclick="filterLibrary('ops',this)">🎧 שיחה</button>
-    <button class="filter-btn" onclick="filterMostViewed(this)">👁️ הנצפות ביותר</button>
+    <button class="filter-btn" data-cat="sim" onclick="filterLibrary('sim',this)">SIM/eSIM</button>
+    <button class="filter-btn" data-cat="data" onclick="filterLibrary('data',this)">גלישה</button>
+    <button class="filter-btn" data-cat="signal" onclick="filterLibrary('signal',this)">קליטה</button>
+    <button class="filter-btn" data-cat="calls" onclick="filterLibrary('calls',this)">שיחות</button>
+    <button class="filter-btn" data-cat="sms" onclick="filterLibrary('sms',this)">SMS</button>
+    <button class="filter-btn" data-cat="intl" onclick="filterLibrary('intl',this)">חו"ל</button>
+    <button class="filter-btn" data-cat="billing" onclick="filterLibrary('billing',this)">חיובים</button>
+    <button class="filter-btn" data-cat="plans" onclick="filterLibrary('plans',this)">מסלולים</button>
+    <button class="filter-btn" data-cat="ops" onclick="filterLibrary('ops',this)">שיחה</button>
+    <button class="filter-btn" onclick="filterMostViewed(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="nb-cat-ic"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path></svg> הנצפות ביותר</button>
   </div>
   <div id="library-content"></div>
 </div>
