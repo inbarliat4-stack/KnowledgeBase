@@ -6020,7 +6020,7 @@ function nbItemHref(id){ return nbNavUrl('item='+encodeURIComponent(id)); }
 // The plugin sends every address under /kb/ to the same page. Items are found
 // by their code, so changing an English name never breaks an old link, and
 // old #item=… links still work. The GitHub version has no server to answer
-// such addresses and keeps #item=….
+// such addresses, so it uses the same names after # (#item=O-50-sim-activation).
 var NB_ITEM_SLUGS={
   'E-01':'abroad-escalation','E-10':'reception-escalation','E-30':'data-escalation','E-40':'calls-escalation','E-60':'sms-escalation',
   'M-00':'abroad-diagnosis','M-10':'reception-diagnosis','M-30':'data-diagnosis','M-40':'calls-diagnosis','M-60':'sms-diagnosis',
@@ -6104,10 +6104,34 @@ function nbPathToLoc(path){
   key=nbDocKeyFromSlug(p[0]);
   return key?'item='+encodeURIComponent(key):'';
 }
+// GitHub (no WordPress paths): the #… part is readable too, with the same names as
+// WordPress — #item=O-56-sim-delivery, #topic=sim-delivery. Inside the app a screen
+// is still named by its key; old #item=kbd_… / #topic=7 links keep working.
+function nbLocToHash(loc){
+  var m=/^(item|topic|review)=(.+)$/.exec(loc||'');
+  if(!m) return loc;
+  var val; try{ val=decodeURIComponent(m[2]); }catch(e){ val=m[2]; }
+  if(m[1]==='topic'){ var t=TOPICS.find(function(x){return String(x.id)===val;}); return 'topic='+(t?encodeURIComponent(nbTopicSlug(t)):m[2]); }
+  var d=window.dynamicDocs&&window.dynamicDocs[val];
+  return m[1]+'='+(d?encodeURIComponent(nbItemSlug(d,val)):m[2]);
+}
+function nbHashToLoc(h){
+  var m=/^(item|topic|review)=(.+)$/.exec(h||'');
+  if(!m) return h;
+  var val; try{ val=decodeURIComponent(m[2]); }catch(e){ val=m[2]; }
+  if(m[1]==='topic'){
+    if(TOPICS.some(function(x){return String(x.id)===val;})) return h;
+    var t=TOPICS.find(function(x){return nbTopicSlug(x)===val;});
+    return t?'topic='+encodeURIComponent(t.id):h;
+  }
+  if((window.dynamicDocs||{})[val]) return h;
+  var k=nbDocKeyFromSlug(val);
+  return k?m[1]+'='+encodeURIComponent(k):h;
+}
 // The screen the address names: the path on WordPress, else (and for old links) the #… part.
 function nbCurrentLoc(){
   var l=nbPathBase()?nbPathToLoc(location.pathname):'';
-  return l||location.hash.replace(/^#/,'');
+  return l||nbHashToLoc(location.hash.replace(/^#/,''));
 }
 var NB_NEWTAB_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
 function nbNewTabIcon(id){
@@ -6149,7 +6173,7 @@ function nbNavState(){
 }
 function nbNavUrl(loc){
   if(nbPathBase()) return nbLocToPath(loc);
-  return loc?'#'+loc:location.pathname+location.search;
+  return loc?'#'+nbLocToHash(loc):location.pathname+location.search;
 }
 function nbSetLocation(loc){
   try{ var s=Object.assign({},nbNavState(),{loc:loc}); history.replaceState(s,'',nbNavUrl(loc)); }catch(e){}
@@ -6398,7 +6422,7 @@ window.addEventListener('popstate',function(e){
   setTimeout(function(){ window.scrollTo(0,s.scroll||0); },120);
 });
 function nbRestoreLocation(){
-  var loc=nbStartLocation||(nbPathBase()?nbPathToLoc(nbStartPath):'');
+  var loc=(nbStartLocation?nbHashToLoc(nbStartLocation):'')||(nbPathBase()?nbPathToLoc(nbStartPath):'');
   nbStartLocation=''; nbStartPath='';
   if(loc) nbShowLocation(loc,null); else nbUpdateBackLinks();
 }
