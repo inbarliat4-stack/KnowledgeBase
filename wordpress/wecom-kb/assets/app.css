@@ -897,8 +897,10 @@ select.s1-input{height:40px;cursor:pointer}
 .o-steps{list-style:none;counter-reset:ostep;display:flex;flex-direction:column;gap:6px}
 .o-steps>li{counter-increment:ostep;position:relative;padding:10px 46px 10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.6}
 .o-steps>li::before{content:counter(ostep);position:absolute;right:12px;top:9px;width:24px;height:24px;border-radius:50%;background:#2E5CE0;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.o-steps.o-plain>li{padding-right:30px}
-.o-steps.o-plain>li::before{content:'';right:13px;top:19px;width:6px;height:6px}
+/* No numbered circles on steps in any item (12.11.2026): every step list shows a small bullet,
+   as sections marked "not numbered" always did. Section titles keep their numbers. */
+.o-steps>li{padding-right:30px}
+.o-steps>li::before{content:'';right:13px;top:19px;width:6px;height:6px}
 /* I – rich text */
 .kv-rich{font-size:14.5px;line-height:1.75;color:var(--text)}
 .kv-rich h2{font-size:19px;font-weight:800;color:var(--navy);margin:18px 0 8px}
@@ -1156,7 +1158,7 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 [data-stage]{scroll-margin-top:84px}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
-.o-steps>li.kb-missing{padding:4px 46px 4px 14px}
+.o-steps>li.kb-missing{padding:4px 30px 4px 14px}
 .o-steps>li.kb-missing::before{top:50%;transform:translateY(-50%);background:var(--warn)}
 /* A code in the text that matches no item: marked for completion, never a fake link */
 .kb-unresolved{border-bottom:1.5px dashed var(--warn-b);color:var(--warn);cursor:help}
@@ -1173,7 +1175,7 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 16px}
 .av-toc{flex:1 1 320px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
 .av-toc-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
-.av-toc ol{margin:0;padding-right:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:13.5px;line-height:1.5}
+.av-toc ol{margin:0;padding-right:20px;display:flex;flex-direction:column;gap:3px;font-size:13.5px;line-height:1.5}
 .av-toc a{color:#1D45B4;cursor:pointer;text-decoration:none}
 .av-toc a:hover{text-decoration:underline}
 .av-mode{display:inline-flex;border:1px solid var(--border-strong);border-radius:10px;overflow:hidden;flex-shrink:0;align-self:flex-start}
@@ -1223,16 +1225,19 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 /* Tabs inside the app: a strip under the top bar, shown from two tabs on. */
 .nb-tabs{position:sticky;top:52px;z-index:60;margin:-24px -20px 18px;padding:8px 20px 0;background:var(--bg);border-bottom:1px solid var(--border)}
 .nb-tabs[hidden]{display:none}
-.nb-tabs-row{display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:-1px}
-.nb-tab{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:250px;padding:7px 6px 7px 10px;background:#E9EDF2;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;font-size:12.5px;color:var(--text-2);transition:background var(--t)}
-.nb-tab:hover{background:#F4F6F9}
+.nb-tabs-row{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin-bottom:-1px}
+/* Roomier tabs (12.11.2026): space between type tag, title and ×; the bar casts a soft shadow so
+   text scrolling under it stays separate. */
+.nb-tabs{padding-top:10px;box-shadow:0 6px 12px -8px rgba(31,46,59,.18)}
+.nb-tab{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0;max-width:270px;padding:8px 8px 8px 12px;background:#ECECEC;border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;font-size:12.5px;line-height:1.4;color:var(--text-2);transition:background var(--t)}
+.nb-tab:hover{background:#F4F4F4}
 .nb-tab.active{background:#fff;color:var(--navy);box-shadow:inset 0 3px 0 var(--red);border-bottom:1px solid #fff}
 .nb-tab:focus-visible{outline:2px solid #1D45B4;outline-offset:-2px}
 .nb-tab-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .nb-tab.active .nb-tab-text{font-weight:600}
-.nb-tab-kind{flex-shrink:0;width:18px;height:18px;border-radius:5px;color:#fff;font-size:10.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.nb-tab-kind{flex-shrink:0;width:20px;height:20px;border-radius:6px;color:#fff;font-size:10.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 .nb-tab-kind.home{background:var(--navy);font-size:12px}
-.nb-tab-x{flex-shrink:0;width:20px;height:20px;border:none;background:transparent;border-radius:5px;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
+.nb-tab-x{flex-shrink:0;width:22px;height:22px;margin-inline-start:2px;border:none;background:transparent;border-radius:5px;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
 .nb-tab-x:hover,.nb-tab-x:focus-visible{background:#DDE3EA;color:var(--navy);outline:none}
 @keyframes nbTabFlash{0%,100%{background:#E9EDF2}35%{background:#FFE3D6}}
 .nb-tab-flash:not(.active){animation:nbTabFlash .9s ease 2}
@@ -1272,8 +1277,14 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-o .o-steps{gap:2px}
 .av-o .o-steps>li{background:none;border:none;border-radius:0;padding:5px 34px 5px 0}
 .av-o .o-steps>li::before{right:4px;top:7px;width:22px;height:22px;font-size:11.5px}
-.av-o .o-steps.o-plain>li{padding-right:20px}
-.av-o .o-steps.o-plain>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
+/* No numbered circles on the item page either: every step is a small grey bullet. */
+.av-o .o-steps>li{padding-right:20px}
+.av-o .o-steps>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
+/* A step with a link box beside it: text and bullet start level with the box's middle,
+   so the bullet stays on the text's first line (the row used to centre the text, not the bullet). */
+.av-o .o-steps .av-ref-row{align-items:start}
+.av-o .o-steps .av-ref-text{padding-top:12px}
+.av-o .o-steps>li:has(.av-ref-row)::before{top:26px}
 /* The open item's view switch and table of contents, in the sidebar (wide screens) */
 .av-toolbar{flex-direction:column;align-items:stretch}
 @media(min-width:769px){#av-toolbar{display:none}}
@@ -1283,7 +1294,8 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .snav-doc .av-mode button{flex:1;padding:7px 4px;font-size:12px}
 .snav-doc .av-toc{background:none;border:none;padding:0}
 .snav-doc .av-toc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:0 2px 6px;margin:0}
-.snav-doc .av-toc ol{padding-right:0;font-size:11.5px;gap:1px}
+/* Side-menu table of contents only: no numbers (they clashed with step titles like "2. שלב שלישי"). The on-page one keeps its numbers. */
+.snav-doc .av-toc ol{padding-right:0;list-style:none;font-size:11.5px;gap:1px}
 .snav-doc .av-toc a{display:block;padding:4px 6px;color:var(--text-2);border-radius:6px;line-height:1.4;transition:background var(--t),color var(--t)}
 .snav-doc .av-mode button{font-size:11.5px}
 .snav-doc .av-toc a:hover,.snav-doc .av-toc a:focus-visible{color:#1D45B4;background:#E8EEFF;text-decoration:none;outline:none}
@@ -1393,3 +1405,67 @@ body.gate-open{overflow:hidden}
   .search-head{padding:10px 12px}
   .search-count{display:block;margin-top:2px}
 }
+/* ── PLAYGROUND STYLE (12.11.2026) ─────────────────────────────────────────
+   Look taken from the Astryx playground (playground/, local only): quieter
+   filters with aligned labels, roomier cards with a soft shadow and grey hover,
+   brand-orange category line icons, coloured item-type tags, grey active menu item. */
+.nb-cat-ic{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:-4px}
+.filter-btn .nb-cat-ic{width:16px;height:16px;vertical-align:-3px;margin-left:4px}
+/* Topic cards */
+.topic-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.topic-card{border-radius:12px;box-shadow:var(--shadow-sm);transition:background var(--t),box-shadow var(--t)}
+.topic-card:hover{transform:none;background:#F2F2F2;box-shadow:var(--shadow-md)}
+.tc-body{padding:16px}
+.tc-top{margin-bottom:8px}
+.tc-cat{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--red-d)!important}
+.tc-title{font-size:16px;line-height:1.4;margin-bottom:8px}
+.tc-desc{font-size:13px;line-height:1.6;display:block;-webkit-line-clamp:unset;overflow:visible}
+.tc-foot{border-top:none;padding-top:0;margin-top:14px}
+.tc-count{font-size:12px;font-weight:600;color:var(--navy)}
+/* Item-type tags: filled, no outline */
+.kind-badge{border-color:transparent!important;border-radius:6px}
+.kind-badge.sm{min-width:22px;padding:1px 6px;font-weight:700}
+.kind-dot{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:6px;font-size:11px;font-weight:700;margin-left:6px}
+/* Filters: one label width so the "הכל" buttons line up; quiet buttons, grey when selected */
+.lib-filter-row,#lib-filters{gap:4px}
+.filter-label{width:80px;flex-shrink:0;margin-left:8px;font-size:12px;font-weight:600;color:var(--navy);letter-spacing:0}
+.filter-btn,.filter-btn.kind-btn{background:transparent;border:1.5px solid transparent;box-shadow:none;border-radius:8px;padding:5px 12px;font-weight:500;color:var(--navy)}
+.filter-btn:hover{background:#ECECEC;border-color:transparent;color:var(--navy);box-shadow:none}
+.filter-btn.active,.filter-btn.kind-btn.active{background:#E4E4E4;border-color:transparent;color:var(--navy);font-weight:600;box-shadow:none}
+/* Side menu: grey current page, orange count */
+.snav-item.active{background:#ECECEC;color:var(--navy)}
+.snav-badge{background:#FFE6DB;color:var(--red-d);font-weight:600}
+/* ── PLAYGROUND STYLE, step 2 (12.11.2026) ── light top bar; entry screen like the playground. */
+/* Top bar: white with a hairline border; same height as before (sticky parts depend on it). */
+.topnav{background:var(--white);border-bottom:1px solid var(--border)}
+.nav-label{color:var(--muted)}
+.nav-search{background:var(--white);border:1px solid var(--border-strong);border-radius:10px}
+.nav-search:focus-within{background:var(--white);border-color:var(--red)}
+.nav-search svg{stroke:#8A9099}
+.nav-search input{color:var(--navy)}
+.nav-search input::placeholder{color:#8A9099}
+.nav-search input::-webkit-search-cancel-button{filter:none}
+.role-badge{background:transparent;border:none;color:var(--navy);padding:0}
+.role-badge button{background:var(--white);color:var(--navy);border:1px solid var(--border-strong);border-radius:8px;padding:5px 12px}
+.role-badge button:hover{background:#F2F2F2}
+.rb-icon svg{width:16px;height:16px;display:block}
+/* Entry screen */
+#nb-gate{background:#F1F1F1}
+.gate-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:480px;margin:auto}
+.gate-brand{margin-bottom:0}
+.gate-brand img{height:64px}
+.gate-card{max-width:480px;padding:32px;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.gate-card.lock{max-width:400px}
+.gate-title{color:var(--navy);font-size:26px;font-weight:700;margin-bottom:4px}
+.gate-sub{font-size:14px;font-weight:400;color:var(--muted);margin-bottom:20px}
+.gate-pw{height:44px;background:var(--white);border:1px solid var(--border-strong)}
+.gate-pw-btn{height:44px;font-size:15px}
+.gate-roles{grid-template-columns:1fr;gap:12px;margin-bottom:16px}
+.gate-role{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:2px;align-items:start;text-align:right;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow-sm)}
+.gate-role:hover,.gate-role:focus-visible{background:#F2F2F2;border-color:var(--border);box-shadow:var(--shadow-md)}
+.gate-icon{grid-row:1/3;color:var(--navy)}
+.gate-icon svg{width:24px;height:24px;display:block}
+.gate-role-name{font-size:15px}
+.gate-role-desc{font-size:13px;color:var(--muted)}
+.gate-note{background:transparent;padding:0;text-align:center;font-size:12.5px}
+.gate-foot{margin-top:0;font-size:12.5px;color:var(--muted)}

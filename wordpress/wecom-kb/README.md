@@ -20,6 +20,23 @@ wecom-kb/
     └── wp-bridge.js/.css ← hand-written WordPress layer (persistence, read-only mode)
 ```
 
+## What's new in 1.5.0 (12.11.2026)
+
+The changes come from `index.html` as usual; the plugin's PHP is unchanged apart from the version number.
+
+- **New look.** The design follows the Astryx playground (a local design test, not part of the plugin). Styles only, every feature works as before:
+  - **Top bar:** light, with a light search field, and the role shown with an outlined "החלף" button.
+  - **Library:** filter rows with aligned labels and quiet buttons (grey when selected).
+  - **Topic cards:** more room, a soft shadow and a grey hover. The coloured category stripe stays.
+  - **Icons:** orange line icons for categories (an aeroplane for חו"ל) instead of emoji.
+  - **Item-type tags:** M purple, R orange, O blue, E yellow, S turquoise, T green, I grey, on the filters and the cards.
+  - **Side menu:** a grey current page and orange counts.
+  - **In-app tabs:** roomier, with a soft shadow under the pinned strip.
+  - **Entry screen** (GitHub only): logo above a white card on light grey, and roles as stacked cards with line icons.
+- **Numbering.** Steps show a small bullet instead of a blue numbered circle. Section titles keep their numbers: O-56's titles have the original Word document's numbers 1–5. Only the side-menu table of contents is unnumbered; the one on the item page (narrow screens) is numbered again. A step beside a reference box now lines up with its bullet.
+- **Content.** `NB_SEED_VERSION` is now 73: the O items' step sections were re-marked and O-56's titles numbered. On the first visit, the built-in content is refreshed by the usual rule (items people created or edited in the app are kept).
+- **Addresses.** Unchanged on WordPress (`/kb/O-50-sim-activation`). The GitHub version now uses the same names after `#` (`#item=O-50-sim-activation`), and old `#item=kbd_…` links still work.
+
 ## What's new in 1.4.0 (11.11.2026)
 
 **Readable addresses.** Every screen has a real address under the knowledge base page, instead of `/kb/#item=kbd_o10`:

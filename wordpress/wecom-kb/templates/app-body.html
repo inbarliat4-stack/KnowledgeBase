@@ -30,19 +30,19 @@
   <div class="page-header"><div class="page-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-4px;margin-left:6px"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>ספריית ידע –   <span id="lib-count">140</span> פריטי ידע</div><div class="page-sub">עולם תוכן ← נושא ← פריטי ידע | לחצו על נושא כדי לראות את כל פריטי הידע שבו</div></div>
   <div class="lib-filter-row" id="lib-worlds"></div>
   <div class="lib-filter-row" id="lib-kinds"></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px" id="lib-filters">
+  <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-bottom:20px" id="lib-filters">
     <span class="filter-label">קטגוריות</span>
     <button class="filter-btn active" data-cat="all" onclick="filterLibrary('all',this)">הכל</button>
-    <button class="filter-btn" data-cat="sim" onclick="filterLibrary('sim',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-left:2px"><path d="M16 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8l-6-6z"/><path d="M16 2v6h6"/><rect x="9.3" y="12" width="5.4" height="3.4" rx="0.9"/></svg> SIM/eSIM</button>
-    <button class="filter-btn" data-cat="data" onclick="filterLibrary('data',this)">🌐 גלישה</button>
-    <button class="filter-btn" data-cat="signal" onclick="filterLibrary('signal',this)">📶 קליטה</button>
-    <button class="filter-btn" data-cat="calls" onclick="filterLibrary('calls',this)">📞 שיחות</button>
-    <button class="filter-btn" data-cat="sms" onclick="filterLibrary('sms',this)">✉️ SMS</button>
-    <button class="filter-btn" data-cat="intl" onclick="filterLibrary('intl',this)">✈️ חו"ל</button>
-    <button class="filter-btn" data-cat="billing" onclick="filterLibrary('billing',this)">💳 חיובים</button>
-    <button class="filter-btn" data-cat="plans" onclick="filterLibrary('plans',this)">📋 מסלולים</button>
-    <button class="filter-btn" data-cat="ops" onclick="filterLibrary('ops',this)">🎧 שיחה</button>
-    <button class="filter-btn" onclick="filterMostViewed(this)">👁️ הנצפות ביותר</button>
+    <button class="filter-btn" data-cat="sim" onclick="filterLibrary('sim',this)">SIM/eSIM</button>
+    <button class="filter-btn" data-cat="data" onclick="filterLibrary('data',this)">גלישה</button>
+    <button class="filter-btn" data-cat="signal" onclick="filterLibrary('signal',this)">קליטה</button>
+    <button class="filter-btn" data-cat="calls" onclick="filterLibrary('calls',this)">שיחות</button>
+    <button class="filter-btn" data-cat="sms" onclick="filterLibrary('sms',this)">SMS</button>
+    <button class="filter-btn" data-cat="intl" onclick="filterLibrary('intl',this)">חו"ל</button>
+    <button class="filter-btn" data-cat="billing" onclick="filterLibrary('billing',this)">חיובים</button>
+    <button class="filter-btn" data-cat="plans" onclick="filterLibrary('plans',this)">מסלולים</button>
+    <button class="filter-btn" data-cat="ops" onclick="filterLibrary('ops',this)">שיחה</button>
+    <button class="filter-btn" onclick="filterMostViewed(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" class="nb-cat-ic"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path></svg> הנצפות ביותר</button>
   </div>
   <div id="library-content"></div>
 </div>
