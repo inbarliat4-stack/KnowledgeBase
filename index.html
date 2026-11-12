@@ -1184,7 +1184,7 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 16px}
 .av-toc{flex:1 1 320px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
 .av-toc-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
-.av-toc ol{margin:0;padding-right:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:13.5px;line-height:1.5}
+.av-toc ol{margin:0;padding-right:20px;display:flex;flex-direction:column;gap:3px;font-size:13.5px;line-height:1.5}
 .av-toc a{color:#1D45B4;cursor:pointer;text-decoration:none}
 .av-toc a:hover{text-decoration:underline}
 .av-mode{display:inline-flex;border:1px solid var(--border-strong);border-radius:10px;overflow:hidden;flex-shrink:0;align-self:flex-start}
@@ -1294,7 +1294,8 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .snav-doc .av-mode button{flex:1;padding:7px 4px;font-size:12px}
 .snav-doc .av-toc{background:none;border:none;padding:0}
 .snav-doc .av-toc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted-l);padding:0 2px 6px;margin:0}
-.snav-doc .av-toc ol{padding-right:0;font-size:11.5px;gap:1px}
+/* Side-menu table of contents only: no numbers (they clashed with step titles like "2. שלב שלישי"). The on-page one keeps its numbers. */
+.snav-doc .av-toc ol{padding-right:0;list-style:none;font-size:11.5px;gap:1px}
 .snav-doc .av-toc a{display:block;padding:4px 6px;color:var(--text-2);border-radius:6px;line-height:1.4;transition:background var(--t),color var(--t)}
 .snav-doc .av-mode button{font-size:11.5px}
 .snav-doc .av-toc a:hover,.snav-doc .av-toc a:focus-visible{color:#1D45B4;background:#E8EEFF;text-decoration:none;outline:none}
