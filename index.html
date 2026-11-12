@@ -908,8 +908,10 @@ select.s1-input{height:40px;cursor:pointer}
 .o-steps{list-style:none;counter-reset:ostep;display:flex;flex-direction:column;gap:6px}
 .o-steps>li{counter-increment:ostep;position:relative;padding:10px 46px 10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;line-height:1.6}
 .o-steps>li::before{content:counter(ostep);position:absolute;right:12px;top:9px;width:24px;height:24px;border-radius:50%;background:#2E5CE0;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.o-steps.o-plain>li{padding-right:30px}
-.o-steps.o-plain>li::before{content:'';right:13px;top:19px;width:6px;height:6px}
+/* No numbered circles on steps in any item (12.11.2026): every step list shows a small bullet,
+   as sections marked "not numbered" always did. Section titles keep their numbers. */
+.o-steps>li{padding-right:30px}
+.o-steps>li::before{content:'';right:13px;top:19px;width:6px;height:6px}
 /* I – rich text */
 .kv-rich{font-size:14.5px;line-height:1.75;color:var(--text)}
 .kv-rich h2{font-size:19px;font-weight:800;color:var(--navy);margin:18px 0 8px}
@@ -1167,7 +1169,7 @@ button.m-target{cursor:pointer;transition:all var(--t)}
 [data-stage]{scroll-margin-top:84px}
 .kb-missing{background:var(--warn-bg)!important;border:1px dashed var(--warn-b)!important;color:var(--warn)!important;border-radius:8px;font-weight:500}
 li.kb-missing{padding:4px 8px;list-style:none;margin-right:-8px}
-.o-steps>li.kb-missing{padding:4px 46px 4px 14px}
+.o-steps>li.kb-missing{padding:4px 30px 4px 14px}
 .o-steps>li.kb-missing::before{top:50%;transform:translateY(-50%);background:var(--warn)}
 /* A code in the text that matches no item: marked for completion, never a fake link */
 .kb-unresolved{border-bottom:1.5px dashed var(--warn-b);color:var(--warn);cursor:help}
@@ -1283,8 +1285,9 @@ body:not(.wkb-readonly) .av-head .av-date{display:none}
 .av-o .o-steps{gap:2px}
 .av-o .o-steps>li{background:none;border:none;border-radius:0;padding:5px 34px 5px 0}
 .av-o .o-steps>li::before{right:4px;top:7px;width:22px;height:22px;font-size:11.5px}
-.av-o .o-steps.o-plain>li{padding-right:20px}
-.av-o .o-steps.o-plain>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
+/* No numbered circles on the item page either: every step is a small grey bullet. */
+.av-o .o-steps>li{padding-right:20px}
+.av-o .o-steps>li::before{right:5px;top:14px;width:5px;height:5px;background:var(--border-strong)}
 /* The open item's view switch and table of contents, in the sidebar (wide screens) */
 .av-toolbar{flex-direction:column;align-items:stretch}
 @media(min-width:769px){#av-toolbar{display:none}}
